@@ -4,14 +4,13 @@ type Units =
     | UnitsmGpm3 
     | UnitsVolume 
     | UnitsNkpr 
-    | UnitsCustom of int * string 
+
+    member x.Code = Units.context x |> fst
     
     static member context = function
-        | UnitsmGpm3 ->     2, "мг/м3"
-        | UnitsVolume ->    7, "%об"
-        | UnitsNkpr ->      14, "%НКПР"
-        | UnitsCustom (x,y)  -> x,y
- 
+        | UnitsmGpm3 ->     2m, "мг/м3"
+        | UnitsVolume ->    7m, "%об"
+        | UnitsNkpr ->      14m, "%НКПР"
     static member code = Units.context >> fst
     static member what = Units.context >> snd
 
@@ -23,17 +22,17 @@ type Units =
 
 type Gas =
     | CO2 | CH4 | C3H8 | SumCH
-    static member context = function
-        | CH4 ->    5, ""
-        | C3H8 ->   7
-        | CO2 ->    4, 7 
-    static member code = Gas.context >> fst
-    static member unitsCode = Gas.context >> snd
-    static member isCH = function  CO2 -> false | _ -> true 
+    
     member x.What = sprintf "%A" x
     
-    static member what (x:Gas) = x.What
+    member x.Code = Gas.code x
 
+    static member code = function
+        | CO2 ->    4m
+        | CH4 ->    5m
+        | SumCH ->  6m
+        | C3H8 ->   7m
+    static member what (x:Gas) = x.What
     static member values = 
         [CH4;C3H8; SumCH; CO2 ]
     
@@ -41,25 +40,30 @@ type Gas =
 type Scale =     
     | Sc4 | Sc10 | Sc20 | Sc50 | Sc100 
 
+    member x.Code = Scale.code x
+    member x.Value = Scale.value x
     member x.What = Scale.what x
     static member context = function
-        | Sc4   -> 57, 4m
-        | Sc10  -> 7,  10m
-        | Sc20  -> 9,  20m 
-        | Sc50  -> 0,  50m 
-        | Sc100 -> 21, 100m 
+        | Sc4   -> 57m, 4m
+        | Sc10  -> 7m,  10m
+        | Sc20  -> 9m,  20m 
+        | Sc50  -> 0m,  50m 
+        | Sc100 -> 21m, 100m 
     static member code = Scale.context >> fst
     static member value = Scale.context >> snd
     static member what = Scale.context >> snd >> sprintf "0-%M"
 
     static member values = FSharpType.unionCasesList<Scale>
 
+type ChannelIndex = 
+    | Chan1
+    | Chan2
 
-
-type ProductTypeChannel =
+type Channel =
     {   Gas : Gas
+        Units : Units
         Scale : Scale }
-    member x.What = ProductTypeChannel.what x
+    member x.What = Channel.what x
     static member errorLimit x conc = 
         match x.Gas, x.Scale with
         | (CH4 | C3H8), _
@@ -69,87 +73,36 @@ type ProductTypeChannel =
         | _ -> 1m
     static member what x = 
         sprintf "%s, %s" x.Gas.What x.Scale.What
-    static member new' gas scale = { Gas = gas; Scale = scale }
+    static member new' gas units scale = { Gas = gas; Scale = scale; Units = units }
         
 
 type ProductType =   
     {   TypeNumber : int
-        Channels : ProductTypeChannel list }  
+        Channel : Channel 
+        Channel2 : Channel option }  
+
+    static member isTwoChannels x = x.Channel2.IsSome
+    static member isOneChannels x = x.Channel2.IsNone
+    static member channels x =
+        List.choose id [   Some x.Channel; x.Channel2 ]
+
+    static member channelsCount x = ProductType.channels x |> List.length
+        
+
     static member what x =
-        x.Channels 
-        |> Seq.toStr ", " ProductTypeChannel.what
+        x |> ProductType.channels 
+        |> Seq.toStr ", " Channel.what
         |> sprintf "%d, %s" x.TypeNumber
 
 [<AutoOpen>]
 module private Helpers2 =
     open System.IO
-    type Chn = ProductTypeChannel
-    let defchns = [
-        Chn.new' CO2 Sc100
-        Chn.new' CO2 Sc100
-        ]
-        
-
-[<AutoOpen>]
-module  Helpers1 =
     let types, saveTypes = 
         Json.Config.create "types.json" ( fun () ->
             [   {   TypeNumber = 10
-                    Channels = [ProductTypeChannel.construct CO2 Sc100] }  
-            ] )
-
-[<AutoOpen>]
-module private Helpers =
-    open System.IO
-    let types =
-    
-
-        let filename = Path.Combine(Path.ofExe, "ProductTypes.config")
-        let isExisted = File.Exists filename
-        let xtypes = 
-            if not isExisted then [] else 
-                match TextConfig.readFromFile filename Parse.productTypes with
-                | None -> []
-                | Some x -> x
-        let types =         
-            [   "10.CO2.2", [   PPRIBOR_TYPE, 10m
-                                ED_IZMER_1, 1m
-                                Gas_Type_1, 1m
-                                SHKALA_1, 5m ] 
-
-                "10.CO2.3", [   PPRIBOR_TYPE, 10m
-                                ED_IZMER_1, 1m
-                                Gas_Type_1, 1m
-                                SHKALA_1, 5m ]  
-                "11.CH.3", [    PPRIBOR_TYPE, 10m
-                                ED_IZMER_1, 1m
-                                Gas_Type_1, 1m
-                                SHKALA_1, 5m 
-
-                                ED_IZMER_2, 1m
-                                Gas_Type_2, 1m
-                                SHKALA_2, 5m  ] ]
-            |> List.map( fun (s,xs) ->
-                s, xs |> List.map( fun ((n,_,_),value) -> n,value ) |> Map.ofList  )
-
-        let types = xtypes @ types |> Map.ofList |> Map.toList
-    
-        
-        let x = 
-            types |> List.map( fun (name,kefs) ->
-                name, 
-                    kefs |> Map.filter( fun nkef _ ->
-                        Kef.kefsn |> List.exists( (=) nkef ) ) )
-        if not isExisted then
-            TextConfig.writeToFile filename 
-                (   formatList x "\r\n" (fun (s,kefsVals) -> 
-                    sprintf "\"%s\"\r\n\t %s" s 
-                        (   formatList kefsVals "; " (fun n_val -> sprintf "%d, %g" n_val.Key n_val.Value) ) ))
-        x
+                    Channel = Channel.new' CO2 UnitsVolume Sc100  
+                    Channel2 = None } ] )
 
 type ProductType with 
-
-    static member values = values
-
-    static member index x = 
-        List.findIndex ((=) x) values
+    static member values = types
+    static member save = saveTypes

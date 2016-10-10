@@ -155,14 +155,14 @@ type PhysVar =
     
 type Id = string
 
-type Channel = 
+type ChannelIndex = 
     | Chan1
     | Chan2
 
-    member x.Conc = Channel.conc x
-    member x.Termo = Channel.termo x
-    member x.Var1 = Channel.var1 x
-    member x.N = Channel.n x
+    member x.Conc = ChannelIndex.conc x
+    member x.Termo = ChannelIndex.termo x
+    member x.Var1 = ChannelIndex.var1 x
+    member x.N = ChannelIndex.n x
     
     static member conc = function
         | Chan1 -> CCh0
@@ -180,25 +180,38 @@ type Channel =
         | Chan1 -> 1
         | Chan2 -> 2
 
-    static member pgsCoef = function
-        | Chan1, ScaleBeg -> Some Pgs1_1
-        | Chan2, ScaleBeg  -> Some Pgs1_2
-        | Chan1, ScaleEnd -> Some Pgs3_1
-        | Chan2, ScaleEnd -> Some Pgs3_2
-        | _ -> None
+    static member prodTypeCoefs = function
+        | Chan1 -> Pgs1_1, Pgs3_1, PREDEL_LO_1, PREDEL_HI_1, SHKALA_1, ED_IZMER_1, Gas_Type_1
+        | Chan2  -> Pgs1_2, Pgs3_2, PREDEL_LO_2, PREDEL_HI_2, SHKALA_2, ED_IZMER_2, Gas_Type_2
 
     static member values = [Chan1; Chan2]
 
+    static member coefsLin = function
+        | Chan1 -> [CLin1_0; CLin1_1; CLin1_2; CLin1_3]
+        | Chan2 -> [CLin2_0; CLin1_2; CLin2_2; CLin2_3]
+
+    static member coefsTermo = function
+        | Chan1, ScaleBeg -> [KNull_T1_0; KNull_T1_1; KNull_T1_2]
+        | Chan1, ScaleEnd -> [KSens_T1_0; KSens_T1_1; KSens_T1_1]
+        | Chan2, ScaleBeg -> [KNull_T2_0; KNull_T2_1; KNull_T2_2]
+        | Chan2, ScaleEnd -> [KSens_T2_0; KSens_T2_1; KSens_T2_1]
+        | x -> failwithf "ChannelIndex.coefsTermo %A" x
+
+    
+
+
+    
+
 type KefGroup = 
-    | KefLin of Channel
-    | KefTermo of Channel * ScalePt
+    | KefLin of ChannelIndex
+    | KefTermo of ChannelIndex * ScalePt
     | KefTermoPressure
     | KefPressureSens
     static member ctx = function
         | KefLin chan -> 
             [chan.Conc],
                 sprintf "LIN%d" chan.N, sprintf "Линеаризация ф-ии преобразов. к.%d" chan.N, 
-                    [CLin1_0; CLin1_1; CLin1_2; CLin1_3],
+                    ChannelIndex.coefsLin chan,
                         ScalePt.values, [TermoNorm], [Pnorm]
         
         | KefTermo (chan,scalePt) -> 
@@ -209,8 +222,8 @@ type KefGroup =
                 | ScaleEnd -> "чувст."
             [chan.Termo; chan.Var1],
                 sprintf "T%s%d" scalePt.What chan.N, sprintf "Комп. вл. темп. на %s к. %d" s chan.N, 
-                    [KNull_T1_0; KNull_T1_1; KNull_T1_2],
-                        [ScaleBeg], TermoPt.values, [Pnorm]
+                    ChannelIndex.coefsTermo (chan,scalePt),
+                        [scalePt], TermoPt.values, [Pnorm]
 
         | KefPressureSens ->
             [TppCh0; VdatP],
@@ -231,11 +244,12 @@ type KefGroup =
     member x.Gases = KefGroup.gases x
     member x.Temps = KefGroup.temps x
     member x.Press = KefGroup.press x
+    member x.Coefs = KefGroup.coefs x
 
     static member vars = KefGroup.ctx >> (fun (x,_,_,_,_,_,_) -> x)
     static member what = KefGroup.ctx >> (fun (_,x,_,_,_,_,_) -> x)
     static member dscr = KefGroup.ctx >> (fun (_,_,x,_,_,_,_) -> x)
-    static member kefs = KefGroup.ctx >> (fun (_,_,_,x,_,_,_) -> x)
+    static member coefs = KefGroup.ctx >> (fun (_,_,_,x,_,_,_) -> x)
     static member gases = KefGroup.ctx >> (fun (_,_,_,_,x,_,_) -> x)
     static member temps = KefGroup.ctx >> (fun (_,_,_,_,_,x,_) -> x)
     static member press = KefGroup.ctx >> (fun (_,_,_,_,_,_,x) -> x)
@@ -359,7 +373,7 @@ module Vars =
                         for t in kg.Temps do
                             for p in kg.Press do
                                 yield (FeatureKefGroup kg), var,gas,t,p
-            for chan in Channel.values do
+            for chan in ChannelIndex.values do
                 for gas in ScalePt.values do
                     for t in TermoPt.values do
                         yield Test, chan.Conc, gas, t, Pnorm  

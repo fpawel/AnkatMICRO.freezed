@@ -19,49 +19,39 @@ let encodeDate (date : DateTime) =
     let day = decimal date.Day
     year * 10000m + month * 100m + day
 
- 
 
-let initKefValue chan pgs productType kef p = 
-    let _,_, gas, scale, kef4, kef14, kef45 = ProductType.ctx productType
-    let now = DateTime.Now
-    let pgsKef = Channel.pgsCoef (chan,gas)
-    match kef with
-    | YEAR          -> Some <| decimal now.Year
-    | _ when Some kef = pgsKef -> Some <| pgs gas
-    | _ when Channel.pgsKCoef chan = kef -> Some <| pgs ScaleEnd
-    | CoefShkala1       -> Some <| decimal ( Scale.code scale)
-    | CoefPredelLo1     -> Some <| 0m
-    | CoefPredelHi1     -> Some <| Scale.value scale
-    | CoefEdIzmer1      -> Some <| decimal ( Gas.unitsCode gas)
-    | CoefGasType1      -> Some <| decimal ( Gas.code gas)
-    | CoefMaxCountReg   -> Some <| kef4
-    | CoefKyskch        -> Some <| kef14
-    | CoefCb            -> Some <| kef45  
 
-    | CoefCchlin0 ->    Some <| 0m
-    | CoefCchlin1 ->    Some <| 1m
-    | CoefCchlin2 ->    Some <| 0m
-    | CoefCchlin3 ->    Some <| 0m
+let initKefsValues pgs t =
+    let chans = [ 
+        yield Chan1, t.Channel
+        match t.Channel2 with
+        | Some ch -> yield Chan2, ch 
+        | _ -> () ]  
 
-    | CoefChtNull0 ->     Some <| 0m
-    | CoefChtNull1 ->     Some <| 0m
-    | CoefChtNull2 ->     Some <| 0m
-    | CoefKChtSens0 ->     Some <| 1m
-    | CoefKChtSens1 ->     Some <| 0m
-    | CoefKChtSens2 ->     Some <| 0m
+    [   for iChan, chan in chans do
+            let pgs0, pgsK, shk0, shkK, shk, units, gastype = ChannelIndex.prodTypeCoefs iChan
+            yield pgs0, pgs ScaleBeg 
+            yield pgsK, pgs ScaleEnd
+            yield shk0, 0m
+            yield shkK, chan.Scale.Value
+            yield shk, chan.Scale.Code  
+            yield units, chan.Units.Code
+            yield gastype, chan.Gas.Code 
+            yield! List.zip (ChannelIndex.coefsLin iChan) [0m; 1m; 0m; 0m] 
 
-    | CoefSelfaddr      -> Some <| decimal p.Addr
+            yield! List.zip (ChannelIndex.coefsTermo (iChan,ScaleBeg)) [0m; 0m; 0m] 
+            yield! List.zip (ChannelIndex.coefsTermo (iChan,ScaleEnd)) [1m; 0m; 0m]  
+            
+            let now = DateTime.Now
+            yield YEAR, decimal now.Year ]
 
-    | _ -> None
+    
 
-let initializeKefsValues kefs pgs productType = state{ 
-    //let _,_, gas, scale, kef4, kef14, kef45 = ProductType.ctx productType    
-    for kef in kefs do
+
+let initializeKefsValues pgs t = state{ 
+    for kef,value in initKefsValues pgs t do
         let! p = getState
-        match initKefValue pgs productType kef p with
-        | None -> ()
-        | Some value -> 
-            do! P.setKef kef (Some value) }
+        do! P.setKef kef (Some value) }
     
 [<AutoOpen>]
 module private PivateComputeProduct = 
