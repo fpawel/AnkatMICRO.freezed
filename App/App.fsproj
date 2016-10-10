@@ -83,7 +83,7 @@
     <Compile Include="Json\JsonSerialization.fs" />
     <Compile Include="Json\JsonConfig.fs" />
     <Compile Include="Ankat\Coef.fs" />
-    <Compile Include="Ankat\ProductType.fs" />
+    <Compile Include="Ankat\ProdType.fs" />
     <Compile Include="Ankat\Ankat.fs" />
     <Compile Include="AppCore\ComportConfig.fs" />
     <Compile Include="AppCore\Comport.fs" />

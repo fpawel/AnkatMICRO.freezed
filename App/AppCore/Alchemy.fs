@@ -19,13 +19,16 @@ let encodeDate (date : DateTime) =
     let day = decimal date.Day
     year * 10000m + month * 100m + day
 
-let initKefValue pgs productType kef p = 
+ 
+
+let initKefValue chan pgs productType kef p = 
     let _,_, gas, scale, kef4, kef14, kef45 = ProductType.ctx productType
     let now = DateTime.Now
+    let pgsKef = Channel.pgsCoef (chan,gas)
     match kef with
-    | CoefYear          -> Some <| decimal now.Year
-    | CoefPgsChNull     -> Some <| pgs ScaleBeg
-    | CoefPgsChSens     -> Some <| pgs ScaleEnd 
+    | YEAR          -> Some <| decimal now.Year
+    | _ when Some kef = pgsKef -> Some <| pgs gas
+    | _ when Channel.pgsKCoef chan = kef -> Some <| pgs ScaleEnd
     | CoefShkala1       -> Some <| decimal ( Scale.code scale)
     | CoefPredelLo1     -> Some <| 0m
     | CoefPredelHi1     -> Some <| Scale.value scale
@@ -107,9 +110,13 @@ module private PivateComputeProduct =
             xs |> List.rev |> Seq.toStr ", " fmt     
             |> sprintf "точках %s"
 
-    let getTermoValues var gas p =
+    let getValuesTermo chan var gas p   =
         TermoPt.values
-        |> List.map( fun t ->  Termo, var, gas, t) |> getVarsValues p
+        |> List.map( fun t -> FeatureKefGroup( KefTermo(chan,gas)) , var, gas, t, Pnorm) |> getVarsValues p
+
+    let getTermoT chan = getValuesTermo chan chan.Termo
+
+    let getVar1T chan = getValuesTermo chan chan.Var1
 
     let getScaleValues p f =
         ScalePt.values
@@ -121,30 +128,30 @@ module private PivateComputeProduct =
         | KefPressureSens -> failwith "KefPressureSens is not for gauss!"
         | KefLin chan -> 
             ScalePt.values 
-            |> List.map( fun gas -> Lin, chan.Conc, gas, TermoNorm )
+            |> List.map( fun gas -> FeatureKefGroup( KefLin chan ), chan.Conc, gas, TermoNorm, Pnorm )
             |> getVarsValues p
             |> Result.map ( fun xs -> 
                 List.zip xs ( ScalePt.values |> List.map pgs  ) )
             |> Result.mapErr( 
-                fmtErr (function  V(_,_,gas,_) -> sprintf "%A" gas)
+                fmtErr (function  V(_,_,gas,_,_) -> sprintf "%A" gas)
                 >> sprintf "нет значения LIN в %s" )
         | KefTermo (chan,ScaleBeg) -> 
             result {
-                let! t = getTermoValues chan.Termo ScaleBeg p
-                let! var = getTermoValues chan.Var1 ScaleBeg p
+                let! t = getTermoT chan ScaleBeg p
+                let! var = getVar1T chan ScaleBeg p
                 return List.zip t ( List.map (fun var -> - var) var) }
             |> Result.mapErr( 
-                fmtErr (function V(_,var,_,t) -> sprintf "%s.%s" (PhysVar.what var) (TermoPt.what t) )                
+                fmtErr (function V(_,var,_,t,_) -> sprintf "%s.%s" (PhysVar.what var) (TermoPt.what t) )                
                 >> sprintf "нет значения T0 в %s" )
 
         | KefTermo (chan,ScaleEnd) -> 
             result {
-                let! t = getTermoValues chan.Termo ScaleEnd p
-                let! var = getTermoValues chan.Var1 ScaleEnd p
-                let! var0 = getTermoValues chan.Var1 ScaleBeg p
+                let! t = getTermoT chan ScaleEnd p
+                let! var = getVar1T chan ScaleEnd p
+                let! var0 = getVar1T chan ScaleBeg p
                 return List.zip3 t var0 var}
             |> Result.mapErr( 
-                fmtErr (function V(_,var,_,t) -> sprintf "%s.%s" (PhysVar.what var) (TermoPt.what t) )
+                fmtErr (function V(_,var,_,t,_) -> sprintf "%s.%s" (PhysVar.what var) (TermoPt.what t) )
                 >> sprintf "нет значения TK в %s" )
             |> Result.bind(fun xs ->
                 let errs =
@@ -185,21 +192,6 @@ let compute group pgs productType = state {
         Logging.info "метод Гаусса X=%s Y=%s ==> %s=%s" (ff x) (ff y) skefs (ff result)
         do! result |> Array.toList |> List.zip kefs |> Product.setKefs   }
 
-let translateTermo = 
-    let (~%%) var = state{
-        let! p = getState
-        do! 
-            [ for t in [TermoLow; TermoHigh] do
-                for gas in ScalePt.values do 
-                    yield 
-                        Product.getVar (Test,var,gas,t) p 
-                        |> Option.map(fun value -> (Termo, var, gas, t), value ) ]
-            |> List.choose id
-            |> Product.setVars  }
-    state{ 
-        do! %% Var1
-        do! %% Temp }
-
     
 
 let concErrorlimit productType concValue =        
@@ -210,9 +202,12 @@ let concErrorlimit productType concValue =
     elif scale=Sc20 then 1.0m else 0.m
 
 
-let termoErrorlimit productType pgs (gas,t) product =
+let termoErrorlimit chan productType pgs (gas,t) product =
+    let concVar = Channel.conc chan
     if ProductType.isCH productType |> not then 
-        (Product.getVar (Test,Conc, gas,t) product, Product.getVar (Test, Temp, gas, t) product) 
+        
+        let tempVar = Channel.termo chan
+        (Product.getVar (Test, concVar, gas,t,Pnorm) product, Product.getVar (Test, tempVar, gas, t,Pnorm) product) 
         |> Option.map2(fun(c,t) -> 
             let dt = t - 20m     
             let maxc = concErrorlimit productType pgs
@@ -221,7 +216,7 @@ let termoErrorlimit productType pgs (gas,t) product =
         match gas with
         | ScaleBeg -> Some 5m
         | _ ->
-            Product.getVar (Test,Conc,gas,TermoNorm) product
+            Product.getVar (Test,concVar,gas,TermoNorm,Pnorm) product
             |> Option.map(fun conc20 -> conc20 * 0.15m |> abs  |> decimal )
 
 type ValueError = 
@@ -236,30 +231,16 @@ type ValueError =
 
 type Product with
 
-    static member concError productType pgs gas product = 
-        Product.getVar (Test,Conc, gas, TermoNorm) product 
+    static member concError chan productType pgs gas product = 
+        Product.getVar (Test, (Channel.conc chan), gas, TermoNorm, Pnorm) product 
         |> Option.map(fun conc ->                 
             { Value = conc; Nominal = pgs; Limit = concErrorlimit productType pgs } ) 
 
-    static member tex1Error productType pgs gas product = 
-        Product.getVar (Tex1, Conc, gas, TermoNorm) product 
-        |> Option.map(fun conc ->                 
-            { Value = conc; Nominal = pgs; Limit = concErrorlimit productType pgs } ) 
-
-    static member tex2Error productType pgs gas product = 
-        Product.getVar (Tex2, Conc, gas, TermoNorm) product 
-        |> Option.map(fun conc ->                 
-            { Value = conc; Nominal = pgs; Limit = concErrorlimit productType pgs } ) 
-
-    static member retNkuError productType pgs gas product = 
-        Product.getVar (RetNku, Conc, gas, TermoNorm) product 
-        |> Option.map(fun conc ->                 
-            { Value = conc; Nominal = pgs; Limit = concErrorlimit productType pgs } ) 
-
-    static member termoError productType pgs (gas,t) p = 
-        (   Product.getVar (Test,Conc,gas,t) p,
-            Product.getVar (Test,Conc,gas,TermoNorm) p,
-            termoErrorlimit productType pgs (gas,t) p )
+    static member termoError chan productType pgs (gas,t) p = 
+        let concVar = Channel.conc chan
+        (   Product.getVar (Test,concVar,gas,t, Pnorm) p,
+            Product.getVar (Test,concVar,gas,TermoNorm, Pnorm) p,
+            termoErrorlimit chan productType pgs (gas,t) p )
         |> Option.map3( fun (c,c20,limit) -> 
             { Value = c; Nominal = c20; Limit = limit } )
 
