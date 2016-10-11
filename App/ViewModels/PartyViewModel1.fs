@@ -71,7 +71,7 @@ type Party1
     let mutable partyHeader = partyHeader
     let mutable partyData = partyData
     let productType() = partyHeader.ProductType 
-    let getPgs sens gas = Party.ballonConc (sens,gas) partyData.BallonConc
+    let getPgs n = Party.ballonConc n partyData.BallonConc
     let getTermoTemperature t = 
         partyData.TermoTemperature
         |> Map.tryFind t
@@ -131,8 +131,8 @@ type Party1
             |> List.iter x.DeleteProduct
             setProducts otherPartyData.Products
 
-            Vars.sensorScalePoints
-            |> List.iter (Property.sensorScalePt >> x.RaisePropertyChanged)
+            SScalePt.values
+            |> List.iter (SScalePt.property >> x.RaisePropertyChanged)
 
             for t in TermoPt.values do
                 x.RaisePropertyChanged <| TermoPt.name t
@@ -167,7 +167,7 @@ type Party1
     member x.SetPgs (gas,value) =
         if Some value <>  partyData.BallonConc.TryFind gas then
             partyData <- { partyData with BallonConc = Map.add gas value partyData.BallonConc }
-            x.RaisePropertyChanged <| Property.sensorScalePt gas
+            x.RaisePropertyChanged <| SScalePt.property gas
             setMainWindowTitle()
             updateProductsTypeAlchemy()
 

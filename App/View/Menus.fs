@@ -68,7 +68,7 @@ let modbusToolsPopup =
     [   yield "Установка адреса", setAddr
         yield!
             Command.values
-            |> List.filter( (<>) ResetAddy ) 
+            |> List.filter( (<>) CmdSetAddr ) 
             |> List.map( fun cmd -> 
                 (sprintf "MDBUS: %s" cmd.What), 
                     popupNumberDialog 

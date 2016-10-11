@@ -12,54 +12,68 @@ type DelaysHelperViewModel() =
     override x.RaisePropertyChanged propertyName = 
         ViewModelBase.raisePropertyChanged x propertyName
 
-    [<DisplayName("Продувка ПГС0, к.1")>]    
-    [<Description("Продувка ПГС0, к.1, длительность час:мин:сек")>]
-    [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.BlowDelay_ScaleBeg_1 
-        with get() = x.GetDelay (BlowDelay (Sens1, ScaleBeg))
-        and set value = x.SetDelay (BlowDelay (Sens1, ScaleBeg)) value  
-
     [<DisplayName("Продувка ПГС1, к.1")>]    
     [<Description("Продувка ПГС1, к.1, длительность час:мин:сек")>]
     [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.BlowDelay_ScaleMid1_1 
-        with get() = x.GetDelay (BlowDelay (Sens1, ScaleMid1))
-        and set value = x.SetDelay (BlowDelay (Sens1, ScaleMid1)) value  
+    member x.BlowDelay_Sens1_ScaleBeg 
+        with get() = x.GetDelay (BlowDelay {SensorIndex = Sens1;
+           ScalePt = ScaleBeg;})
+        and set value = x.SetDelay (BlowDelay {SensorIndex = Sens1;
+           ScalePt = ScaleBeg;}) value  
 
     [<DisplayName("Продувка ПГС2, к.1")>]    
     [<Description("Продувка ПГС2, к.1, длительность час:мин:сек")>]
     [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.BlowDelay_ScaleMid2_1 
-        with get() = x.GetDelay (BlowDelay (Sens1, ScaleMid2))
-        and set value = x.SetDelay (BlowDelay (Sens1, ScaleMid2)) value  
+    member x.BlowDelay_Sens1_ScaleMid1 
+        with get() = x.GetDelay (BlowDelay {SensorIndex = Sens1;
+           ScalePt = ScaleMid1;})
+        and set value = x.SetDelay (BlowDelay {SensorIndex = Sens1;
+           ScalePt = ScaleMid1;}) value  
+
+    [<DisplayName("Продувка ПГС3, к.1")>]    
+    [<Description("Продувка ПГС3, к.1, длительность час:мин:сек")>]
+    [<TypeConverter(typeof<TimeSpanConverter>)>]
+    member x.BlowDelay_Sens1_ScaleMid2 
+        with get() = x.GetDelay (BlowDelay {SensorIndex = Sens1;
+           ScalePt = ScaleMid2;})
+        and set value = x.SetDelay (BlowDelay {SensorIndex = Sens1;
+           ScalePt = ScaleMid2;}) value  
 
     [<DisplayName("Продувка ПГС4, к.1")>]    
     [<Description("Продувка ПГС4, к.1, длительность час:мин:сек")>]
     [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.BlowDelay_ScaleEnd_1 
-        with get() = x.GetDelay (BlowDelay (Sens1, ScaleEnd))
-        and set value = x.SetDelay (BlowDelay (Sens1, ScaleEnd)) value  
-
-    [<DisplayName("Продувка ПГС0, к.2")>]    
-    [<Description("Продувка ПГС0, к.2, длительность час:мин:сек")>]
-    [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.BlowDelay_ScaleBeg_2 
-        with get() = x.GetDelay (BlowDelay (Sens2, ScaleBeg))
-        and set value = x.SetDelay (BlowDelay (Sens2, ScaleBeg)) value  
+    member x.BlowDelay_Sens1_ScaleEnd 
+        with get() = x.GetDelay (BlowDelay {SensorIndex = Sens1;
+           ScalePt = ScaleEnd;})
+        and set value = x.SetDelay (BlowDelay {SensorIndex = Sens1;
+           ScalePt = ScaleEnd;}) value  
 
     [<DisplayName("Продувка ПГС1, к.2")>]    
     [<Description("Продувка ПГС1, к.2, длительность час:мин:сек")>]
     [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.BlowDelay_ScaleMid1_2 
-        with get() = x.GetDelay (BlowDelay (Sens2, ScaleMid1))
-        and set value = x.SetDelay (BlowDelay (Sens2, ScaleMid1)) value  
+    member x.BlowDelay_Sens2_ScaleBeg 
+        with get() = x.GetDelay (BlowDelay {SensorIndex = Sens2;
+           ScalePt = ScaleBeg;})
+        and set value = x.SetDelay (BlowDelay {SensorIndex = Sens2;
+           ScalePt = ScaleBeg;}) value  
+
+    [<DisplayName("Продувка ПГС2, к.2")>]    
+    [<Description("Продувка ПГС2, к.2, длительность час:мин:сек")>]
+    [<TypeConverter(typeof<TimeSpanConverter>)>]
+    member x.BlowDelay_Sens2_ScaleMid1 
+        with get() = x.GetDelay (BlowDelay {SensorIndex = Sens2;
+           ScalePt = ScaleMid1;})
+        and set value = x.SetDelay (BlowDelay {SensorIndex = Sens2;
+           ScalePt = ScaleMid1;}) value  
 
     [<DisplayName("Продувка ПГС4, к.2")>]    
     [<Description("Продувка ПГС4, к.2, длительность час:мин:сек")>]
     [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.BlowDelay_ScaleEnd_2 
-        with get() = x.GetDelay (BlowDelay (Sens2, ScaleEnd))
-        and set value = x.SetDelay (BlowDelay (Sens2, ScaleEnd)) value  
+    member x.BlowDelay_Sens2_ScaleEnd 
+        with get() = x.GetDelay (BlowDelay {SensorIndex = Sens2;
+           ScalePt = ScaleEnd;})
+        and set value = x.SetDelay (BlowDelay {SensorIndex = Sens2;
+           ScalePt = ScaleEnd;}) value  
 
     [<DisplayName("Прогрев НКУ")>]    
     [<Description("Прогрев НКУ, длительность час:мин:сек")>]
@@ -82,30 +96,38 @@ type DelaysHelperViewModel() =
         with get() = x.GetDelay (WarmDelay TermoHigh)
         and set value = x.SetDelay (WarmDelay TermoHigh) value  
 
-    [<DisplayName("Калибровка ПГС0, к.1")>]    
-    [<Description("Калибровка ПГС0, к.1, длительность час:мин:сек")>]
+    [<DisplayName("Калибровка ПГС1, к.1")>]    
+    [<Description("Калибровка ПГС1, к.1, длительность час:мин:сек")>]
     [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.AdjustDelay_ScaleBeg_1 
-        with get() = x.GetDelay (AdjustDelay (Sens1, ScaleBeg))
-        and set value = x.SetDelay (AdjustDelay (Sens1, ScaleBeg)) value  
+    member x.AdjustDelay_Sens1_ScaleBeg 
+        with get() = x.GetDelay (AdjustDelay {SensorIndex = Sens1;
+             ScalePt = ScaleBeg;})
+        and set value = x.SetDelay (AdjustDelay {SensorIndex = Sens1;
+             ScalePt = ScaleBeg;}) value  
 
     [<DisplayName("Калибровка ПГС4, к.1")>]    
     [<Description("Калибровка ПГС4, к.1, длительность час:мин:сек")>]
     [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.AdjustDelay_ScaleEnd_1 
-        with get() = x.GetDelay (AdjustDelay (Sens1, ScaleEnd))
-        and set value = x.SetDelay (AdjustDelay (Sens1, ScaleEnd)) value  
+    member x.AdjustDelay_Sens1_ScaleEnd 
+        with get() = x.GetDelay (AdjustDelay {SensorIndex = Sens1;
+             ScalePt = ScaleEnd;})
+        and set value = x.SetDelay (AdjustDelay {SensorIndex = Sens1;
+             ScalePt = ScaleEnd;}) value  
 
-    [<DisplayName("Калибровка ПГС0, к.2")>]    
-    [<Description("Калибровка ПГС0, к.2, длительность час:мин:сек")>]
+    [<DisplayName("Калибровка ПГС1, к.2")>]    
+    [<Description("Калибровка ПГС1, к.2, длительность час:мин:сек")>]
     [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.AdjustDelay_ScaleBeg_2 
-        with get() = x.GetDelay (AdjustDelay (Sens2, ScaleBeg))
-        and set value = x.SetDelay (AdjustDelay (Sens2, ScaleBeg)) value  
+    member x.AdjustDelay_Sens2_ScaleBeg 
+        with get() = x.GetDelay (AdjustDelay {SensorIndex = Sens2;
+             ScalePt = ScaleBeg;})
+        and set value = x.SetDelay (AdjustDelay {SensorIndex = Sens2;
+             ScalePt = ScaleBeg;}) value  
 
     [<DisplayName("Калибровка ПГС4, к.2")>]    
     [<Description("Калибровка ПГС4, к.2, длительность час:мин:сек")>]
     [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.AdjustDelay_ScaleEnd_2 
-        with get() = x.GetDelay (AdjustDelay (Sens2, ScaleEnd))
-        and set value = x.SetDelay (AdjustDelay (Sens2, ScaleEnd)) value  
+    member x.AdjustDelay_Sens2_ScaleEnd 
+        with get() = x.GetDelay (AdjustDelay {SensorIndex = Sens2;
+             ScalePt = ScaleEnd;})
+        and set value = x.SetDelay (AdjustDelay {SensorIndex = Sens2;
+             ScalePt = ScaleEnd;}) value  

@@ -37,7 +37,7 @@ type Product(p, getProdType, getPgs, partyId) =
 
     for ((f,v,gas,t,p) as var) in Vars.vars do
         let k1 = 
-            sprintf "(Feature.%s, PhysVar.%s, ScalePt.%s, TermoPt.%s, PressurePt.%s)" 
+            sprintf "(%s, %s, %s, %s, %s)" 
                 (Feature.name f) (PhysVar.name v) (ScalePt.name gas) (TermoPt.name t)
                 (PressurePt.name p)
         yield sprintf """
@@ -45,26 +45,17 @@ type Product(p, getProdType, getPgs, partyId) =
         with get () = x.getVarUi %s
         and set value = x.setVarUi %s value"""  (Property.var var) k1 k1 
         
-    for ((sensInd, gas) as v) in Vars.sensor_gas_vars do
+    for n in SensorScalePt.values do
         yield sprintf """
-    member x.%s = x.GetConcError (SensorIndex.%s, ScalePt.%s) """  
-                        (Property.concError v) 
-                        (SensorIndex.name sensInd) 
-                        (ScalePt.name gas) 
+    member x.%s = x.GetConcError %s """  (Property.concError n) n.Name
         
-    for ((sensInd, gas,t) as v) in Vars.sensor_gas_t_vars do
+    for n,t in SensorScalePt.valuesT do
         yield sprintf """
-    member x.%s = x.GetTermoError (SensorIndex.%s, ScalePt.%s, TermoPt.%s) """  
-                    (Property.termoError v ) 
-                    (SensorIndex.name sensInd)
-                    (ScalePt.name gas) 
-                    (TermoPt.name t)  
+    member x.%s = x.GetTermoError (%s, %s) """  (Property.termoError (n,t) ) n.Name t.Name
     for var in PhysVar.values do
-        let name = PhysVar.name var
+        
         yield sprintf """
-    member x.%s = x.getPhysVarValueUi PhysVar.%s """  
-                    name
-                    name |]
+    member x.%s = x.getPhysVarValueUi %s """ var.Property var.Name |]
 
     |> createSourcefile "ViewModels/ProductViewModel.fs" 
 
@@ -83,31 +74,31 @@ type Party(partyHeader, partyData) =
 
     
         
-    for (sensInd, gas) as k in Sens1.ScalePts1 @ Sens2.ScalePts1 do
-        let whatPgs = Vars.formatSensorScalePt k
-        let whatScale = ScalePt.whatScale gas
-        let name = ScalePt.name gas
+    for n in SensorScalePt.values do
+        let whatPgs = SensorScalePt.format n
+        let whatScale = ScalePt.whatScale n.ScalePt
+        
         yield sprintf """
     [<Category("Концентрация ПГС")>] 
     [<DisplayName("%s")>]    
     [<Description("Концентрация %s, канал %d, %s")>]
     member x.%s
-        with get() = x.GetPgs ScalePt.%s
-        and set v = x.SetPgs (ScalePt.%s, v) """  whatPgs whatPgs sensInd.N whatScale name name name
+        with get() = x.GetPgs %s
+        and set v = x.SetPgs (%s, v) """  whatPgs whatPgs n.SensorIndex.N whatScale n.Property n.Name n.Name
         
     for t in TermoPt.values  do
         let what = TermoPt.what t
         let descr = TermoPt.dscr t
-        let name = TermoPt.name t
+        
 
         yield sprintf """
     [<Category("Температура")>] 
     [<DisplayName("%s")>]    
     [<Description("%s")>]
     member x.%s 
-        with get() = x.GetTermoTemperature TermoPt.%s
-        and set v = x.SetTermoTemperature (TermoPt.%s,v) """  
-                what descr name name name  |]
+        with get() = x.GetTermoTemperature %s
+        and set v = x.SetTermoTemperature (%s,v) """  
+                what descr t.Property t.Name t.Name |]
     |> createSourcefile "ViewModels/PartyViewModel.fs" 
 
 createSourceFile_ProductViewModel()

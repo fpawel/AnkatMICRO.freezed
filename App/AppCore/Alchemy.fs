@@ -26,19 +26,22 @@ let initKefsValues pgs prodType =
         | Some ch -> yield Sens2, ch 
         | _ -> () ]  
 
-    [   for sensInd, chan in chans do
+    [   for sensInd, sensor in chans do
+            let n0 = SScalePt.new' sensInd ScaleBeg
+            let nk = SScalePt.new' sensInd ScaleEnd
+
             let pgs0, pgsK, shk0, shkK, shk, units, gastype = SensorIndex.prodTypeCoefs sensInd
-            yield pgs0, pgs sensInd ScaleBeg
-            yield pgsK, pgs sensInd ScaleEnd
+            yield pgs0, pgs n0
+            yield pgsK, pgs nk
             yield shk0, 0m
-            yield shkK, chan.Scale.Value
-            yield shk, chan.Scale.Code  
-            yield units, chan.Units.Code
-            yield gastype, chan.Gas.Code 
+            yield shkK, sensor.Scale.Value
+            yield shk, sensor.Scale.Code  
+            yield units, sensor.Units.Code
+            yield gastype, sensor.Gas.Code 
             yield! List.zip (SensorIndex.coefsLin sensInd) [0m; 1m; 0m; 0m] 
 
-            yield! List.zip (SensorIndex.coefsTermo (sensInd, ScaleBeg)) [0m; 0m; 0m] 
-            yield! List.zip (SensorIndex.coefsTermo (sensInd, ScaleEnd)) [1m; 0m; 0m]  
+            yield! List.zip n0.CoefsTermo [0m; 0m; 0m] 
+            yield! List.zip nk.CoefsTermo [1m; 0m; 0m]  
             
             let now = DateTime.Now
             yield YEAR, decimal now.Year ]
@@ -89,7 +92,7 @@ module private PivateComputeProduct =
 
     let getValuesTermo chan var gas p   =
         TermoPt.values
-        |> List.map( fun t -> FeatureKefGroup( TermoCoefs(chan,gas)) , var, gas, t, Pnorm) |> getVarsValues p
+        |> List.map( fun t -> FeatureKefGroup( TermoCoefs( SScalePt.new' chan gas)) , var, gas, t, Pnorm) |> getVarsValues p
 
     let getTermoT chan = getValuesTermo chan chan.Termo
 
@@ -127,12 +130,12 @@ module private PivateComputeProduct =
             |> List.map( fun gas -> FeatureKefGroup( LinCoefs chan ), chan.Conc, gas, TermoNorm, Pnorm )
             |> getVarsValues p
             |> Result.map ( fun xs -> 
-                List.zip xs ( chan.ScalePts |> List.map (getPgsConc chan)  ) )
+                List.zip xs ( chan.ScalePts |> List.map ( SScalePt.new' chan >> getPgsConc )  ) )
             |> Result.mapErr( 
                 fmtErr (function  V(_,_,gas,_,_) -> sprintf "%A" gas)
                 >> sprintf "нет значения LIN в %s" )
 
-        | TermoCoefs (chan,ScaleBeg) -> 
+        | TermoCoefs { SensorIndex = chan; ScalePt = ScaleBeg} -> 
             result {
                 let! t = getTermoT chan ScaleBeg p
                 let! var = getVar1T chan ScaleBeg p
@@ -141,7 +144,7 @@ module private PivateComputeProduct =
                 fmtErr (function V(_,var,_,t,_) -> sprintf "%s.%s" (PhysVar.what var) (TermoPt.what t) )                
                 >> sprintf "нет значения T0 в %s" )
 
-        | TermoCoefs (chan,ScaleEnd) -> 
+        | TermoCoefs { SensorIndex = chan; ScalePt = ScaleEnd} -> 
             result {
                 let! t = getTermoT chan ScaleEnd p
                 let! var = getVar1T chan ScaleEnd p
@@ -165,7 +168,8 @@ module private PivateComputeProduct =
                     |> fmtErr TermoPt.what 
                     |> sprintf "при расчёте TK деление на ноль в %s"
                     |> Err )
-        | TermoCoefs (_, ScaleMid) ->  failwith "there is no KefTermo (_,ScaleMid) in AnkatMICRO!!"
+        | TermoCoefs { ScalePt = ScaleMid1} 
+        | TermoCoefs { ScalePt = ScaleMid2} ->  failwith "there is no TermoCoefs (_,ScaleMid) in AnkatMICRO!!"
 
 
     let doValuesGaussXY group xy =
@@ -258,7 +262,7 @@ let createNewProduct addr getPgs productType =
 
 let createNewParty() = 
     let h,d = Party.createNewEmpty()
-    let getPgsConc sensInd gas = d.BallonConc.TryFind (sensInd, gas) |> Option.getWith 0m
+    let getPgsConc = d.BallonConc.TryFind >> Option.getWith 0m
     let productType = h.ProductType
     let product = createNewProduct 1uy getPgsConc productType
     let products = [ product ]
@@ -266,10 +270,10 @@ let createNewParty() =
 
 let createNewParty1( name, productType, count) : Party.Content = 
         let pgs =
-            Sens1.ScalePts1  @ Sens2.ScalePts1                
-            |> List.map(fun pt -> pt, ScalePt.defaultBallonConc (snd pt) )             
+            SScalePt.values
+            |> List.map(fun pt -> pt, ScalePt.defaultBallonConc pt.ScalePt )             
             |> Map.ofList 
-        let getPgsConc x y = pgs.TryFind (x,y) |> Option.getWith 0m
+        let getPgsConc = pgs.TryFind >> Option.getWith 0m
         let products = 
             [1uy..count] 
             |> List.map( fun addr ->  createNewProduct addr getPgsConc productType )

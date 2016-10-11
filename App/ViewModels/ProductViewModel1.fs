@@ -22,27 +22,28 @@ type Product1(p : P, getProductType, getPgs, partyId) =
 
     let mutable connection : Result<string,string> option = None
     
-    let getTermoError (sensorIndex,scalePt,termoPt) = 
-        SensorIndex.sensorOfProdTypeByIndex (getProductType()) sensorIndex
+    let getTermoError (n, termoPt) = 
+        SensorIndex.sensorOfProdTypeByIndex (getProductType()) n.SensorIndex
         |> Option.bind( fun sensor ->
             P.termoError 
-                {ChannelSensor = sensor; ChannelIndex = sensorIndex} 
-                (getPgs sensorIndex scalePt) (scalePt,termoPt) p )
+                {ChannelSensor = sensor; ChannelIndex = n.SensorIndex} 
+                (getPgs n) 
+                (n.ScalePt, termoPt) p )
 
-    let getConcError (sensorIndex,scalePt) = 
-        SensorIndex.sensorOfProdTypeByIndex (getProductType()) sensorIndex
+    let getConcError n = 
+        SensorIndex.sensorOfProdTypeByIndex (getProductType()) n.SensorIndex
         |> Option.bind( fun sensor ->
             P.concError 
-                {ChannelSensor = sensor; ChannelIndex = sensorIndex} 
-                (getPgs sensorIndex scalePt) scalePt p )
+                {ChannelSensor = sensor; ChannelIndex = n.SensorIndex} 
+                (getPgs n) n.ScalePt p )
 
     let getConcErrors () = 
-        Vars.sensor_gas_vars
+        SScalePt.values
         |> List.map(fun k -> k, getConcError k )
         |> Map.ofList
 
     let getTermoErrors () = 
-        Vars.sensor_gas_t_vars
+        SScalePt.valuesT
         |> List.map(fun k -> k, getTermoError k )
         |> Map.ofList
                
@@ -76,11 +77,11 @@ type Product1(p : P, getProductType, getPgs, partyId) =
         let varsValues = getVarsValues()
         let kefsValues = getKefsValues()
 
-        Vars.sensor_gas_vars
+        SScalePt.values
         |> List.filter(fun gas -> prevConcErrors.[gas] <> concErrors.[gas] )
         |> List.iter (Property.concError >> x.RaisePropertyChanged)
 
-        Vars.sensor_gas_t_vars 
+        SScalePt.valuesT
         |> List.filter(fun var -> prevTermoError.[var] <> termoError.[var] )
         |> List.iter (Property.termoError >> x.RaisePropertyChanged) 
 
@@ -171,13 +172,10 @@ type Product1(p : P, getProductType, getPgs, partyId) =
                 sprintf "%s.20%d" m y )
             |> Option.getWith ""
 
-    member x.ForceCalculateErrors() =
-        let (~%%) = x.RaisePropertyChanged
-        for sensInd in SensorIndex.values do
-            for ( (sensInd,gas) as k) in Sens1.ScalePts1 @ Sens2.ScalePts1 do
-                %% Property.concError k
-                for t in TermoPt.values do
-                    %% Property.termoError (sensInd,gas,t) 
+    member x.ForceCalculateErrors() =        
+        List.iter (Property.concError >> x.RaisePropertyChanged ) SScalePt.values
+        List.iter (Property.termoError >> x.RaisePropertyChanged ) SScalePt.valuesT
+                    
 
     member x.Product 
         with get () = p

@@ -82,24 +82,23 @@ type Ankat.ViewModel.Product1 with
             let _ = x.ReadModbus( ReadVar var)
             () }
 
-    member private p.calculateTestConc channel gas conc = 
+    member private p.calculateTestConc channel n conc = 
         
         let concErrorlimit = channel.ChannelSensor.ConcErrorlimit conc
-        let pgs = party.GetPgs gas
+        let pgs = party.GetPgs n
         let d = abs(conc - pgs)
         Logging.write 
             (if d < concErrorlimit then Logging.Info else Logging.Error)
             "%s, проверка погрешности %s=%M - конц.=%M, погр.=%M, макс.погр.=%M" 
-                p.What (ScalePt.what gas) pgs conc d concErrorlimit  
+                p.What n.What pgs conc d concErrorlimit  
         
 
 
-    member p.TestConc channel gas = maybeErr{
-        let whatPt = ScalePt.what gas
+    member p.TestConc channel n = maybeErr{
         let concVar = SensorIndex.conc channel.ChannelIndex
         let! conc = p.ReadModbus( ReadVar concVar )
-        p.setVar (Test,concVar,gas,TermoNorm,Pnorm) (Some conc)
-        p.calculateTestConc channel gas conc }
+        p.setVar (Test,concVar, n.ScalePt, TermoNorm,Pnorm) (Some conc)
+        p.calculateTestConc channel n conc }
 
 type Ankat.ViewModel.Party with
     member x.DoForEachProduct f = 
@@ -210,12 +209,12 @@ module private Helpers1 =
     type OpConfig = Config
     type Op = Operation
 
-    let switchPneumo x = maybeErr{
+    let switchPneumo gas = maybeErr{
         let code, title, text = 
-            match x with
-            | Some (gsensInd, scalePt) -> 
-                let s = ScalePt.what gas
-                ScalePt.code gas |> byte, "Продувка " + s, "Подайте " + s
+            match gas with
+            | Some gas -> 
+                let code = SScalePt.pneumoBlockCode gas
+                byte code, "Продувка " + gas.What, "Подайте " + gas.What
             | _ -> 0uy, "Выключить пневмоблок", "Отключите газ"
 
         if appCfg.UsePneumoblock then
@@ -228,7 +227,7 @@ module private Helpers1 =
                 | _ -> Logging.info "пневмоблок закрыт вручную" }
 
     let blow minutes gas what = 
-        let s = ScalePt.what gas
+        let s = SScalePt.what gas
         let title, text = "Продувка " + s, "Подайте " + s
 
         (what, TimeSpan.FromMinutes (float minutes), BlowDelay gas ) <-|-> fun gettime -> maybeErr{        
@@ -248,22 +247,40 @@ module private Helpers1 =
         else 
             do! Hardware.Warm.warm value Thread2.isKeepRunning party.Interrogate  }
 
-    let adjust (sensInd,scalePt) = 
-        let cmd, wht = 
-            match sensInd,scalePt with
-            | Sens1, ScaleBeg ->
-                CmdAdjustNull1, "начала" 
-            
-        let whatOperation = sprintf "Калибровка %s шкалы" wht
-        let defaultDelayTime = TimeSpan.FromMinutes 3.
-        (whatOperation, defaultDelayTime, AdjustDelay isScaleEnd)  <-|-> fun gettime -> maybeErr{
-            let pgs = party.GetPgs gas
-            Logging.info  "Калибровка %s шкалы, %M" wht  pgs
-            do! switchPneumo <| Some gas
-            do! Delay.perform (sprintf  "Продувка перед калибровкой %A" gas.What) gettime true
-            do! party.WriteModbus( cmd, pgs ) 
-            do! Delay.perform (sprintf  "Выдержка после калибровки %A" gas.What) (fun () -> TimeSpan.FromSeconds 10.) true
-            }
+    type SScalePt with
+        static member adjust n = 
+            let cmd = SScalePt.cmdAdjust n            
+            let defaultDelayTime = TimeSpan.FromMinutes 3.
+            (cmd.What, defaultDelayTime, AdjustDelay n)  <-|-> fun gettime -> maybeErr{
+                let pgs = party.GetPgs n
+                Logging.info  "%s, %M" n.What pgs
+                do! switchPneumo <| Some n
+                do! Delay.perform (sprintf  "Продувка перед калибровкой %A" n.What) gettime true
+                do! party.WriteModbus( cmd, pgs ) 
+                do! Delay.perform (sprintf  "Выдержка после калибровки %A" n.What) (fun () -> TimeSpan.FromSeconds 10.) true
+                }
+
+    type SensorIndex with
+        member x.Adjust = SensorIndex.adjust x
+        static member adjust sensInd =
+            sprintf "Калибровка к.%d" (SensorIndex.n sensInd) <||> [
+                SScalePt.adjust <| SScalePt.new' sensInd ScaleBeg
+                SScalePt.adjust <| SScalePt.new' sensInd ScaleEnd ]
+
+    let isSens2() = party.getProductType().Sensor2.IsSome
+
+    let blowAir = 
+        "Продувка воздухом" <||> [   
+            blow 1 SScalePt.Beg1 "Продуть воздух"
+            "Закрыть пневмоблок" <|> fun () -> switchPneumo None
+        ]
+
+    let adjust() =
+        "Калибровка" <||> [   
+            yield Sens1.Adjust
+            if isSens2() then
+                yield Sens2.Adjust 
+            yield blowAir]
 
     let goNku = "Установка НКУ" <|> fun () -> warm TermoNorm
 
@@ -278,37 +295,57 @@ module private Helpers1 =
             | Some error -> Logging.error "%s" error
             | _ -> () ) }
 
-let blowAir = 
-    "Продувка воздухом" <||> [   
-        blow 1 ScaleBeg "Продуть воздух"
-        "Закрыть пневмоблок" <|> fun () -> switchPneumo None
-    ]
-let blowAndRead feat temp press =
-    [   for gas in ScalePt.values ->
-            gas.What <||> [
-                yield blow 3 gas "Продувка"
-                yield "Считывание" <|> readVarsValues feat gas temp press ] 
-        yield blowAir ]
 
-let warmAndRead feat temp  =
-    sprintf "Cнятие %A %A" (Feature.what1 feat) (TermoPt.what temp) <||> 
-        [   yield sprintf "Температура %A" (TermoPt.what temp) <||> [
-                yield "Установка"  <|> fun () -> warm temp
-                yield ("Выдержка", TimeSpan.FromHours 1., WarmDelay temp) <-|-> fun gettime -> maybeErr{    
-                    do! switchPneumo None    
-                    do! Delay.perform ( sprintf "Выдержка термокамеры %A" (TermoPt.what temp) ) gettime true } ]
-        
-            yield! blowAndRead feat temp Pnorm  ]
+    type GasesList =
+        | AllGases 
+        | BegEndGases 
+        | Sens1Gases
+        member x.Gases = GasesList.gases x
+        static member gases = function
+            | Sens1Gases ->[ SScalePt.Beg1; SScalePt.End1  ]
+            | BegEndGases -> 
+                [   yield SScalePt.Beg1
+                    yield SScalePt.End1 
+                    if isSens2() then
+                        yield SScalePt.End2  ]
+            | AllGases -> 
+                [   yield SScalePt.Beg1
+                    yield SScalePt.Mid11
+                    yield SScalePt.Mid21                    
+                    yield SScalePt.End1 
+                    if isSens2() then
+                        yield SScalePt.Mid2
+                        yield SScalePt.End2 ]
 
-let test = 
+
+    let blowAndRead feat gasesList temp press =
+        [   for gas in GasesList.gases gasesList ->
+                SScalePt.what gas <||> [
+                    yield blow 3 gas "Продувка"
+                    yield "Считывание" <|> readVarsValues feat gas.ScalePt temp press ] 
+            yield blowAir ]
+
+
     
-    [   adjust false
-        adjust true 
-        blowAir
-        "Cнятие НКУ" <||> ( blowAndRead Test TermoNorm Pnorm )
-        warmAndRead Test TermoLow 
-        warmAndRead Test TermoHigh  ]
-    |> (<||>) "Проверка"
+        
+
+    let warmAndRead feat gasesList temp  =
+        
+        sprintf "Cнятие %A %A" (Feature.what1 feat) (TermoPt.what temp) <||> 
+            [   yield sprintf "Температура %A" (TermoPt.what temp) <||> [
+                    yield "Установка"  <|> fun () -> warm temp
+                    yield ("Выдержка", TimeSpan.FromHours 1., WarmDelay temp) <-|-> fun gettime -> maybeErr{    
+                        do! switchPneumo None    
+                        do! Delay.perform ( sprintf "Выдержка термокамеры %A" (TermoPt.what temp) ) gettime true } ]        
+                yield! blowAndRead feat gasesList temp Pnorm  ]
+
+let test() = 
+    "Проверка" <||> [   
+        adjust()        
+        "Cнятие НКУ" <||> ( blowAndRead Test AllGases TermoNorm Pnorm )
+        warmAndRead Test AllGases TermoLow 
+        warmAndRead Test AllGases TermoHigh  ]
+    
 
 
 let productionWork = 
