@@ -81,29 +81,6 @@ type ApplicatioConfig =
         [<TypeConverter(typeof<YesNoConverter>)>]
         mutable UseMidleScale : bool
 
-        [<Category("Подогрев плат")>]
-        [<DisplayName("Адрес MODBUS")>]
-        [<Description("MODBUS адрес устройства подогрева плат")>]
-        mutable WarmDeviceAddr : byte
-
-        [<Category("Подогрев плат")>]
-        [<DisplayName("Подогрев плат")>]
-        [<Description("Использовать подогрев плат")>]
-        [<TypeConverter(typeof<YesNoConverter>)>]
-        mutable UseWarmBoard : bool
-
-        [<Category("Подогрев плат")>]
-        [<DisplayName("Температура включения подогрева плат, \"С")>]
-        [<Description("Начало температурного диапазона работы устройства подогрева плат, \"С")>]
-        mutable TemperatureWarmBoardOn : decimal
-
-        [<Category("Подогрев плат")>]
-        [<DisplayName("Температура выключения подогрева плат, \"С")>]
-        [<Description("Конец температурного диапазона работы устройства подогрева плат, \"С")>]
-        mutable TemperatureWarmBoardOff : decimal
-
-        
-        
         [<Browsable(false)>]
         View : View.Config  }
     static member create() = {   
@@ -123,10 +100,12 @@ type ApplicatioConfig =
         ComportProducts = ComportConfig.Config.withDescr "приборы"
         ComportPneumo = ComportConfig.Config.withDescr "пневмоблок"
         ComportTermo = ComportConfig.Config.withDescr "термокамера"
-        ComportOven = ComportConfig.Config.withDescr "ОВЕН" 
-        WarmDeviceAddr = 0x63uy
-        UseWarmBoard = false
-        TemperatureWarmBoardOn = -40m
-        TemperatureWarmBoardOff = -30m }
+        ComportOven = ComportConfig.Config.withDescr "ОВЕН"  }
 
 let config, save = Json.Config.create "app.config.json" ApplicatioConfig.create
+
+
+
+let productTypes, saveProductTypes = 
+    Json.Config.create "productTypes.json" ( fun () -> [ Ankat.ProductType.first ] )
+

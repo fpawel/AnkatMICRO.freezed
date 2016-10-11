@@ -13,7 +13,7 @@ open Ankat
 
 type ProductId = Id
 
-let mutable physVar = Conc
+let mutable physVar = Sens1.Conc
 
 [<AutoOpen>]
 module private Helpers =

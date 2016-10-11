@@ -6,7 +6,7 @@
 #load "Utils/Logging.fs"
 #load "Utils/Utils.fs"
 #load "Ankat/Coef.fs"
-#load "Ankat/ProductType.fs"
+#load "Ankat/ProdType.fs"
 #load "Ankat/Ankat.fs"
 
 open System

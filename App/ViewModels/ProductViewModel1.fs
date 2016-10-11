@@ -22,22 +22,30 @@ type Product1(p : P, getProductType, getPgs, partyId) =
 
     let mutable connection : Result<string,string> option = None
     
-    let getConcError scalePt = P.concError (getProductType()) (getPgs scalePt) scalePt p
-    let getTex1Error scalePt = P.tex1Error (getProductType()) (getPgs scalePt) scalePt p
-    let getTex2Error scalePt = P.tex2Error (getProductType()) (getPgs scalePt) scalePt p
+    let getTermoError (sensorIndex,scalePt,termoPt) = 
+        SensorIndex.sensorOfProdTypeByIndex (getProductType()) sensorIndex
+        |> Option.bind( fun sensor ->
+            P.termoError 
+                {ChannelSensor = sensor; ChannelIndex = sensorIndex} 
+                (getPgs sensorIndex scalePt) (scalePt,termoPt) p )
 
-    let getTermoError (scalePt,termoPt) = P.termoError (getProductType()) (getPgs scalePt) (scalePt,termoPt) p
+    let getConcError (sensorIndex,scalePt) = 
+        SensorIndex.sensorOfProdTypeByIndex (getProductType()) sensorIndex
+        |> Option.bind( fun sensor ->
+            P.concError 
+                {ChannelSensor = sensor; ChannelIndex = sensorIndex} 
+                (getPgs sensorIndex scalePt) scalePt p )
 
-    let getConcErrors() = 
-        ScalePt.values 
-        |> List.map(fun gas -> gas, getConcError gas )
+    let getConcErrors () = 
+        Vars.sensor_gas_vars
+        |> List.map(fun k -> k, getConcError k )
         |> Map.ofList
-            
-    let getTermoErrors() = 
-        Vars.gas_t_vars 
-        |> List.map(fun var -> var, getTermoError var )
-        |> Map.ofList
 
+    let getTermoErrors () = 
+        Vars.sensor_gas_t_vars
+        |> List.map(fun k -> k, getTermoError k )
+        |> Map.ofList
+               
     let getVarsValues() = 
         Vars.vars
         |> List.map(fun ctx -> ctx, P.getVar ctx p )
@@ -51,18 +59,41 @@ type Product1(p : P, getProductType, getPgs, partyId) =
     let mutable physVar = Map.empty
 
     let coefValueChangedEvent = Event<Product1 * Coef * decimal option >()
+
+    
     
     [<CLIEvent>]
     member x.CoefValueChanged = coefValueChangedEvent.Publish
 
-    member x.setKefsInitValues () = 
-        let t = getProductType()    
-        x.Product <-
-            runState 
-                ( Alchemy.initializeKefsValues coefs getPgs t )
-                x.Product
-            |> snd
+    member x.andThenUpdateAllErrors(f) = 
+        let prevConcErrors =  getConcErrors()                
+        let prevTermoError = getTermoErrors()
+        let prevVarsValues = getVarsValues()
+        let prevKefsValues = getKefsValues()
+        f()
+        let concErrors =  getConcErrors()
+        let termoError = getTermoErrors()
+        let varsValues = getVarsValues()
+        let kefsValues = getKefsValues()
 
+        Vars.sensor_gas_vars
+        |> List.filter(fun gas -> prevConcErrors.[gas] <> concErrors.[gas] )
+        |> List.iter (Property.concError >> x.RaisePropertyChanged)
+
+        Vars.sensor_gas_t_vars 
+        |> List.filter(fun var -> prevTermoError.[var] <> termoError.[var] )
+        |> List.iter (Property.termoError >> x.RaisePropertyChanged) 
+
+    member x.setKefsInitValues () = 
+        let productType = getProductType()    
+
+        let prodstate = state {
+            let! product = getState
+            do!
+                initKefsValues getPgs productType
+                |> Product.setKefs  }        
+        x.Product <- snd <| runState  prodstate x.Product
+            
     member x.setPhysVarValue var value =        
         PhysVarValues.addValue {K.Party = partyId; K.Product = p.Id; K.Var = var } value
         MainWindow.form.PerformThreadSafeAction <| fun () ->
@@ -78,13 +109,7 @@ type Product1(p : P, getProductType, getPgs, partyId) =
         |> Option.getWith ""
 
     member x.GetConcError = getConcError        
-
-    member x.GetTex1Error = getTex1Error
-    member x.GetTex2Error = getTex2Error
-
-    member x.GetRetNkuError scalePt = 
-        P.retNkuError (getProductType()) (getPgs scalePt) scalePt p
-        
+    
     member x.GetTermoError = getTermoError
 
     member x.Connection
@@ -148,37 +173,24 @@ type Product1(p : P, getProductType, getPgs, partyId) =
 
     member x.ForceCalculateErrors() =
         let (~%%) = x.RaisePropertyChanged
-        for gas in ScalePt.values do
-            %% Property.concError gas 
-            %% Property.retNkuError gas 
-            %% Property.tex1Error gas 
-            %% Property.tex2Error gas 
-            for t in TermoPt.values do
-                %% Property.termoError (gas,t) 
+        for sensInd in SensorIndex.values do
+            for ( (sensInd,gas) as k) in Sens1.ScalePts1 @ Sens2.ScalePts1 do
+                %% Property.concError k
+                for t in TermoPt.values do
+                    %% Property.termoError (sensInd,gas,t) 
 
     member x.Product 
         with get () = p
         and set other =
             if p = other then () else
-            let prevConcErrors =  getConcErrors()                
-            let prevTermoError = getTermoErrors()
             let prevVarsValues = getVarsValues()
             let prevKefsValues = getKefsValues()
 
-            p <- other
+            x.andThenUpdateAllErrors <| fun () ->
+                p <- other
 
-            let concErrors =  getConcErrors()
-            let termoError = getTermoErrors()
             let varsValues = getVarsValues()
             let kefsValues = getKefsValues()
-
-            ScalePt.values
-            |> List.filter(fun gas -> prevConcErrors.[gas] <> concErrors.[gas] )
-            |> List.iter (Property.concError >> x.RaisePropertyChanged)
-
-            Vars.gas_t_vars 
-            |> List.filter(fun var -> prevTermoError.[var] <> termoError.[var] )
-            |> List.iter (Property.termoError >> x.RaisePropertyChanged) 
 
             Vars.vars
             |> List.filter(fun var -> prevVarsValues.[var] <> varsValues.[var] )
@@ -202,23 +214,15 @@ type Product1(p : P, getProductType, getPgs, partyId) =
         coefValueChangedEvent.Trigger(x,kef,value)
 
     member x.getVar var = P.getVar var p
-    member x.setVar ( (feat, physVar, scalePt, termoPt) as var) value =
+    member x.setVar ( (feat, physVar, scalePt, termoPt, presPt) as var) value =
         if P.getVar var p = value then () else
-        let prevConcError = getConcError scalePt
-        let prevTermoError = getTermoError (scalePt,termoPt)
 
-        let s = state{ do! P.setVar var value}
-        p <- runState s p |> snd
-        var |> Property.var |> x.RaisePropertyChanged
+        x.andThenUpdateAllErrors <| fun () ->
+            let s = state{ do! P.setVar var value}
+            p <- runState s p |> snd
+            var |> Property.var |> x.RaisePropertyChanged
 
-        let newConcError = getConcError scalePt
-        if newConcError <> prevConcError then
-            scalePt |> Property.concError |> x.RaisePropertyChanged
-
-        let newTermoError = getTermoError (scalePt,termoPt)
-        if newTermoError <> prevTermoError then
-            (scalePt,termoPt) |> Property.termoError |> x.RaisePropertyChanged
-
+        
     member x.getKefUi kef = 
         P.getKef kef p 
         |> Option.map Decimal.toStr6

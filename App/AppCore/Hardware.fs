@@ -39,71 +39,6 @@ module Pneumo =
         |> MainWindow.HardwareInfo.peumo.setTextSafe r.Level 
         r |> Result.map(fun _ -> ())
 
-
-module WarmingBoard =
-    type WarmingBoardState = 
-        | On | Off
-        static member what = function
-            | On -> "включение" 
-            | _ -> "выключение"
-
-
-        static member d = function
-            | On ->  [3uy; 0xE8uy] 
-            | Off -> [0uy; 0uy]
-
-        static member fromBool = function
-            | true ->  On
-            | _ -> Off
-
-        member x.WhatShort = 
-            match x with
-            | On -> "вкл." 
-            | _ -> "выкл."
-
-    let state = Ref.Observable(None)
-
-    let switch newstate =
-        let request = 
-            {   R.addy = cfg.WarmDeviceAddr
-                R.cmd = 0x10uy
-                R.data = 
-                    [   yield! [0uy;0uy;0uy;1uy;2uy ] 
-                        yield! WarmingBoardState.d newstate ]
-                R.what = WarmingBoardState.what newstate }
-        let r =
-            Mdbs.getResponse cfg.ComportOven request (fun _ -> "Ok") <| function
-                | [  0x00uy; 0x00uy; 0x00uy; 0x01uy ] -> Ok ()
-                | xs -> bytesToStr xs |> sprintf "не соответствие формата ответа : %A"  |> Err
-        state.Value <- Some ( r |> Result.map(fun _ -> newstate) ) 
-
-        match r with
-        | Ok _ -> newstate.WhatShort, None
-        | Err e -> "Ошибка", Some e
-        |> MainWindow.HardwareInfo.peumo.setTextSafe r.Level 
-
-        r
-
-    let private (|OvenStateFromBool|) = WarmingBoardState.fromBool
-
-
-    let on() = switch On
-    let off() = switch Off
-
-    let private (|LessOn|) t = t < cfg.TemperatureWarmBoardOn 
-    let private (|GreatOff|) t = t > cfg.TemperatureWarmBoardOff
-
-    let private (|InOnOff|) = function
-        | LessOn false & GreatOff false -> true
-        | _ -> false
-
-    let update currentTemperature = 
-        match state.Value, currentTemperature with
-        | Some (Ok On), InOnOff true -> Ok ()
-        | Some (Ok Off), InOnOff false -> Ok ()
-        | _, InOnOff (OvenStateFromBool value) -> 
-            switch value 
-
 module Termo =   
 
     type TermoState = 
@@ -229,11 +164,6 @@ module Warm =
     
         if (not <| isKeepRunning()) then return! Err "прервано" else
         let! (temperature,setPointTemperature) = Termo.read()
-        do!
-            if cfg.UseWarmBoard then
-                WarmingBoard.update temperature
-            else 
-                Ok ()
         if abs( s.destT - temperature ) < cfg.TermoWarmError then
             return temperature 
         else

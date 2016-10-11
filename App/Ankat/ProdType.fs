@@ -27,6 +27,8 @@ type Gas =
     
     member x.Code = Gas.code x
 
+    member x.IsCH = Gas.isCH x
+
     static member code = function
         | CO2 ->    4m
         | CH4 ->    5m
@@ -34,7 +36,12 @@ type Gas =
         | C3H8 ->   7m
     static member what (x:Gas) = x.What
     static member values = 
-        [CH4;C3H8; SumCH; CO2 ]
+        [CH4; C3H8; SumCH; CO2 ]
+    static member isCH = function
+        | CO2 ->    false
+        | CH4 
+        | SumCH 
+        | C3H8 ->   true
     
 
 type Scale =     
@@ -55,15 +62,15 @@ type Scale =
 
     static member values = FSharpType.unionCasesList<Scale>
 
-type ChannelIndex = 
-    | Chan1
-    | Chan2
-
-type Channel =
+// датчик концентрации
+type Sensor =
     {   Gas : Gas
         Units : Units
         Scale : Scale }
-    member x.What = Channel.what x
+    member x.What = Sensor.what x
+    
+    member x.ConcErrorlimit = Sensor.concErrorlimit x
+
     static member errorLimit x conc = 
         match x.Gas, x.Scale with
         | (CH4 | C3H8), _
@@ -74,35 +81,37 @@ type Channel =
     static member what x = 
         sprintf "%s, %s" x.Gas.What x.Scale.What
     static member new' gas units scale = { Gas = gas; Scale = scale; Units = units }
+
+    static member concErrorlimit x concValue =        
+        match x.Gas, x.Scale with
+        | CH4,_ 
+        | SumCH,_ 
+        | C3H8,_ ->     2.5m+0.05m * concValue
+        | CO2, Sc4 ->   0.2m + 0.05m * concValue
+        | CO2, Sc10 ->  0.5m
+        | CO2, Sc20 ->  1m
+        | _ -> 0m
         
 
 type ProductType =   
     {   TypeNumber : int
-        Channel : Channel 
-        Channel2 : Channel option }  
+        Sensor : Sensor 
+        Sensor2 : Sensor option }  
 
-    static member isTwoChannels x = x.Channel2.IsSome
-    static member isOneChannels x = x.Channel2.IsNone
-    static member channels x =
-        List.choose id [   Some x.Channel; x.Channel2 ]
+    member x.What = ProductType.what x
 
-    static member channelsCount x = ProductType.channels x |> List.length
-        
+    static member hasTwoSensors x = x.Sensor2.IsSome
+    static member hasOneSensor x = x.Sensor2.IsNone
+    static member sensors x =
+        List.choose id [   Some x.Sensor; x.Sensor2 ]
+
+    static member channelsCount x = ProductType.sensors x |> List.length
 
     static member what x =
-        x |> ProductType.channels 
-        |> Seq.toStr ", " Channel.what
+        x |> ProductType.sensors 
+        |> Seq.toStr ", " Sensor.what
         |> sprintf "%d, %s" x.TypeNumber
-
-[<AutoOpen>]
-module private Helpers2 =
-    open System.IO
-    let types, saveTypes = 
-        Json.Config.create "types.json" ( fun () ->
-            [   {   TypeNumber = 10
-                    Channel = Channel.new' CO2 UnitsVolume Sc100  
-                    Channel2 = None } ] )
-
-type ProductType with 
-    static member values = types
-    static member save = saveTypes
+    static member first = 
+        {   TypeNumber = 10
+            Sensor = Sensor.new' CO2 UnitsVolume Sc100  
+            Sensor2 = None }

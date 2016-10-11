@@ -172,6 +172,8 @@ type Double with
         | None -> Double.NaN
         | Some x -> x
 
+let fun0() = ()
+
 
 
         

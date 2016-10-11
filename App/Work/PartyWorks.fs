@@ -15,16 +15,6 @@ module private Helpers =
     let viewCfg = appCfg.View
 
 
-    let writeInitKefs write = state{ 
-        for kef in Coef.coefs do
-            if notKeepRunning() then () else
-            let! p = getState
-            match initKefValue party.GetPgs (party.getProductType()) kef p with
-            | None -> ()
-            | Some value -> 
-                do! P.setKef kef (Some value) 
-                write kef value }
-
 let checkedProducts() = 
     party.Products
     |> Seq.filter( fun p -> p.IsChecked )
@@ -66,11 +56,8 @@ type Ankat.ViewModel.Product1 with
             
     member x.WriteKefsInitValues() = 
         let t = party.getProductType()        
-        Coef.coefs 
-        |> List.choose( fun kef -> 
-            if notKeepRunning() then None else 
-            Alchemy.initKefValue party.GetPgs t kef x.Product 
-            |> Option.map(fun v -> kef, Some v) )
+        Alchemy.initKefsValues party.GetPgs t
+        |> List.map( fun (coef,value) -> coef, Some value )
         |> x.WriteKefs
 
     member x.ReadKefs kefs = maybeErr {
@@ -89,23 +76,30 @@ type Ankat.ViewModel.Product1 with
     member x.Interrogate() = maybeErr {
         let xs = 
             let xs = AppConfig.config.View.VisiblePhysVars
-            if Set.isEmpty xs then [Conc] else
+            if Set.isEmpty xs then [Sens1.Conc] else
             Set.toList xs
         for var in xs do
             let _ = x.ReadModbus( ReadVar var)
             () }
 
-    member p.TestConc gas = maybeErr{
-        let whatPt = ScalePt.what gas
-        let! conc = p.ReadModbus( ReadVar Conc )
-        p.setVar (Test,Conc,gas,TermoNorm) (Some conc)
-        let concErrorlimit = Alchemy.concErrorlimit (party.getProductType()) conc
+    member private p.calculateTestConc channel gas conc = 
+        
+        let concErrorlimit = channel.ChannelSensor.ConcErrorlimit conc
         let pgs = party.GetPgs gas
         let d = abs(conc - pgs)
         Logging.write 
             (if d < concErrorlimit then Logging.Info else Logging.Error)
             "%s, проверка погрешности %s=%M - конц.=%M, погр.=%M, макс.погр.=%M" 
-                p.What (ScalePt.what gas) pgs conc d concErrorlimit }
+                p.What (ScalePt.what gas) pgs conc d concErrorlimit  
+        
+
+
+    member p.TestConc channel gas = maybeErr{
+        let whatPt = ScalePt.what gas
+        let concVar = SensorIndex.conc channel.ChannelIndex
+        let! conc = p.ReadModbus( ReadVar concVar )
+        p.setVar (Test,concVar,gas,TermoNorm,Pnorm) (Some conc)
+        p.calculateTestConc channel gas conc }
 
 type Ankat.ViewModel.Party with
     member x.DoForEachProduct f = 
@@ -145,7 +139,7 @@ type Ankat.ViewModel.Party with
     member x.ComputeAndWriteKefGroup (kefGroup) = 
         x.DoForEachProduct(fun p -> 
             p.ComputeKefGroup kefGroup
-            KefGroup.kefs kefGroup
+            kefGroup.Coefs
             |> List.map (fun x -> x, None)
             |> p.WriteKefs  
             |> ignore )
@@ -194,13 +188,13 @@ module private Helpers1 =
     let (<||>) what xs =  Operation.CreateScenary ( what, none)  xs
 
     let computeGroup kefGroup = 
-        sprintf "Расчёт %A" (KefGroup.what kefGroup) <|> fun () -> 
+        sprintf "Расчёт %A" (GroupCoefs.what kefGroup) <|> fun () -> 
             party.ComputeKefGroup kefGroup
             None
 
     let writeGroup kefGroup = 
-        sprintf "Запись к-тов группы %A" (KefGroup.what kefGroup) <|> fun () -> 
-            KefGroup.kefs kefGroup
+        sprintf "Запись к-тов группы %A" (GroupCoefs.what kefGroup) <|> fun () -> 
+            kefGroup.Coefs
             |> List.map(fun x -> x, None)
             |> party.WriteKefs 
 
@@ -209,17 +203,17 @@ module private Helpers1 =
                 party.ComputeKefGroup kefGroup
                 None
             "Запись" <|> fun () ->  
-                KefGroup.kefs kefGroup
+                kefGroup.Coefs
                 |> List.map(fun x -> x, None)
                 |> party.WriteKefs ]
 
     type OpConfig = Config
     type Op = Operation
 
-    let switchPneumo gas = maybeErr{
+    let switchPneumo x = maybeErr{
         let code, title, text = 
-            match gas with
-            | Some gas -> 
+            match x with
+            | Some (gsensInd, scalePt) -> 
                 let s = ScalePt.what gas
                 ScalePt.code gas |> byte, "Продувка " + s, "Подайте " + s
             | _ -> 0uy, "Выключить пневмоблок", "Отключите газ"
@@ -254,12 +248,12 @@ module private Helpers1 =
         else 
             do! Hardware.Warm.warm value Thread2.isKeepRunning party.Interrogate  }
 
-    let adjust isScaleEnd = 
-        let cmd, gas, wht = 
-            if not isScaleEnd then 
-                AdjustBeg, ScaleBeg, "начало" 
-            else 
-                AdjustEnd, ScaleEnd, "конец"
+    let adjust (sensInd,scalePt) = 
+        let cmd, wht = 
+            match sensInd,scalePt with
+            | Sens1, ScaleBeg ->
+                CmdAdjustNull1, "начала" 
+            
         let whatOperation = sprintf "Калибровка %s шкалы" wht
         let defaultDelayTime = TimeSpan.FromMinutes 3.
         (whatOperation, defaultDelayTime, AdjustDelay isScaleEnd)  <-|-> fun gettime -> maybeErr{
@@ -273,13 +267,13 @@ module private Helpers1 =
 
     let goNku = "Установка НКУ" <|> fun () -> warm TermoNorm
 
-    let readVarsValues feat gas t wht = maybeErr{
+    let readVarsValues feat gas t press wht = maybeErr{
         do! Comport.testPort appCfg.ComportProducts
         do! party.DoForEachProduct(fun p -> 
             maybeErr{
                 for var in PhysVar.values do
                     let! readedValue = p.ReadModbus( ReadVar var)
-                    p.setVar (feat,var,gas,t) (Some readedValue)
+                    p.setVar (feat,var,gas,t, press) (Some readedValue)
                     Logging.info "%s : %s = %s" p.What (PhysVar.what var) (Decimal.toStr6 readedValue) } |> function 
             | Some error -> Logging.error "%s" error
             | _ -> () ) }
@@ -289,64 +283,33 @@ let blowAir =
         blow 1 ScaleBeg "Продуть воздух"
         "Закрыть пневмоблок" <|> fun () -> switchPneumo None
     ]
-let blowAndRead feat t =
+let blowAndRead feat temp press =
     [   for gas in ScalePt.values ->
             gas.What <||> [
                 yield blow 3 gas "Продувка"
-                yield "Считывание" <|> readVarsValues feat gas t  ] 
+                yield "Считывание" <|> readVarsValues feat gas temp press ] 
         yield blowAir ]
 
-let warmAndRead feat t =
-    sprintf "Cнятие %A %A" (Feature.what1 feat) (TermoPt.what t) <||> 
-        [   yield sprintf "Температура %A" (TermoPt.what t) <||> [
-                yield "Установка"  <|> fun () -> warm t
-                yield ("Выдержка", TimeSpan.FromHours 1., WarmDelay t) <-|-> fun gettime -> maybeErr{    
+let warmAndRead feat temp  =
+    sprintf "Cнятие %A %A" (Feature.what1 feat) (TermoPt.what temp) <||> 
+        [   yield sprintf "Температура %A" (TermoPt.what temp) <||> [
+                yield "Установка"  <|> fun () -> warm temp
+                yield ("Выдержка", TimeSpan.FromHours 1., WarmDelay temp) <-|-> fun gettime -> maybeErr{    
                     do! switchPneumo None    
-                    do! Delay.perform ( sprintf "Выдержка термокамеры %A" (TermoPt.what t) ) gettime true } ]
+                    do! Delay.perform ( sprintf "Выдержка термокамеры %A" (TermoPt.what temp) ) gettime true } ]
         
-            yield! blowAndRead feat t  ]
+            yield! blowAndRead feat temp Pnorm  ]
 
 let test = 
     
     [   adjust false
         adjust true 
         blowAir
-        "Cнятие НКУ" <||> ( blowAndRead Test TermoNorm  )
+        "Cнятие НКУ" <||> ( blowAndRead Test TermoNorm Pnorm )
         warmAndRead Test TermoLow 
-        warmAndRead Test TermoHigh 
-        warmAndRead Test Termo90 
-        warmAndRead RetNku TermoNorm  ]
+        warmAndRead Test TermoHigh  ]
     |> (<||>) "Проверка"
 
-let texprogon = 
-    "Техпрогон" <||> [   
-        adjust false
-        adjust true 
-        blowAir
-        "Снятие перед техпрогоном" <||> blowAndRead Tex1 TermoNorm 
-        ("Выдержка на техпрогоне", TimeSpan.FromHours 16., TexprogonDelay) <-|-> fun gettime ->
-            Delay.perform "Техпрогон" gettime true
-        "Снятие после техпрогона" <||> blowAndRead Tex2 TermoNorm ]
-
-let reworkTermo = 
-        
-    [   goNku
-        adjust false
-        adjust true
-        blowAir
-        "Снятие НКУ для перевода климатики" <||> blowAndRead Termo TermoNorm 
-        "Переcчёт" <|> fun () ->
-            party.DoForEachProduct(fun p -> 
-                p.Product <- snd <| runState Alchemy.translateTermo p.Product )
-            |> Result.someErr
-            
-        "Термокомпенсация" <||> [
-            "Начало шкалы" <||> computeAndWriteGroup (KefTermo ScaleBeg)
-            "Конец шкалы" <||> computeAndWriteGroup (KefTermo ScaleEnd) ]
-        test ]
-    |> (<||>) "Перевод климатики" 
-
-    
 
 let productionWork = 
     [   "Установка к-тов исп." <|> fun () -> maybeErr{
@@ -359,15 +322,15 @@ let productionWork =
         adjust false
         adjust true 
         "Линеаризация" <||> [
-            yield "Снятие" <||> blowAndRead Lin TermoNorm 
-            yield!  computeAndWriteGroup KefLin ]
+            yield "Снятие" <||> blowAndRead ( FeatureKefGroup <| LinCoefs Sens1) TermoNorm Pnorm
+            yield!  computeAndWriteGroup LinCoefs ]
         warmAndRead Termo TermoLow 
         warmAndRead Termo TermoHigh 
         warmAndRead Termo Termo90 
         warmAndRead Termo TermoNorm 
         "Термокомпенсация"  <||> [
             for gas in ScalePt.values ->
-                 gas.What <||> computeAndWriteGroup  (KefTermo gas) ]
+                 gas.What <||> computeAndWriteGroup  (TermoCoefs gas) ]
         test
         texprogon ]
     |> (<||>) "Осн."

@@ -57,9 +57,9 @@ type ProductTypesConverter() =
     override this.GetStandardValuesSupported _ = true
     override this.GetStandardValuesExclusive _ = true
     override this.GetStandardValues _ =       
-        ProductType.values
+        AppConfig.productTypes
         |> Seq.toArray
-        |> Array.map( fun x -> x.What)
+        |> Array.map ProductType.what
         |> TypeConverter.StandardValuesCollection
         
 [<AbstractClass>]
@@ -71,7 +71,7 @@ type Party1
     let mutable partyHeader = partyHeader
     let mutable partyData = partyData
     let productType() = partyHeader.ProductType 
-    let getPgs gas = Party.ballonConc gas partyData.BallonConc
+    let getPgs sens gas = Party.ballonConc (sens,gas) partyData.BallonConc
     let getTermoTemperature t = 
         partyData.TermoTemperature
         |> Map.tryFind t
@@ -98,11 +98,10 @@ type Party1
 
     let setMainWindowTitle() = 
         MainWindow.form.Text <- 
-            sprintf "Партия %s %s %A ПГС1=%M ПГС2=%M ПГС3=%M" 
+            sprintf "Партия %s %s %A" 
                 (DateTime.format "dd/MM/yy" partyHeader.Date)
                 partyHeader.ProductType.What  
                 partyHeader.Name
-                (getPgs ScaleBeg) (getPgs ScaleMid) (getPgs ScaleEnd)
   
     do
         setMainWindowTitle()
@@ -131,8 +130,10 @@ type Party1
             |> Seq.toList
             |> List.iter x.DeleteProduct
             setProducts otherPartyData.Products
-            for gas in ScalePt.values do
-                x.RaisePropertyChanged <| ScalePt.name gas
+
+            Vars.sensorScalePoints
+            |> List.iter (Property.sensorScalePt >> x.RaisePropertyChanged)
+
             for t in TermoPt.values do
                 x.RaisePropertyChanged <| TermoPt.name t
             x.RaisePropertyChanged "ProductType"
@@ -166,7 +167,7 @@ type Party1
     member x.SetPgs (gas,value) =
         if Some value <>  partyData.BallonConc.TryFind gas then
             partyData <- { partyData with BallonConc = Map.add gas value partyData.BallonConc }
-            x.RaisePropertyChanged <| ScalePt.name gas
+            x.RaisePropertyChanged <| Property.sensorScalePt gas
             setMainWindowTitle()
             updateProductsTypeAlchemy()
 
@@ -198,9 +199,9 @@ type Party1
         and set v = 
             if v <> x.ProductType then
                 let t = 
-                    ProductType.values 
+                    AppConfig.productTypes
                     |> List.tryFind( ProductType.what >> (=) v)
-                    |> Option.getWith A00
+                    |> Option.getWith ProductType.first
                 partyHeader <- { partyHeader with ProductType = t}
                 x.RaisePropertyChanged "ProductType"
                 setMainWindowTitle()
