@@ -160,8 +160,8 @@ let radioButtons<'a when 'a : comparison> parent (items : 'a list) (what : 'a ->
                 let b,p = %% x
                 b.Visible <- visibleItems'.Contains x  
                 p.Visible <- b.Visible 
-                if b.Visible then Some  (b.Height + 3) else None)
-            |> List.reduce (+)
+                if b.Visible then Some  (b.Height + 3) else None)            
+            |> List.fold (+) 0
         if visibleItems'.Contains  activeItem then () else
             visibleItems 
             |> List.maybeHead

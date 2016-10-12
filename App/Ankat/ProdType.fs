@@ -114,4 +114,4 @@ type ProductType =
     static member first = 
         {   TypeNumber = 10
             Sensor = Sensor.new' CO2 UnitsVolume Sc100  
-            Sensor2 = None }
+            Sensor2 = Some <| Sensor.new' CH4 UnitsVolume Sc100   }

@@ -10,50 +10,50 @@ type Party(partyHeader, partyData) =
         ViewModelBase.raisePropertyChanged x propertyName
 
     [<Category("Концентрация ПГС")>] 
-    [<DisplayName("ПГС1/к2")>]    
-    [<Description("Концентрация ПГС1/к2, канал 1, начало шкалы")>]
+    [<DisplayName("ПГС1/1")>]    
+    [<Description("Концентрация ПГС1/1, канал 1, начало шкалы")>]
     member x.Sens1_ScaleBeg
         with get() = x.GetPgs {SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg}
         and set v = x.SetPgs ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg}, v) 
 
     [<Category("Концентрация ПГС")>] 
-    [<DisplayName("ПГС2/к2")>]    
-    [<Description("Концентрация ПГС2/к2, канал 1, 1-ая середина шкалы")>]
+    [<DisplayName("ПГС2/1")>]    
+    [<Description("Концентрация ПГС2/1, канал 1, 1-ая середина шкалы")>]
     member x.Sens1_ScaleMid1
         with get() = x.GetPgs {SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleMid1}
         and set v = x.SetPgs ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleMid1}, v) 
 
     [<Category("Концентрация ПГС")>] 
-    [<DisplayName("ПГС3/к2")>]    
-    [<Description("Концентрация ПГС3/к2, канал 1, 2-ая середина шкалы")>]
+    [<DisplayName("ПГС3/1")>]    
+    [<Description("Концентрация ПГС3/1, канал 1, 2-ая середина шкалы")>]
     member x.Sens1_ScaleMid2
         with get() = x.GetPgs {SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleMid2}
         and set v = x.SetPgs ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleMid2}, v) 
 
     [<Category("Концентрация ПГС")>] 
-    [<DisplayName("ПГС4/к2")>]    
-    [<Description("Концентрация ПГС4/к2, канал 1, конец шкалы")>]
+    [<DisplayName("ПГС4/1")>]    
+    [<Description("Концентрация ПГС4/1, канал 1, конец шкалы")>]
     member x.Sens1_ScaleEnd
         with get() = x.GetPgs {SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd}
         and set v = x.SetPgs ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd}, v) 
 
     [<Category("Концентрация ПГС")>] 
-    [<DisplayName("ПГС1/к3")>]    
-    [<Description("Концентрация ПГС1/к3, канал 2, начало шкалы")>]
+    [<DisplayName("ПГС1/2")>]    
+    [<Description("Концентрация ПГС1/2, канал 2, начало шкалы")>]
     member x.Sens2_ScaleBeg
         with get() = x.GetPgs {SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg}
         and set v = x.SetPgs ({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg}, v) 
 
     [<Category("Концентрация ПГС")>] 
-    [<DisplayName("ПГС2/к3")>]    
-    [<Description("Концентрация ПГС2/к3, канал 2, 1-ая середина шкалы")>]
+    [<DisplayName("ПГС2/2")>]    
+    [<Description("Концентрация ПГС2/2, канал 2, 1-ая середина шкалы")>]
     member x.Sens2_ScaleMid1
         with get() = x.GetPgs {SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleMid1}
         and set v = x.SetPgs ({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleMid1}, v) 
 
     [<Category("Концентрация ПГС")>] 
-    [<DisplayName("ПГС4/к3")>]    
-    [<Description("Концентрация ПГС4/к3, канал 2, конец шкалы")>]
+    [<DisplayName("ПГС4/2")>]    
+    [<Description("Концентрация ПГС4/2, канал 2, конец шкалы")>]
     member x.Sens2_ScaleEnd
         with get() = x.GetPgs {SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd}
         and set v = x.SetPgs ({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd}, v) 

@@ -22,7 +22,7 @@ module private Helpers =
     type Dlg = MyWinForms.PopupDialog.Options
 
 
-let showSelectScenaryDialog : Button -> unit = 
+let showSelectScenaryDialog  (targetButton : Button)  = 
     let tv = 
         new MyWinForms.Components.TriStateCheckTreeView
                 (Font = new Font( "Segue UI", 12.f ),
@@ -71,4 +71,4 @@ let showSelectScenaryDialog : Button -> unit =
     tv.Select()
     tv.Focus() |> ignore
     validate()
-    dialog.Show
+    dialog.Show targetButton

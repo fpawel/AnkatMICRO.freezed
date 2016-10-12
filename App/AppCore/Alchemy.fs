@@ -92,30 +92,30 @@ module private PivateComputeProduct =
 
     let getValuesTermo chan var gas p   =
         TermoPt.values
-        |> List.map( fun t -> KefGroup( TermoCoefs( SScalePt.new' chan gas)) , var, gas, t, Pnorm) |> getVarsValues p
+        |> List.map( fun t -> Correction( CorrectionTermoScale( SScalePt.new' chan gas)) , var, gas, t, PressNorm) |> getVarsValues p
 
     let getTermoT chan = getValuesTermo chan chan.Termo
 
     let getVar1T chan = getValuesTermo chan chan.Var1
 
     let calculatePressureSensCoefs (p:Product) =
-        let ctx v p = KefGroup PressureSensCoefs , v, ScaleBeg, TermoNorm, p
-        match getVarsValues p [ ctx Pmm Pnorm; ctx Pmm Phigh; ctx VdatP Pnorm;  ctx VdatP Phigh ]  with
+        let ctx v p = Correction CorrectionPressSens , v, ScaleBeg, TermoNorm, p
+        match getVarsValues p [ ctx Pmm PressNorm; ctx Pmm PressHigh; ctx VdatP PressNorm;  ctx VdatP PressHigh ]  with
         | Ok [x0; x1; y0; y1] -> 
             let k0 = (y1-y0)/( x1 - x0 )
             let k1 = y0 - x0*k0
-            Logging.info "%s : расчёт коэффициентов %A ==> %M, %M" p.What PressureSensCoefs.Dscr k0 k1
+            Logging.info "%s : расчёт коэффициентов %A ==> %M, %M" p.What CorrectionPressSens.Dscr k0 k1
             Ok [ k0; k1 ]
         | _ -> "не достаточно исходных данных" |> Err
 
     let getGaussXY p getPgsConc  = function
-        | PressureSensCoefs -> failwith "PressureSensCoefs is not for gauss!"
-        | TermoPressureCoefs ->
+        | CorrectionPressSens -> failwith "PressureSensCoefs is not for gauss!"
+        | CorrectionTermoPress ->
             // [ Termo1, ch1.Tpp, Air; Termo1, ch1.Var1, Air ]
-            let g = KefGroup TermoPressureCoefs
+            let g = Correction CorrectionTermoPress
             let xs var = 
                 TermoPt.values
-                |> List.map( fun t -> g , var, ScaleBeg, t, Pnorm) 
+                |> List.map( fun t -> g , var, ScaleBeg, t, PressNorm) 
                 |> getVarsValues p
             result {
                 let! temps = xs Sens1.Termo
@@ -123,11 +123,11 @@ module private PivateComputeProduct =
                 return List.zip temps vars }
             |> Result.mapErr( 
                 fmtErr (function  V(_,_,_,t,_) -> sprintf "%A" t)
-                >> sprintf "нет значения %A в %s" TermoPressureCoefs.Dscr )
+                >> sprintf "нет значения %A в %s" CorrectionTermoPress.Dscr )
 
-        | LinCoefs chan -> 
+        | CorrectionLinScale chan -> 
             chan.ScalePts 
-            |> List.map( fun gas -> KefGroup( LinCoefs chan ), chan.Conc, gas, TermoNorm, Pnorm )
+            |> List.map( fun gas -> Correction( CorrectionLinScale chan ), chan.Conc, gas, TermoNorm, PressNorm )
             |> getVarsValues p
             |> Result.map ( fun xs -> 
                 List.zip xs ( chan.ScalePts |> List.map ( SScalePt.new' chan >> getPgsConc )  ) )
@@ -135,7 +135,7 @@ module private PivateComputeProduct =
                 fmtErr (function  V(_,_,gas,_,_) -> sprintf "%A" gas)
                 >> sprintf "нет значения LIN в %s" )
 
-        | TermoCoefs { SensorIndex = Sens1; ScalePt = ScaleBeg} -> 
+        | CorrectionTermoScale { SensorIndex = Sens1; ScalePt = ScaleBeg} -> 
             result {
                 let! t = getTermoT Sens1 ScaleBeg p
                 let! var = getVar1T Sens1 ScaleBeg p
@@ -144,7 +144,7 @@ module private PivateComputeProduct =
                 fmtErr (function V(_,var,_,t,_) -> sprintf "%s.%s" (PhysVar.what var) (TermoPt.what t) )                
                 >> sprintf "нет значения T0.к1 в %s" )
 
-        | TermoCoefs { SensorIndex = Sens2; ScalePt = ScaleBeg} -> 
+        | CorrectionTermoScale { SensorIndex = Sens2; ScalePt = ScaleBeg} -> 
             result {
                 let! t = getTermoT Sens2 ScaleBeg p
                 let! var = getVar1T Sens2 ScaleBeg p
@@ -153,7 +153,7 @@ module private PivateComputeProduct =
                 fmtErr (function V(_,var,_,t,_) -> sprintf "%s.%s" (PhysVar.what var) (TermoPt.what t) )                
                 >> sprintf "нет значения T0.к2 в %s" )
 
-        | TermoCoefs { SensorIndex = chan; ScalePt = ScaleEnd} -> 
+        | CorrectionTermoScale { SensorIndex = chan; ScalePt = ScaleEnd} -> 
             result {
                 let! t = getTermoT chan ScaleEnd p
                 let! var = getVar1T chan ScaleEnd p
@@ -177,12 +177,12 @@ module private PivateComputeProduct =
                     |> fmtErr TermoPt.what 
                     |> sprintf "при расчёте TK.к%d деление на ноль в %s" chan.N
                     |> Err )
-        | TermoCoefs { ScalePt = ScaleMid1} 
-        | TermoCoefs { ScalePt = ScaleMid2} ->  failwith "there is no TermoCoefs (_,ScaleMid) in AnkatMICRO!!"
+        | CorrectionTermoScale { ScalePt = ScaleMid1} 
+        | CorrectionTermoScale { ScalePt = ScaleMid2} ->  failwith "there is no TermoCoefs (_,ScaleMid) in AnkatMICRO!!"
 
 
     let doValuesGaussXY group xy =
-        let groupCoefs = GroupCoefs.coefs group
+        let groupCoefs = Correction.coefs group
         let groupCoefsSet = Set.ofList groupCoefs
         let strGroupCoefs = Seq.toStr ", " (Coef.order >> string) groupCoefs
 
@@ -195,10 +195,10 @@ module private PivateComputeProduct =
 
 let compute group getPgsConc productType = state {
     let! product = getState
-    let groupCoefs = GroupCoefs.coefs group
+    let groupCoefs = Correction.coefs group
     let groupCoefsSet = Set.ofList groupCoefs
     let strGroupCoefs = Seq.toStr ", " (Coef.order >> string) groupCoefs
-    Logging.info "%s : расчёт коэффициентов %A, %s" (Product.what product) (GroupCoefs.what group) strGroupCoefs
+    Logging.info "%s : расчёт коэффициентов %A, %s" (Product.what product) (Correction.what group) strGroupCoefs
     do!
         initKefsValues getPgsConc productType
         |> List.filter(fst >> groupCoefsSet.Contains)
@@ -206,7 +206,7 @@ let compute group getPgsConc productType = state {
 
     let result = 
         match group with
-        | PressureSensCoefs -> calculatePressureSensCoefs product
+        | CorrectionPressSens -> calculatePressureSensCoefs product
         | _ ->
             getGaussXY product getPgsConc group
             |> Result.map (doValuesGaussXY group)
@@ -220,11 +220,11 @@ let compute group getPgsConc productType = state {
     
 let getProductTermoErrorlimit channel pgs (gas,t) product =
     let concVar = channel.ChannelIndex.Conc
-    let f = Test channel.ChannelIndex
+    let f = TestConcErrors channel.ChannelIndex
     if not channel.ChannelSensor.Gas.IsCH then         
         let tempVar = channel.ChannelIndex.Termo
         
-        (Product.getVar (f, concVar, gas,t,Pnorm) product, Product.getVar (f, tempVar, gas, t,Pnorm) product) 
+        (Product.getVar (f, concVar, gas,t,PressNorm) product, Product.getVar (f, tempVar, gas, t,PressNorm) product) 
         |> Option.map2(fun(c,t) -> 
             let dt = t - 20m     
             let maxc = channel.ChannelSensor.ConcErrorlimit pgs
@@ -233,7 +233,7 @@ let getProductTermoErrorlimit channel pgs (gas,t) product =
         match gas with
         | ScaleBeg -> Some 5m
         | _ ->
-            Product.getVar (f,concVar,gas,TermoNorm,Pnorm) product
+            Product.getVar (f,concVar,gas,TermoNorm,PressNorm) product
             |> Option.map(fun conc20 -> conc20 * 0.15m |> abs  |> decimal )
 
 type ValueError = 
@@ -249,14 +249,14 @@ type ValueError =
 type Product with
 
     static member concError channel pgs gas product = 
-        Product.getVar (Test channel.ChannelIndex, channel.ChannelIndex.Conc, gas, TermoNorm, Pnorm) product 
+        Product.getVar (TestConcErrors channel.ChannelIndex, channel.ChannelIndex.Conc, gas, TermoNorm, PressNorm) product 
         |> Option.map(fun conc ->                 
             { Value = conc; Nominal = pgs; Limit = channel.ChannelSensor.ConcErrorlimit pgs } ) 
 
     static member termoError channel pgs (gas,t) p = 
         let concVar = channel.ChannelIndex.Conc
-        (   Product.getVar (Test channel.ChannelIndex,concVar,gas,t, Pnorm) p,
-            Product.getVar (Test channel.ChannelIndex,concVar,gas,TermoNorm, Pnorm) p,
+        (   Product.getVar (TestConcErrors channel.ChannelIndex,concVar,gas,t, PressNorm) p,
+            Product.getVar (TestConcErrors channel.ChannelIndex,concVar,gas,TermoNorm, PressNorm) p,
             Product.termoErrorlimit channel pgs (gas,t) p )
         |> Option.map3( fun (c,c20,limit) -> 
             { Value = c; Nominal = c20; Limit = limit } )

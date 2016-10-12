@@ -19,48 +19,61 @@ type private VE = Ankat.Alchemy.ValueError
 module TabsheetVars =
     type Page = 
         {   PhysVar : PhysVar
-            Feature : Feature
+            ProductionPoint : ProductionPoint
             TermoPt : TermoPt
-            PressurePt : PressurePt} 
+            PressPt : PressPt} 
         
     let mutable private page = { 
         PhysVar = Sens1.Conc
-        Feature = KefGroup <| LinCoefs Sens1
+        ProductionPoint = Correction <| CorrectionLinScale Sens1
         TermoPt = TermoNorm
-        PressurePt = Pnorm}
+        PressPt = PressNorm}
 
-    let addcol dataPropertyName headerText = 
+    let private addcol dataPropertyName headerText = 
         new DataGridViewTextBoxColumn( DataPropertyName = dataPropertyName, HeaderText = headerText)
         |> gridProducts.Columns.AddColumn
 
+    let private termoLeter = function
+        | TermoNorm -> ""
+        | TermoLow -> "-"
+        | TermoHigh -> "+"
+
     let update () = 
         
-        sprintf "%s, %s, %s, %s" page.Feature.What2 page.PhysVar.What 
-            page.TermoPt.Dscr page.PressurePt.What
+        sprintf "%s, %s, %s, %s" page.ProductionPoint.What2 page.PhysVar.What 
+            page.TermoPt.Dscr page.PressPt.What
         |> setActivePageTitle 
         gridProducts.Columns.``remove all columns but`` Columns.main
-        let f = page.Feature
-        match f.Gases, f.PhysVars, f.Temeratures, f.Pressures with
-        | _::_::_, [physvar], [TermoNorm], [Pnorm] ->
-            for gas in f.Gases do
-                let var = page.Feature, physvar, gas, TermoNorm, Pnorm
-                addcol (Vars.what var) gas.What
-        | [gas], _::_::_, _::_::_, [Pnorm] ->
-            for physvar in f.PhysVars do
-                let var = page.Feature, physvar, gas, page.TermoPt, Pnorm
-                addcol (Vars.what var) physvar.What
-        | _ -> ()
+        let f = page.ProductionPoint
         
-
+        match f with
+        | Correction (CorrectionLinScale _ )
+        | TestConcErrors _ ->
+            for gas in f.Gases do
+                let var = page.ProductionPoint, page.PhysVar, gas, page.TermoPt, page.PressPt
+                addcol (Vars.property var) gas.What
+        | Correction (CorrectionTermoScale _ | CorrectionTermoPress) -> 
+            for t in [TermoNorm; TermoLow; TermoHigh] do
+                for physvar in f.PhysVars do
+                    let var = page.ProductionPoint, physvar, f.Gases.Head, t, PressNorm
+                    addcol (Vars.property var) (physvar.What + termoLeter t)
+        | Correction CorrectionPressSens  -> 
+            for p in f.Pressures do
+                for physvar in f.PhysVars do                
+                    let var = page.ProductionPoint, physvar, ScaleBeg, TermoNorm, p
+                    addcol (Vars.property var) (sprintf "%s.%s" physvar.What p.What)
+        
     let private addp () =         
         let p = new Panel(Parent = TabsheetVars.BottomTab, Dock = DockStyle.Top)
         let _ = new Panel(Parent = TabsheetVars.BottomTab, Dock = DockStyle.Top, Height = 10)
         p
 
+    
+
     module Press =
         let get,set, setVisibility = 
-            radioButtons (addp ()) PressurePt.values PressurePt.what <| fun x -> 
-                page <- {page with PressurePt = x }
+            radioButtons (addp ()) PressPt.values PressPt.what <| fun x -> 
+                page <- {page with PressPt = x }
                 update()
 
     module Termo =
@@ -82,29 +95,29 @@ module TabsheetVars =
 
     module Feat =
         let get,set, setVisibility = 
-            radioButtons (addp ()) Feature.values Feature.what2 <| fun x ->
-             
-                page <- {page with Feature = x }
+            let f set setVis = 
+                function
+                    | [v] -> v,[]
+                    | x::_ as xs -> x,xs
+                >> fun (x,xs) -> 
+                    set x
+                    setVis xs
 
-                match x.PhysVars with
-                | [v] -> page <- {page with PhysVar = v }; []
-                | xs -> xs
-                |> PhysVar.setVisibility 
+            radioButtons (addp ()) ProductionPoint.values ProductionPoint.what2 <| fun x ->
+                f PhysVar.set PhysVar.setVisibility x.PhysVars 
+                f Termo.set Termo.setVisibility x.Temperatures 
+                f Press.set Press.setVisibility x.Pressures 
+                page <- { page with ProductionPoint = x }
 
-                let temeratures = Set.ofList <| Feature.temeratures x
-                TermoPt.values 
-                |> List.filter temeratures.Contains 
-                |> Termo.setVisibility
 
-                let physvars = Set.ofList <| Feature.physVars x
-                PhysVar.values 
-                |> List.filter physvars.Contains 
-                |> PhysVar.setVisibility
-
-                let pressures = Set.ofList <| Feature.pressures x
-                PressurePt.values 
-                |> List.filter pressures.Contains 
-                |> Press.setVisibility
+                match x with
+                | Correction (CorrectionTermoScale _  | CorrectionTermoPress) ->
+                    PhysVar.setVisibility []
+                    Termo.setVisibility []                
+                | Correction CorrectionPressSens  -> 
+                    PhysVar.setVisibility []
+                    Press.setVisibility []
+                | _ -> ()
 
                 update()
 

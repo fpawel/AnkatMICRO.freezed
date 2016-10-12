@@ -97,7 +97,7 @@ type Ankat.ViewModel.Product1 with
     member p.TestConc channel n = maybeErr{
         let concVar = SensorIndex.conc channel.ChannelIndex
         let! conc = p.ReadModbus( ReadVar concVar )
-        p.setVar (Test channel.ChannelIndex, concVar, n.ScalePt, TermoNorm,Pnorm) (Some conc)
+        p.setVar (TestConcErrors channel.ChannelIndex, concVar, n.ScalePt, TermoNorm,PressNorm) (Some conc)
         p.calculateTestConc channel n conc }
 
 type Ankat.ViewModel.Party with
@@ -187,18 +187,18 @@ module private Helpers1 =
     let (<||>) what xs =  Operation.CreateScenary ( what, none)  xs
 
     let computeGroup kefGroup = 
-        sprintf "Расчёт %A" (GroupCoefs.what kefGroup) <|> fun () -> 
+        sprintf "Расчёт %A" (Correction.what kefGroup) <|> fun () -> 
             party.ComputeKefGroup kefGroup
             None
 
     let writeGroup kefGroup = 
-        sprintf "Запись к-тов группы %A" (GroupCoefs.what kefGroup) <|> fun () -> 
+        sprintf "Запись к-тов группы %A" (Correction.what kefGroup) <|> fun () -> 
             kefGroup.Coefs
             |> List.map(fun x -> x, None)
             |> party.WriteKefs 
 
     let computeAndWriteGroup kefGroup = 
-        (GroupCoefs.what kefGroup) <||> [   
+        (Correction.what kefGroup) <||> [   
             "Расчёт" <|> fun () -> 
                 party.ComputeKefGroup kefGroup
                 None
@@ -287,8 +287,8 @@ module private Helpers1 =
 
     let readVars (feat,gas,t,press) = 
         let what = 
-            sprintf "Снятие %A, %s, %s, %s" (Feature.what2 feat ) 
-                (ScalePt.what gas ) (TermoPt.what t) (PressurePt.what press)
+            sprintf "Снятие %A, %s, %s, %s" (ProductionPoint.what2 feat ) 
+                (ScalePt.what gas ) (TermoPt.what t) (PressPt.what press)
         what <|> fun () -> maybeErr{
             do! Comport.testPort appCfg.ComportProducts
             do! party.DoForEachProduct(fun p -> 
@@ -303,7 +303,7 @@ module private Helpers1 =
 
 
     let formatGasFeatsList (gas, feats) =
-        let strFeats = feats |> Set.ofSeq |> Seq.toStr ", " Feature.what2
+        let strFeats = feats |> Set.ofSeq |> Seq.toStr ", " ProductionPoint.what2
         let strGas = SScalePt.what gas
         sprintf "%s, %s" strFeats strGas
 
@@ -311,7 +311,7 @@ module private Helpers1 =
         let gases, feats' = List.unzip featsGasesList
         let feats = List.concat feats' 
         let strGases = gases |> Set.ofSeq |> Seq.toStr ", " SScalePt.what
-        let strFeats = feats |> Set.ofSeq |> Seq.toStr ", " Feature.what2
+        let strFeats = feats |> Set.ofSeq |> Seq.toStr ", " ProductionPoint.what2
         sprintf "%s, %s" strFeats strGases
 
 
@@ -332,7 +332,7 @@ module private Helpers1 =
                     yield ("Выдержка", TimeSpan.FromHours 1., WarmDelay temp) <-|-> fun gettime -> maybeErr{    
                         do! switchPneumo None    
                         do! Delay.perform ( sprintf "Выдержка термокамеры %A" (TermoPt.what temp) ) gettime true } ]        
-                yield blowAndRead featsGasesList (temp,Pnorm)  ]
+                yield blowAndRead featsGasesList (temp,PressNorm)  ]
     
     let featGases1 s f = 
         SensorIndex.scalePts s 
@@ -340,25 +340,25 @@ module private Helpers1 =
 
     let test() = 
         let xs =
-            [   yield! featGases1 Sens1 Test
+            [   yield! featGases1 Sens1 TestConcErrors
                 if isSens2() then
-                    yield! featGases1 Sens2 Test ]
+                    yield! featGases1 Sens2 TestConcErrors ]
         "Проверка" <||> [   
             adjust()        
-            blowAndRead xs (TermoNorm,Pnorm )
+            blowAndRead xs (TermoNorm,PressNorm )
             warmAndRead xs TermoLow 
             warmAndRead xs TermoHigh  ]
     let lin() =        
         let xs =
-            [   yield! featGases1 Sens1 (LinCoefs >> KefGroup)
+            [   yield! featGases1 Sens1 (CorrectionLinScale >> Correction)
                 if isSens2() then
-                    yield! featGases1 Sens2 (LinCoefs >> KefGroup) ]
+                    yield! featGases1 Sens2 (CorrectionLinScale >> Correction) ]
 
         "Линеаризация" <||> [
-                yield blowAndRead xs (TermoNorm, Pnorm)
-                yield computeAndWriteGroup <| LinCoefs Sens1
+                yield blowAndRead xs (TermoNorm, PressNorm)
+                yield computeAndWriteGroup <| CorrectionLinScale Sens1
                 if isSens2() then
-                    yield computeAndWriteGroup <| LinCoefs Sens2 ]
+                    yield computeAndWriteGroup <| CorrectionLinScale Sens2 ]
 
     let norming() = 
         "Нормировка" <|> fun () -> maybeErr{
@@ -372,7 +372,7 @@ let production() =
     let termoFeatsGases =
         let mk gas n = 
             let x = SScalePt.new' n gas
-            x, [KefGroup <| TermoCoefs x]
+            x, [Correction <| CorrectionTermoScale x]
         [   for gas in [ScaleBeg; ScaleEnd] do
                 yield mk gas Sens1 
                 if isSens2() then
@@ -384,7 +384,7 @@ let production() =
             if isSens2() then
                 yield SScalePt.Beg2
                 yield SScalePt.End2 ]
-    let title = if isSens2() then "двуканальные" else "одноканальный"
+    let title = if isSens2() then "двухканальный" else "одноканальный"
     "Анкат-7664МИКРО " + title <||> [
         "Установка к-тов исп." <|> fun () -> maybeErr{
             do! party.DoForEachProduct (fun p -> 
@@ -403,7 +403,7 @@ let production() =
             warmAndRead termoFeatsGases TermoLow 
             warmAndRead termoFeatsGases TermoHigh 
             warmAndRead termoFeatsGases TermoNorm  
-            "Ввод" <||> ( gases |> List.map (TermoCoefs >> computeAndWriteGroup) ) 
+            "Ввод" <||> ( gases |> List.map (CorrectionTermoScale >> computeAndWriteGroup) ) 
             
             ]
         test() ]

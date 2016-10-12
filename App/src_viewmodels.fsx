@@ -38,12 +38,11 @@ type Product(p, getProdType, getPgs, partyId) =
     for ((f,v,gas,t,p) as var) in Vars.vars do
         let k1 = 
             sprintf "(%s, %s, %s, %s, %s)" 
-                (Feature.name f) (PhysVar.name v) (ScalePt.name gas) (TermoPt.name t)
-                (PressurePt.name p)
+                (ProductionPoint.name f) (PhysVar.name v) (ScalePt.name gas) (TermoPt.name t) (PressPt.name p)
         yield sprintf """
     member x.%s
         with get () = x.getVarUi %s
-        and set value = x.setVarUi %s value"""  (Property.var var) k1 k1 
+        and set value = x.setVarUi %s value"""  (Vars.property var) k1 k1 
         
     for n in SScalePt.values do
         yield sprintf """

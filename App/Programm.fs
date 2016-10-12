@@ -30,6 +30,8 @@ let main () =
         
         Application.Run MainWindow.form 
         Ankat.AppContent.save()
+        AppConfig.save()
+        AppConfig.saveProductTypes()
         
         
     with e ->

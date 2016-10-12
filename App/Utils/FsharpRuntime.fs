@@ -18,6 +18,8 @@ module FSharpValue =
         with e ->
             failwithf "Utils unif %A" e
 
+    
+
     let inline tryGetUnionCaseAttribute<'T,'a> (x:'a) = 
         let case,_ = FSharpValue.GetUnionFields(x, x.GetType() )
         case.GetCustomAttributes() |> 

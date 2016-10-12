@@ -192,7 +192,7 @@ type Product1(p : P, getProductType, getPgs, partyId) =
 
             Vars.vars
             |> List.filter(fun var -> prevVarsValues.[var] <> varsValues.[var] )
-            |> List.iter (Property.var >> x.RaisePropertyChanged) 
+            |> List.iter (Vars.property >> x.RaisePropertyChanged) 
 
             Coef.coefs
             |> List.filter(fun coef -> prevKefsValues.[coef] <> kefsValues.[coef] )
@@ -218,7 +218,7 @@ type Product1(p : P, getProductType, getPgs, partyId) =
         x.andThenUpdateAllErrors <| fun () ->
             let s = state{ do! P.setVar var value}
             p <- runState s p |> snd
-            var |> Property.var |> x.RaisePropertyChanged
+            var |> Vars.property |> x.RaisePropertyChanged
 
         
     member x.getKefUi kef = 

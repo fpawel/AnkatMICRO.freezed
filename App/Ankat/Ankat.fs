@@ -2,22 +2,27 @@
 
 open System
 
-type PressurePt =
-    | Pnorm
-    | Phigh
-    member x.Name = PressurePt.name x
-    member x.Property = PressurePt.property x
+[<AutoOpen>]
+module private Helpers =
+    let inline unionCaseName1<'a> (x:'a) = 
+        sprintf "%s.%A" (typeof<'a>.Name) x
+
+type PressPt =
+    | PressNorm
+    | PressHigh
+    member x.Name = PressPt.name x
+    member x.Property = PressPt.property x
 
     member x.What = 
         match x with
-        | Pnorm -> "740"
-        | Phigh -> "800"
+        | PressNorm -> "740"
+        | PressHigh -> "800"
     
 
-    static member what (x:PressurePt) = x.What
-    static member values = [ Pnorm; Phigh ] 
-    static member name (x:PressurePt) = "PressurePt." + FSharpValue.unionCaseName x
-    static member property (x:PressurePt) = FSharpValue.unionCaseName x
+    static member what (x:PressPt) = x.What
+    static member values = [ PressNorm; PressHigh ] 
+    static member name = unionCaseName1<PressPt> 
+    static member property (x:PressPt) = FSharpValue.unionCaseName x
 
 
 type TermoPt =
@@ -37,7 +42,7 @@ type TermoPt =
         
 
     static member values = [ TermoNorm; TermoLow;  TermoHigh  ] 
-    static member name (x:TermoPt) = "TermoPt." + FSharpValue.unionCaseName x
+    static member name = unionCaseName1<TermoPt> 
     static member property (x:TermoPt) = FSharpValue.unionCaseName x
     static member defaultTermoTemperature = function
         | TermoLow -> -60m
@@ -75,7 +80,7 @@ type ScalePt =
         | ScaleMid1 -> 50m
         | ScaleMid2 -> 70m
         | ScaleEnd -> 100m
-    static member name (x:ScalePt) = "ScalePt." + FSharpValue.unionCaseName x
+    static member name = unionCaseName1<ScalePt> 
     static member property (x:ScalePt) = FSharpValue.unionCaseName x
 
 type PhysVar =
@@ -161,7 +166,7 @@ type PhysVar =
         FSharpValue.unionCaseName x
     static member dscr = PhysVar.context >> snd 
     static member values = FSharpType.unionCasesList<PhysVar>
-    static member name (x:PhysVar) = "PhysVar." + FSharpValue.unionCaseName x
+    static member name = unionCaseName1<PhysVar> 
     static member property (x:PhysVar) = FSharpValue.unionCaseName x
     member x.Dscr = PhysVar.dscr x
     member x.What = PhysVar.what x
@@ -219,7 +224,7 @@ type SensorIndex =
 
     member x.ScalePts = SensorIndex.scalePts x
 
-    static member name (x:SensorIndex) = "SensorIndex." + FSharpValue.unionCaseName x
+    static member name = unionCaseName1<SensorIndex>
     static member property (x:SensorIndex) = FSharpValue.unionCaseName x
 
     static member conc = function
@@ -369,19 +374,19 @@ type Channel =
         ChannelIndex : SensorIndex }
 
 
-type GroupCoefs = 
-    | LinCoefs of SensorIndex
-    | TermoCoefs of SScalePt
-    | TermoPressureCoefs
-    | PressureSensCoefs
+type Correction = 
+    | CorrectionLinScale of SensorIndex
+    | CorrectionTermoScale of SScalePt
+    | CorrectionTermoPress
+    | CorrectionPressSens
     static member ctx = function
-        | LinCoefs chan -> 
+        | CorrectionLinScale chan -> 
             [chan.Conc],
                 sprintf "LIN%d" chan.N, sprintf "Линеаризация ф-ии преобразов. к.%d" chan.N, 
                     SensorIndex.coefsLin chan,
-                        chan.ScalePts, [TermoNorm], [Pnorm]
+                        chan.ScalePts, [TermoNorm], [PressNorm]
         
-        | TermoCoefs ({ScalePt = gas; SensorIndex = sens} as n)-> 
+        | CorrectionTermoScale ({ScalePt = gas; SensorIndex = sens} as n)-> 
             let strDescr = 
                 match gas with
                 | ScaleBeg -> "на нулев. показ."
@@ -396,118 +401,119 @@ type GroupCoefs =
             [sens.Termo; sens.Var1],
                 sprintf "T%s%d" strScale sens.N, sprintf "Комп. вл. темп. на %s к. %d" strDescr sens.N, 
                     n.CoefsTermo,
-                        [gas], TermoPt.values, [Pnorm]
+                        [gas], TermoPt.values, [PressNorm]
 
-        | PressureSensCoefs ->
+        | CorrectionPressSens ->
             [TppCh0; VdatP],
                 "PS", "Комп. влиян. давл. на чувст. по каналам",
                     [Coef_Pmmhg_0; Coef_Pmmhg_1],
-                        [ScaleBeg], [TermoNorm], PressurePt.values
+                        [ScaleBeg], [TermoNorm], PressPt.values
 
-        | TermoPressureCoefs ->
+        | CorrectionTermoPress ->
             [Sens1.Termo; VdatP],
                 "PT", "Компенс. влиян. темп. на к. измер. давл.",
                     [KNull_TP_0; KNull_TP_1; KNull_TP_2],
-                        [ScaleBeg], TermoPt.values, [Pnorm]   
+                        [ScaleBeg], TermoPt.values, [PressNorm]   
 
-    member x.What = GroupCoefs.what x
-    member x.Dscr = GroupCoefs.dscr x
+    member x.What = Correction.what x
+    member x.Dscr = Correction.dscr x
 
-    member x.PhysVars = GroupCoefs.vars x
-    member x.Gases = GroupCoefs.gases x
-    member x.Temps = GroupCoefs.temps x
-    member x.Press = GroupCoefs.press x
-    member x.Coefs = GroupCoefs.coefs x
+    member x.PhysVars = Correction.vars x
+    member x.Gases = Correction.gases x
+    member x.Temps = Correction.temps x
+    member x.Press = Correction.press x
+    member x.Coefs = Correction.coefs x
 
-    static member vars = GroupCoefs.ctx >> (fun (x,_,_,_,_,_,_) -> x)
-    static member what = GroupCoefs.ctx >> (fun (_,x,_,_,_,_,_) -> x)
-    static member dscr = GroupCoefs.ctx >> (fun (_,_,x,_,_,_,_) -> x)
-    static member coefs = GroupCoefs.ctx >> (fun (_,_,_,x,_,_,_) -> x)
-    static member gases = GroupCoefs.ctx >> (fun (_,_,_,_,x,_,_) -> x)
-    static member temps = GroupCoefs.ctx >> (fun (_,_,_,_,_,x,_) -> x)
-    static member press = GroupCoefs.ctx >> (fun (_,_,_,_,_,_,x) -> x)
+    static member vars = Correction.ctx >> (fun (x,_,_,_,_,_,_) -> x)
+    static member what = Correction.ctx >> (fun (_,x,_,_,_,_,_) -> x)
+    static member dscr = Correction.ctx >> (fun (_,_,x,_,_,_,_) -> x)
+    static member coefs = Correction.ctx >> (fun (_,_,_,x,_,_,_) -> x)
+    static member gases = Correction.ctx >> (fun (_,_,_,_,x,_,_) -> x)
+    static member temps = Correction.ctx >> (fun (_,_,_,_,_,x,_) -> x)
+    static member press = Correction.ctx >> (fun (_,_,_,_,_,_,x) -> x)
 
     static member values = 
         [   for chan in [Sens1; Sens2] do
-                yield LinCoefs chan
+                yield CorrectionLinScale chan
             for chan in [Sens1; Sens2] do
                 for ptgas in [ScaleBeg; ScaleEnd] do
-                    yield TermoCoefs (SScalePt.new' chan ptgas)
-            yield TermoPressureCoefs
-            yield PressureSensCoefs ]
+                    yield CorrectionTermoScale (SScalePt.new' chan ptgas)
+            yield CorrectionTermoPress
+            yield CorrectionPressSens ]
 
     static member name = 
         function
-            | TermoPressureCoefs -> "TermoPressureCoefs"
-            | PressureSensCoefs -> "PressureSensCoefs"
-            | LinCoefs sensInd -> sprintf "LinCoefs(%s)" (SensorIndex.name sensInd)
-            | TermoCoefs n  -> 
-                sprintf "TermoCoefs(%s)" n.Name
-        >> sprintf "GroupCoefs.%s"
+            | CorrectionTermoPress -> "CorrectionTermoPress"
+            | CorrectionPressSens -> "CorrectionPressSens"
+            | CorrectionLinScale sensInd -> sprintf "CorrectionLinScale(%s)" (SensorIndex.name sensInd)
+            | CorrectionTermoScale n  -> 
+                sprintf "CorrectionTermoScale(%s)" n.Name
+        >> sprintf "Correction.%s"
 
     static member property = function
-        | TermoPressureCoefs -> "TermoPressureCoefs"
-        | PressureSensCoefs -> "PressureSensCoefs"
-        | LinCoefs sensInd -> sprintf "Lin_%s" sensInd.Property
-        | TermoCoefs n -> sprintf "Termo_%s" n.Property
+        | CorrectionTermoPress -> "CorrectionTermoPress"
+        | CorrectionPressSens -> "CorrectionPressSens"
+        | CorrectionLinScale sensInd -> sprintf "CorrectionLinScale_%s" sensInd.Property
+        | CorrectionTermoScale n -> sprintf "CorrectionTermoScale_%s" n.Property
 
-type Feature = 
-    | KefGroup of GroupCoefs
-    | Test of SensorIndex
+type ProductionPoint = 
+    | Correction of Correction
+    | TestConcErrors of SensorIndex
 
-    member x.Property = Feature.property x
-    member x.Gases = Feature.gases x
-    member x.Temeratures = Feature.temeratures x
-    member x.PhysVars = Feature.physVars x
-    member x.Pressures = Feature.pressures x
+    member x.Property = ProductionPoint.property x
+    member x.Gases = ProductionPoint.gases x
+    member x.Temperatures = ProductionPoint.temeratures x
+    member x.PhysVars = ProductionPoint.physVars x
+    member x.Pressures = ProductionPoint.pressures x
 
     static member ofSensor sensor = function
-        | Test s -> s = sensor
-        | KefGroup g ->     
+        | TestConcErrors s -> s = sensor
+        | Correction g ->     
             match g with
-            | LinCoefs s -> s = sensor
-            | TermoCoefs n -> n.SensorIndex = sensor
+            | CorrectionLinScale s -> s = sensor
+            | CorrectionTermoScale n -> n.SensorIndex = sensor
             | _ -> sensor = Sens1
 
 
     static member physVars = function
-        | Test s -> [ s.Conc; s.Termo ]
-        | KefGroup g -> g.PhysVars
+        | TestConcErrors s -> [ s.Conc; s.Termo ]
+        | Correction g -> g.PhysVars
 
     static member pressures = function
-        | Test _ -> [ Pnorm ]
-        | KefGroup g -> g.Press
+        | TestConcErrors _ -> [ PressNorm ]
+        | Correction g -> g.Press
 
     static member temeratures = function
-        | Test _ -> TermoPt.values
-        | KefGroup g -> g.Temps
+        | TestConcErrors _ -> TermoPt.values
+        | Correction g -> g.Temps
 
     static member gases = function
-        | Test s -> s.ScalePts
-        | KefGroup g -> GroupCoefs.gases g
+        | TestConcErrors s -> s.ScalePts
+        | Correction g -> Correction.gases g
 
     static member what = function
-        | KefGroup kg -> kg.Dscr, kg.What
-        | Test s -> sprintf "Проверка к.%d" s.N, sprintf "Проверка%d" s.N
+        | Correction kg -> kg.Dscr, kg.What
+        | TestConcErrors s -> sprintf "Проверка к.%d" s.N, sprintf "Проверка%d" s.N
 
-    static member what1 = Feature.what >> fst 
-    static member what2 = Feature.what >> snd
+    static member what1 = ProductionPoint.what >> fst 
+    static member what2 = ProductionPoint.what >> snd
+
     static member name = function
-        | Test s-> sprintf "Feature.Test(%s)" s.Name
-        | KefGroup x -> sprintf "Feature.KefGroup(%s)" (GroupCoefs.name x)
+        | TestConcErrors s-> sprintf "ProductionPoint.TestConcErrors(%s)" s.Name
+        | Correction x -> sprintf "ProductionPoint.Correction(%s)" (Correction.name x)
 
     static member property = function
-        | Test n -> sprintf "Test_%s" n.Property
-        | KefGroup x -> sprintf "GroupCoefs_%s" (GroupCoefs.property x)
+        | TestConcErrors n -> sprintf "TestConcErrors_%s" n.Property
+        | Correction x -> sprintf "Correction_%s" (Correction.property x)
 
     static member values = 
-        [   for kg in GroupCoefs.values do
-                yield KefGroup kg
-            yield Test Sens1 
-            yield Test Sens2]
+        [   for kg in Correction.values do
+                yield Correction kg
+            yield TestConcErrors Sens1 
+            yield TestConcErrors Sens2]
 
-    member x.What1 = Feature.what1 x
-    member x.What2 = Feature.what2 x
+    member x.What1 = ProductionPoint.what1 x
+    member x.What2 = ProductionPoint.what2 x
 
 
 
@@ -532,20 +538,20 @@ type ReadContext =
         | ReadKef kef -> Coef.readReg kef
         | ReadVar var -> PhysVar.code var
 
-type Var = Feature * PhysVar * ScalePt * TermoPt * PressurePt
+type Var = ProductionPoint * PhysVar * ScalePt * TermoPt * PressPt
 
 module Vars = 
     let what ( (f,v,s,t,p) as x : Var ) = 
-        sprintf "%s.%s.%s.%s.%s" (Feature.what1 f) (PhysVar.what v) (ScalePt.what s) (TermoPt.what t) (PressurePt.what p)
+        sprintf "%s.%s.%s.%s.%s" (ProductionPoint.what1 f) (PhysVar.what v) (ScalePt.what s) (TermoPt.what t) (PressPt.what p)
 
     let property ( (f,v,s,t,p) as x : Var ) = 
-        sprintf "%s_%s_%s_%s_%s" (Feature.property f) (PhysVar.property v) (ScalePt.property s) (TermoPt.property t) (PressurePt.property p)
+        sprintf "Var_%s_%s_%s_%s_%s" (ProductionPoint.property f) (PhysVar.property v) (ScalePt.property s) (TermoPt.property t) (PressPt.property p)
             
     let vars = 
-        [   for f in Feature.values do
+        [   for f in ProductionPoint.values do
                 for var in f.PhysVars do
                         for gas in f.Gases do
-                            for t in f.Temeratures do
+                            for t in f.Temperatures do
                                 for p in f.Pressures do
                                     yield f,var,gas,t,p ]
 
@@ -594,7 +600,7 @@ module Property =
         sprintf "ConcError_%s" (SScalePt.property n)
     let termoError (n,termoPt) = 
         sprintf "TermoError_%s_%s" (SScalePt.property n) (TermoPt.property termoPt)
-    let var var = sprintf "Var_%s" (Vars.property var)
+    
 
 type ProductSerial = 
     {   SerialNumber : uint16
@@ -670,10 +676,10 @@ type Product =
 
     static member termoErrorlimit channel pgs (gas,t) product =
         let concVar = channel.ChannelIndex.Conc
-        let f = Test channel.ChannelIndex
+        let f = TestConcErrors channel.ChannelIndex
         if not channel.ChannelSensor.Gas.IsCH then         
             let tempVar = channel.ChannelIndex.Termo
-            (Product.getVar (f, concVar, gas,t,Pnorm) product, Product.getVar (f, tempVar, gas, t,Pnorm) product) 
+            (Product.getVar (f, concVar, gas,t,PressNorm) product, Product.getVar (f, tempVar, gas, t,PressNorm) product) 
             |> Option.map2(fun(c,t) -> 
                 let dt = t - 20m     
                 let maxc = channel.ChannelSensor.ConcErrorlimit pgs
@@ -682,7 +688,7 @@ type Product =
             match gas with
             | ScaleBeg -> Some 5m
             | _ ->
-                Product.getVar (f,concVar,gas,TermoNorm,Pnorm) product
+                Product.getVar (f,concVar,gas,TermoNorm,PressNorm) product
                 |> Option.map(fun conc20 -> conc20 * 0.15m |> abs  |> decimal )
 
 type LoggingRecord = DateTime * Logging.Level * string
