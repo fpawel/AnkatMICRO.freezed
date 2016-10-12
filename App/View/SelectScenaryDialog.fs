@@ -40,7 +40,7 @@ let showSelectScenaryDialog : Button -> unit =
         | Operation.Scenary (_,xs) -> xs |> List.iter (populate nd)                
         | _ -> ()
                         
-    populate null mil82
+    populate null (production())
      
     let getOperation() = 
         let node = tv.SelectedNode

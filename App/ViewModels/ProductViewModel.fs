@@ -9,392 +9,392 @@ type Product(p, getProdType, getPgs, partyId) =
         ViewModelBase.raisePropertyChanged x propertyName
 
     member x.Var_GroupCoefs_Lin_Sens1_CCh0_ScaleBeg_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Lin_Sens1_CCh0_ScaleMid1_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Lin_Sens1_CCh0_ScaleMid2_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Lin_Sens1_CCh0_ScaleEnd_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh0_ScaleBeg_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh0_ScaleMid1_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh0_ScaleMid2_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh0_ScaleEnd_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh0_ScaleBeg_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh0_ScaleMid1_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh0_ScaleMid2_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh0_ScaleEnd_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh0_ScaleBeg_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh0_ScaleMid1_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh0_ScaleMid2_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh0_ScaleEnd_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Lin_Sens2_CCh1_ScaleBeg_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Lin_Sens2_CCh1_ScaleMid1_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Lin_Sens2_CCh1_ScaleEnd_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh1_ScaleBeg_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh1_ScaleMid1_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh1_ScaleEnd_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh1_ScaleBeg_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh1_ScaleMid1_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh1_ScaleEnd_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh1_ScaleBeg_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh1_ScaleMid1_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_Test_CCh1_ScaleEnd_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_TermoPressureCoefs_Pmm_ScaleBeg_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_TermoPressureCoefs_Pmm_ScaleBeg_TermoNorm_Phigh
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Phigh)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Phigh) value
-
-    member x.Var_GroupCoefs_TermoPressureCoefs_Pmm_ScaleBeg_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_TermoPressureCoefs_Pmm_ScaleBeg_TermoLow_Phigh
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Phigh)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Phigh) value
-
-    member x.Var_GroupCoefs_TermoPressureCoefs_Pmm_ScaleBeg_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_TermoPressureCoefs_Pmm_ScaleBeg_TermoHigh_Phigh
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Phigh)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Phigh) value
-
-    member x.Var_GroupCoefs_TermoPressureCoefs_VdatP_ScaleBeg_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_TermoPressureCoefs_VdatP_ScaleBeg_TermoNorm_Phigh
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Phigh)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Phigh) value
-
-    member x.Var_GroupCoefs_TermoPressureCoefs_VdatP_ScaleBeg_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_TermoPressureCoefs_VdatP_ScaleBeg_TermoLow_Phigh
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Phigh)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Phigh) value
-
-    member x.Var_GroupCoefs_TermoPressureCoefs_VdatP_ScaleBeg_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_TermoPressureCoefs_VdatP_ScaleBeg_TermoHigh_Phigh
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Phigh)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Phigh) value
-
-    member x.Var_GroupCoefs_PressureSensCoefs_VdatP_ScaleBeg_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_PressureSensCoefs_VdatP_ScaleBeg_TermoNorm_Phigh
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Phigh)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Phigh) value
-
-    member x.Var_GroupCoefs_PressureSensCoefs_VdatP_ScaleBeg_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_PressureSensCoefs_VdatP_ScaleBeg_TermoLow_Phigh
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Phigh)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Phigh) value
-
-    member x.Var_GroupCoefs_PressureSensCoefs_VdatP_ScaleBeg_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_PressureSensCoefs_VdatP_ScaleBeg_TermoHigh_Phigh
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Phigh)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Phigh) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.LinCoefs(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens1_ScaleBeg_TppCh0_ScaleBeg_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens1_ScaleBeg_TppCh0_ScaleBeg_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens1_ScaleBeg_TppCh0_ScaleBeg_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_Termo_Sens1_ScaleEnd_TppCh0_ScaleEnd_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_Termo_Sens1_ScaleEnd_TppCh0_ScaleEnd_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_Termo_Sens1_ScaleEnd_TppCh0_ScaleEnd_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_PressureSensCoefs_TppCh0_ScaleBeg_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_PressureSensCoefs_TppCh0_ScaleBeg_TermoNorm_Phigh
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Phigh)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Phigh) value
-
-    member x.Var_GroupCoefs_PressureSensCoefs_TppCh0_ScaleBeg_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_PressureSensCoefs_TppCh0_ScaleBeg_TermoLow_Phigh
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Phigh)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Phigh) value
-
-    member x.Var_GroupCoefs_PressureSensCoefs_TppCh0_ScaleBeg_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_PressureSensCoefs_TppCh0_ScaleBeg_TermoHigh_Phigh
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Phigh)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Phigh) value
-
-    member x.Var_Test_TppCh0_ScaleBeg_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh0_ScaleMid1_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh0_ScaleMid2_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh0_ScaleEnd_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh0_ScaleBeg_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh0_ScaleMid1_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh0_ScaleMid2_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh0_ScaleEnd_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh0_ScaleBeg_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh0_ScaleMid1_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh0_ScaleMid2_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh0_ScaleEnd_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens1_ScaleBeg_Var1Ch0_ScaleBeg_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens1_ScaleBeg_Var1Ch0_ScaleBeg_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens1_ScaleBeg_Var1Ch0_ScaleBeg_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_Termo_Sens1_ScaleEnd_TppCh0_ScaleEnd_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_Termo_Sens1_ScaleEnd_TppCh0_ScaleEnd_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_Termo_Sens1_ScaleEnd_TppCh0_ScaleEnd_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens1_ScaleEnd_Var1Ch0_ScaleEnd_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens1_ScaleEnd_Var1Ch0_ScaleEnd_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens1_ScaleEnd_Var1Ch0_ScaleEnd_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens2_ScaleBeg_TppCh1_ScaleBeg_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens2_ScaleBeg_TppCh1_ScaleBeg_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens2_ScaleBeg_TppCh1_ScaleBeg_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_Termo_Sens2_ScaleEnd_TppCh1_ScaleEnd_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_Termo_Sens2_ScaleEnd_TppCh1_ScaleEnd_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_GroupCoefs_Termo_Sens2_ScaleEnd_TppCh1_ScaleEnd_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh1_ScaleBeg_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh1_ScaleMid1_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh1_ScaleEnd_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh1_ScaleBeg_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh1_ScaleMid1_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh1_ScaleEnd_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh1_ScaleBeg_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh1_ScaleMid1_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressurePt.Pnorm) value
-
-    member x.Var_Test_TppCh1_ScaleEnd_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.Test, PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens2_ScaleBeg_Var1Ch1_ScaleBeg_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens2_ScaleBeg_Var1Ch1_ScaleBeg_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens2_ScaleBeg_Var1Ch1_ScaleBeg_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_Termo_Sens2_ScaleEnd_TppCh1_ScaleEnd_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_Termo_Sens2_ScaleEnd_TppCh1_ScaleEnd_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_Termo_Sens2_ScaleEnd_TppCh1_ScaleEnd_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens2_ScaleEnd_Var1Ch1_ScaleEnd_TermoNorm_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens2_ScaleEnd_Var1Ch1_ScaleEnd_TermoLow_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm) value
 
     member x.Var_GroupCoefs_Termo_Sens2_ScaleEnd_Var1Ch1_ScaleEnd_TermoHigh_Pnorm
-        with get () = x.getVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm)
-        and set value = x.setVarUi (Feature.FeatureKefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm) value
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoCoefs({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_TermoPressureCoefs_Pmm_ScaleBeg_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_TermoPressureCoefs_Pmm_ScaleBeg_TermoNorm_Phigh
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Phigh)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Phigh) value
+
+    member x.Var_GroupCoefs_TermoPressureCoefs_Pmm_ScaleBeg_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_TermoPressureCoefs_Pmm_ScaleBeg_TermoLow_Phigh
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Phigh)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Phigh) value
+
+    member x.Var_GroupCoefs_TermoPressureCoefs_Pmm_ScaleBeg_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_TermoPressureCoefs_Pmm_ScaleBeg_TermoHigh_Phigh
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Phigh)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.Pmm, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Phigh) value
+
+    member x.Var_GroupCoefs_TermoPressureCoefs_VdatP_ScaleBeg_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_TermoPressureCoefs_VdatP_ScaleBeg_TermoNorm_Phigh
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Phigh)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Phigh) value
+
+    member x.Var_GroupCoefs_TermoPressureCoefs_VdatP_ScaleBeg_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_TermoPressureCoefs_VdatP_ScaleBeg_TermoLow_Phigh
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Phigh)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Phigh) value
+
+    member x.Var_GroupCoefs_TermoPressureCoefs_VdatP_ScaleBeg_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_TermoPressureCoefs_VdatP_ScaleBeg_TermoHigh_Phigh
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Phigh)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.TermoPressureCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Phigh) value
+
+    member x.Var_GroupCoefs_PressureSensCoefs_TppCh0_ScaleBeg_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_PressureSensCoefs_TppCh0_ScaleBeg_TermoNorm_Phigh
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Phigh)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Phigh) value
+
+    member x.Var_GroupCoefs_PressureSensCoefs_TppCh0_ScaleBeg_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_PressureSensCoefs_TppCh0_ScaleBeg_TermoLow_Phigh
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Phigh)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Phigh) value
+
+    member x.Var_GroupCoefs_PressureSensCoefs_TppCh0_ScaleBeg_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_PressureSensCoefs_TppCh0_ScaleBeg_TermoHigh_Phigh
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Phigh)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Phigh) value
+
+    member x.Var_GroupCoefs_PressureSensCoefs_VdatP_ScaleBeg_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_PressureSensCoefs_VdatP_ScaleBeg_TermoNorm_Phigh
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Phigh)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Phigh) value
+
+    member x.Var_GroupCoefs_PressureSensCoefs_VdatP_ScaleBeg_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_PressureSensCoefs_VdatP_ScaleBeg_TermoLow_Phigh
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Phigh)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Phigh) value
+
+    member x.Var_GroupCoefs_PressureSensCoefs_VdatP_ScaleBeg_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_GroupCoefs_PressureSensCoefs_VdatP_ScaleBeg_TermoHigh_Phigh
+        with get () = x.getVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Phigh)
+        and set value = x.setVarUi (Feature.KefGroup(GroupCoefs.PressureSensCoefs), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Phigh) value
+
+    member x.Var_Test_Sens1_CCh0_ScaleBeg_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_CCh0_ScaleBeg_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_CCh0_ScaleBeg_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_CCh0_ScaleMid1_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_CCh0_ScaleMid1_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_CCh0_ScaleMid1_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_CCh0_ScaleMid2_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_CCh0_ScaleMid2_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_CCh0_ScaleMid2_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_CCh0_ScaleEnd_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_CCh0_ScaleEnd_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_CCh0_ScaleEnd_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_TppCh0_ScaleBeg_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_TppCh0_ScaleBeg_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_TppCh0_ScaleBeg_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_TppCh0_ScaleMid1_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_TppCh0_ScaleMid1_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_TppCh0_ScaleMid1_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_TppCh0_ScaleMid2_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_TppCh0_ScaleMid2_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_TppCh0_ScaleMid2_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_TppCh0_ScaleEnd_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_TppCh0_ScaleEnd_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens1_TppCh0_ScaleEnd_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_CCh1_ScaleBeg_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_CCh1_ScaleBeg_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_CCh1_ScaleBeg_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_CCh1_ScaleMid1_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_CCh1_ScaleMid1_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_CCh1_ScaleMid1_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_CCh1_ScaleEnd_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_CCh1_ScaleEnd_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_CCh1_ScaleEnd_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_TppCh1_ScaleBeg_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_TppCh1_ScaleBeg_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_TppCh1_ScaleBeg_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_TppCh1_ScaleMid1_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_TppCh1_ScaleMid1_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_TppCh1_ScaleMid1_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_TppCh1_ScaleEnd_TermoNorm_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_TppCh1_ScaleEnd_TermoLow_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressurePt.Pnorm) value
+
+    member x.Var_Test_Sens2_TppCh1_ScaleEnd_TermoHigh_Pnorm
+        with get () = x.getVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm)
+        and set value = x.setVarUi (Feature.Test(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressurePt.Pnorm) value
 
     member x.ConcError_Sens1_ScaleBeg = x.GetConcError {SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg} 
 

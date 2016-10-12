@@ -92,14 +92,14 @@ module private PivateComputeProduct =
 
     let getValuesTermo chan var gas p   =
         TermoPt.values
-        |> List.map( fun t -> FeatureKefGroup( TermoCoefs( SScalePt.new' chan gas)) , var, gas, t, Pnorm) |> getVarsValues p
+        |> List.map( fun t -> KefGroup( TermoCoefs( SScalePt.new' chan gas)) , var, gas, t, Pnorm) |> getVarsValues p
 
     let getTermoT chan = getValuesTermo chan chan.Termo
 
     let getVar1T chan = getValuesTermo chan chan.Var1
 
     let calculatePressureSensCoefs (p:Product) =
-        let ctx v p = FeatureKefGroup PressureSensCoefs , v, ScaleBeg, TermoNorm, p
+        let ctx v p = KefGroup PressureSensCoefs , v, ScaleBeg, TermoNorm, p
         match getVarsValues p [ ctx Pmm Pnorm; ctx Pmm Phigh; ctx VdatP Pnorm;  ctx VdatP Phigh ]  with
         | Ok [x0; x1; y0; y1] -> 
             let k0 = (y1-y0)/( x1 - x0 )
@@ -112,22 +112,22 @@ module private PivateComputeProduct =
         | PressureSensCoefs -> failwith "PressureSensCoefs is not for gauss!"
         | TermoPressureCoefs ->
             // [ Termo1, ch1.Tpp, Air; Termo1, ch1.Var1, Air ]
-            let g = FeatureKefGroup TermoPressureCoefs
+            let g = KefGroup TermoPressureCoefs
             let xs var = 
                 TermoPt.values
                 |> List.map( fun t -> g , var, ScaleBeg, t, Pnorm) 
                 |> getVarsValues p
             result {
                 let! temps = xs Sens1.Termo
-                let! var1s = xs Sens1.Var1
-                return List.zip temps var1s }
+                let! vars = xs VdatP
+                return List.zip temps vars }
             |> Result.mapErr( 
                 fmtErr (function  V(_,_,_,t,_) -> sprintf "%A" t)
                 >> sprintf "нет значения %A в %s" TermoPressureCoefs.Dscr )
 
         | LinCoefs chan -> 
             chan.ScalePts 
-            |> List.map( fun gas -> FeatureKefGroup( LinCoefs chan ), chan.Conc, gas, TermoNorm, Pnorm )
+            |> List.map( fun gas -> KefGroup( LinCoefs chan ), chan.Conc, gas, TermoNorm, Pnorm )
             |> getVarsValues p
             |> Result.map ( fun xs -> 
                 List.zip xs ( chan.ScalePts |> List.map ( SScalePt.new' chan >> getPgsConc )  ) )
@@ -135,14 +135,23 @@ module private PivateComputeProduct =
                 fmtErr (function  V(_,_,gas,_,_) -> sprintf "%A" gas)
                 >> sprintf "нет значения LIN в %s" )
 
-        | TermoCoefs { SensorIndex = chan; ScalePt = ScaleBeg} -> 
+        | TermoCoefs { SensorIndex = Sens1; ScalePt = ScaleBeg} -> 
             result {
-                let! t = getTermoT chan ScaleBeg p
-                let! var = getVar1T chan ScaleBeg p
+                let! t = getTermoT Sens1 ScaleBeg p
+                let! var = getVar1T Sens1 ScaleBeg p
+                return List.zip t var }
+            |> Result.mapErr( 
+                fmtErr (function V(_,var,_,t,_) -> sprintf "%s.%s" (PhysVar.what var) (TermoPt.what t) )                
+                >> sprintf "нет значения T0.к1 в %s" )
+
+        | TermoCoefs { SensorIndex = Sens2; ScalePt = ScaleBeg} -> 
+            result {
+                let! t = getTermoT Sens2 ScaleBeg p
+                let! var = getVar1T Sens2 ScaleBeg p
                 return List.zip t ( List.map (fun var -> - var) var) }
             |> Result.mapErr( 
                 fmtErr (function V(_,var,_,t,_) -> sprintf "%s.%s" (PhysVar.what var) (TermoPt.what t) )                
-                >> sprintf "нет значения T0 в %s" )
+                >> sprintf "нет значения T0.к2 в %s" )
 
         | TermoCoefs { SensorIndex = chan; ScalePt = ScaleEnd} -> 
             result {
@@ -152,7 +161,7 @@ module private PivateComputeProduct =
                 return List.zip3 t var0 var}
             |> Result.mapErr( 
                 fmtErr (function V(_,var,_,t,_) -> sprintf "%s.%s" (PhysVar.what var) (TermoPt.what t) )
-                >> sprintf "нет значения TK в %s" )
+                >> sprintf "нет значения TK.к%d в %s" chan.N )
             |> Result.bind( fun xs ->
                 let errs =
                     xs |> List.zip TermoPt.values 
@@ -166,7 +175,7 @@ module private PivateComputeProduct =
                     errs 
                     |> List.map Option.get
                     |> fmtErr TermoPt.what 
-                    |> sprintf "при расчёте TK деление на ноль в %s"
+                    |> sprintf "при расчёте TK.к%d деление на ноль в %s" chan.N
                     |> Err )
         | TermoCoefs { ScalePt = ScaleMid1} 
         | TermoCoefs { ScalePt = ScaleMid2} ->  failwith "there is no TermoCoefs (_,ScaleMid) in AnkatMICRO!!"
@@ -211,9 +220,11 @@ let compute group getPgsConc productType = state {
     
 let getProductTermoErrorlimit channel pgs (gas,t) product =
     let concVar = channel.ChannelIndex.Conc
+    let f = Test channel.ChannelIndex
     if not channel.ChannelSensor.Gas.IsCH then         
         let tempVar = channel.ChannelIndex.Termo
-        (Product.getVar (Test, concVar, gas,t,Pnorm) product, Product.getVar (Test, tempVar, gas, t,Pnorm) product) 
+        
+        (Product.getVar (f, concVar, gas,t,Pnorm) product, Product.getVar (f, tempVar, gas, t,Pnorm) product) 
         |> Option.map2(fun(c,t) -> 
             let dt = t - 20m     
             let maxc = channel.ChannelSensor.ConcErrorlimit pgs
@@ -222,7 +233,7 @@ let getProductTermoErrorlimit channel pgs (gas,t) product =
         match gas with
         | ScaleBeg -> Some 5m
         | _ ->
-            Product.getVar (Test,concVar,gas,TermoNorm,Pnorm) product
+            Product.getVar (f,concVar,gas,TermoNorm,Pnorm) product
             |> Option.map(fun conc20 -> conc20 * 0.15m |> abs  |> decimal )
 
 type ValueError = 
@@ -238,14 +249,14 @@ type ValueError =
 type Product with
 
     static member concError channel pgs gas product = 
-        Product.getVar (Test, channel.ChannelIndex.Conc, gas, TermoNorm, Pnorm) product 
+        Product.getVar (Test channel.ChannelIndex, channel.ChannelIndex.Conc, gas, TermoNorm, Pnorm) product 
         |> Option.map(fun conc ->                 
             { Value = conc; Nominal = pgs; Limit = channel.ChannelSensor.ConcErrorlimit pgs } ) 
 
     static member termoError channel pgs (gas,t) p = 
         let concVar = channel.ChannelIndex.Conc
-        (   Product.getVar (Test,concVar,gas,t, Pnorm) p,
-            Product.getVar (Test,concVar,gas,TermoNorm, Pnorm) p,
+        (   Product.getVar (Test channel.ChannelIndex,concVar,gas,t, Pnorm) p,
+            Product.getVar (Test channel.ChannelIndex,concVar,gas,TermoNorm, Pnorm) p,
             Product.termoErrorlimit channel pgs (gas,t) p )
         |> Option.map3( fun (c,c20,limit) -> 
             { Value = c; Nominal = c20; Limit = limit } )

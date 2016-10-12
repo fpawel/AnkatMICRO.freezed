@@ -78,9 +78,10 @@ let modbusToolsPopup =
                         (fun value -> sendCommand (cmd,value) ) ) ]
     |> simpleMenu
     
-let pneumoToolsPopup =         
-    [   yield! ScalePt.values |> List.map ( fun gas -> 
-            ScalePt.what gas, fun _ _  -> PartyWorks.Pneumoblock.switch gas )
+let pneumoToolsPopup =       
+    
+    [   yield! PartyWorks.Pneumoblock.clapans |> List.map ( fun gas -> 
+            gas.What, fun _ _  -> PartyWorks.Pneumoblock.switch gas )
         yield "Выкл.", fun _ _ -> PartyWorks.Pneumoblock.close()  ]
     |> simpleMenu
 

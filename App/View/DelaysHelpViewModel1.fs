@@ -13,7 +13,7 @@ module private Helpers =
     
     type DelayContext with
         static member getWorks ctx =
-            Works.all |> List.choose( function 
+            Works.all() |> List.choose( function 
                 | Timed (op, ({DelayContext = EqualsTo ctx true } as d), _) -> Some (op,d)
                 | _ -> None ) 
 

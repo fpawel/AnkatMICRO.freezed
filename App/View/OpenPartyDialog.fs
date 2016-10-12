@@ -71,7 +71,7 @@ module private Helpers =
             let x =
                 new MyWinForms.FlatComboBox(Parent = p, Dock = DockStyle.Top, DropDownStyle = ComboBoxStyle.DropDownList,
                                             DisplayMember = "What", FlatStyle = FlatStyle.Flat)            
-            (box "") :: (List.map box ProductType.values )
+            (box "") :: (List.map box AppConfig.productTypes )
             |> List.toArray
             |> x.Items.AddRange 
             x            
@@ -156,7 +156,7 @@ module private Helpers =
         let acceptFilter _ =
             let prodType = 
                 let n = cbType.SelectedIndex - 1
-                if n>(-1) && n<ProductType.values.Length then Some ProductType.values.[n] else None
+                if n>(-1) && n < AppConfig.productTypes.Length then Some AppConfig.productTypes.[n] else None
             let serial = 
                 let b,v = UInt16.TryParse tbSerialNumber.Text
                 if b then Some v else None

@@ -176,11 +176,7 @@ let private stopHardwareWork() =
         match Hardware.Termo.state.Value with
         | Some (Ok Hardware.Termo.Stop) | None -> ()
         | _ -> yield cop "остановить термокамеру" "остановка термокамеры" <| fun () -> 
-            Hardware.Termo.stop()  
-        match Hardware.WarmingBoard.state.Value with
-        | Some (Ok Hardware.WarmingBoard.Off) | None -> ()
-        | _ -> yield cop "прекратить подогрев плат" "прекращение подогрева плат" <| fun () -> 
-            Hardware.WarmingBoard.off() ]
+            Hardware.Termo.stop()  ]
 
 let run =
     

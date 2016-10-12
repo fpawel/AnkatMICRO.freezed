@@ -10,8 +10,8 @@ type PressurePt =
 
     member x.What = 
         match x with
-        | Pnorm -> "P740"
-        | Phigh -> "P800"
+        | Pnorm -> "740"
+        | Phigh -> "800"
     
 
     static member what (x:PressurePt) = x.What
@@ -215,6 +215,8 @@ type SensorIndex =
     member x.SensorOfProdTypeByIndex prodType =
         SensorIndex.sensorOfProdTypeByIndex prodType x
 
+    member x.CmdNorm = SensorIndex.cmdNorm x
+
     member x.ScalePts = SensorIndex.scalePts x
 
     static member name (x:SensorIndex) = "SensorIndex." + FSharpValue.unionCaseName x
@@ -246,8 +248,6 @@ type SensorIndex =
         | Sens1 -> [CLin1_0; CLin1_1; CLin1_2; CLin1_3]
         | Sens2 -> [CLin2_0; CLin1_2; CLin2_2; CLin2_3]
 
-    
-
     static member sensorOfProdTypeByIndex prodType sensorIndex = 
         match sensorIndex, prodType.Sensor2 with
         | Sens1, _ -> Some prodType.Sensor
@@ -256,6 +256,14 @@ type SensorIndex =
     static member scalePts = function
         | Sens1 -> [ScaleBeg; ScaleMid1; ScaleMid2; ScaleEnd]
         | Sens2 -> [ScaleBeg; ScaleMid1; ScaleEnd]
+
+    static member cmdNorm = function
+        | Sens1 -> CmdNorm1
+        | Sens2 -> CmdNorm2
+
+    static member what = function
+        | Sens1 -> "Канал 1"
+        | Sens2 -> "Канал 2"
 
 // точка шкалы датчика концентрации
 type SScalePt = 
@@ -280,7 +288,7 @@ type SScalePt =
 
 
     static member what x =
-        sprintf "%s/к%d" x.ScalePt.What (x.SensorIndex.N + 1)
+        sprintf "%s/%d" x.ScalePt.What x.SensorIndex.N
 
     static member values_null_end = 
         [   for sensorIndex in SensorIndex.values do
@@ -315,7 +323,7 @@ module private SensorScalePtHelper =
                         yield S.new' sensorIndex gas, t ]
     
     let pneumoBlockCodes = 
-        List.zip values [1;2;3;4; 5;6;7]
+        List.zip values [1uy; 2uy; 3uy; 4uy; 1uy; 5uy; 6uy]
         |> Map.ofList
 
     let Beg1 = S.new' Sens1 ScaleBeg
@@ -323,6 +331,7 @@ module private SensorScalePtHelper =
     let Mid21 = S.new' Sens1 ScaleMid2    
     let End1 = S.new' Sens1 ScaleEnd
 
+    let Beg2 = S.new' Sens2 ScaleBeg
     let Mid2 = S.new' Sens2 ScaleMid1
     let End2 = S.new' Sens2 ScaleEnd
 
@@ -347,8 +356,11 @@ type SScalePt with
     static member  Mid21 = SensorScalePtHelper.Mid21
     static member  End1 = SensorScalePtHelper.End1
 
+    static member  Beg2 = SensorScalePtHelper.Beg2
     static member  Mid2 = SensorScalePtHelper.Mid2
     static member  End2 = SensorScalePtHelper.End2
+
+    
 
 
 // канал измерения концентрации
@@ -370,13 +382,19 @@ type GroupCoefs =
                         chan.ScalePts, [TermoNorm], [Pnorm]
         
         | TermoCoefs ({ScalePt = gas; SensorIndex = sens} as n)-> 
-            let s = 
+            let strDescr = 
                 match gas with
                 | ScaleBeg -> "на нулев. показ."
                 | ScaleEnd -> "чувст."
                 | xx -> failwithf "KefGroup.ctx TermoCoefs(_,%A)" xx
+
+            let strScale = 
+                match gas with
+                | ScaleBeg -> "0"
+                | ScaleEnd -> "K"
+                | _ -> ""
             [sens.Termo; sens.Var1],
-                sprintf "T%s%d" gas.What sens.N, sprintf "Комп. вл. темп. на %s к. %d" s sens.N, 
+                sprintf "T%s%d" strScale sens.N, sprintf "Комп. вл. темп. на %s к. %d" strDescr sens.N, 
                     n.CoefsTermo,
                         [gas], TermoPt.values, [Pnorm]
 
@@ -384,18 +402,18 @@ type GroupCoefs =
             [TppCh0; VdatP],
                 "PS", "Комп. влиян. давл. на чувст. по каналам",
                     [Coef_Pmmhg_0; Coef_Pmmhg_1],
-                        [ScaleBeg], TermoPt.values, PressurePt.values
+                        [ScaleBeg], [TermoNorm], PressurePt.values
 
         | TermoPressureCoefs ->
-            [Pmm; VdatP],
+            [Sens1.Termo; VdatP],
                 "PT", "Компенс. влиян. темп. на к. измер. давл.",
                     [KNull_TP_0; KNull_TP_1; KNull_TP_2],
-                        [ScaleBeg], TermoPt.values, PressurePt.values   
+                        [ScaleBeg], TermoPt.values, [Pnorm]   
 
     member x.What = GroupCoefs.what x
     member x.Dscr = GroupCoefs.dscr x
 
-    member x.Vars = GroupCoefs.vars x
+    member x.PhysVars = GroupCoefs.vars x
     member x.Gases = GroupCoefs.gases x
     member x.Temps = GroupCoefs.temps x
     member x.Press = GroupCoefs.press x
@@ -434,31 +452,62 @@ type GroupCoefs =
         | TermoCoefs n -> sprintf "Termo_%s" n.Property
 
 type Feature = 
-    | FeatureKefGroup of GroupCoefs
-    | Test
+    | KefGroup of GroupCoefs
+    | Test of SensorIndex
 
     member x.Property = Feature.property x
-    
+    member x.Gases = Feature.gases x
+    member x.Temeratures = Feature.temeratures x
+    member x.PhysVars = Feature.physVars x
+    member x.Pressures = Feature.pressures x
+
+    static member ofSensor sensor = function
+        | Test s -> s = sensor
+        | KefGroup g ->     
+            match g with
+            | LinCoefs s -> s = sensor
+            | TermoCoefs n -> n.SensorIndex = sensor
+            | _ -> sensor = Sens1
+
+
+    static member physVars = function
+        | Test s -> [ s.Conc; s.Termo ]
+        | KefGroup g -> g.PhysVars
+
+    static member pressures = function
+        | Test _ -> [ Pnorm ]
+        | KefGroup g -> g.Press
+
+    static member temeratures = function
+        | Test _ -> TermoPt.values
+        | KefGroup g -> g.Temps
+
+    static member gases = function
+        | Test s -> s.ScalePts
+        | KefGroup g -> GroupCoefs.gases g
+
     static member what = function
-        | FeatureKefGroup kg -> kg.Dscr, kg.What
-        | Test -> "Проверка","main"
+        | KefGroup kg -> kg.Dscr, kg.What
+        | Test s -> sprintf "Проверка к.%d" s.N, sprintf "Проверка%d" s.N
 
     static member what1 = Feature.what >> fst 
     static member what2 = Feature.what >> snd
     static member name = function
-        | Test -> "Feature.Test"
-        | FeatureKefGroup x -> sprintf "Feature.FeatureKefGroup(%s)" (GroupCoefs.name x)
+        | Test s-> sprintf "Feature.Test(%s)" s.Name
+        | KefGroup x -> sprintf "Feature.KefGroup(%s)" (GroupCoefs.name x)
 
     static member property = function
-        | Test -> "Test"
-        | FeatureKefGroup x -> sprintf "GroupCoefs_%s" (GroupCoefs.property x)
+        | Test n -> sprintf "Test_%s" n.Property
+        | KefGroup x -> sprintf "GroupCoefs_%s" (GroupCoefs.property x)
 
     static member values = 
         [   for kg in GroupCoefs.values do
-                yield FeatureKefGroup kg
-            yield Test ]
+                yield KefGroup kg
+            yield Test Sens1 
+            yield Test Sens2]
 
     member x.What1 = Feature.what1 x
+    member x.What2 = Feature.what2 x
 
 
 
@@ -493,18 +542,14 @@ module Vars =
         sprintf "%s_%s_%s_%s_%s" (Feature.property f) (PhysVar.property v) (ScalePt.property s) (TermoPt.property t) (PressurePt.property p)
             
     let vars = 
-        [   for kg in GroupCoefs.values do
-                for var in kg.Vars do
-                    for gas in kg.Gases do
-                        for t in kg.Temps do
-                            for p in kg.Press do
-                                yield (FeatureKefGroup kg), var,gas,t,p
-            for sensorIndex in SensorIndex.values do
-                for gas in sensorIndex.ScalePts do
-                    for t in TermoPt.values do
-                        yield Test, sensorIndex.Conc, gas, t, Pnorm  
-                        yield Test, sensorIndex.Termo, gas, t, Pnorm  ]
-        |> List.sortBy( fun (feat,var,gas,t,p) -> var, feat, t, gas, p)
+        [   for f in Feature.values do
+                for var in f.PhysVars do
+                        for gas in f.Gases do
+                            for t in f.Temeratures do
+                                for p in f.Pressures do
+                                    yield f,var,gas,t,p ]
+
+    let varsSet = Set.ofList vars 
 
     let tryGetSensorIndexOfConcVar =
         let xs = SensorIndex.values |> List.map( fun x -> x.Conc, x  ) |> Map.ofList
@@ -625,9 +670,10 @@ type Product =
 
     static member termoErrorlimit channel pgs (gas,t) product =
         let concVar = channel.ChannelIndex.Conc
+        let f = Test channel.ChannelIndex
         if not channel.ChannelSensor.Gas.IsCH then         
             let tempVar = channel.ChannelIndex.Termo
-            (Product.getVar (Test, concVar, gas,t,Pnorm) product, Product.getVar (Test, tempVar, gas, t,Pnorm) product) 
+            (Product.getVar (f, concVar, gas,t,Pnorm) product, Product.getVar (f, tempVar, gas, t,Pnorm) product) 
             |> Option.map2(fun(c,t) -> 
                 let dt = t - 20m     
                 let maxc = channel.ChannelSensor.ConcErrorlimit pgs
@@ -636,7 +682,7 @@ type Product =
             match gas with
             | ScaleBeg -> Some 5m
             | _ ->
-                Product.getVar (Test,concVar,gas,TermoNorm,Pnorm) product
+                Product.getVar (f,concVar,gas,TermoNorm,Pnorm) product
                 |> Option.map(fun conc20 -> conc20 * 0.15m |> abs  |> decimal )
 
 type LoggingRecord = DateTime * Logging.Level * string

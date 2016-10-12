@@ -17,37 +17,98 @@ type private VE = Ankat.Alchemy.ValueError
 
 
 module TabsheetVars =
-    type Page = {PhysVar : PhysVar; Feature : Feature; TermoPt : TermoPt} 
-    let mutable private page = { PhysVar = Conc; Feature = Lin; TermoPt = TermoNorm}
-    let update () = 
-        setActivePageTitle <| sprintf "%s, %s, %s" page.Feature.What1 page.PhysVar.Dscr page.TermoPt.Dscr
-        gridProducts.Columns.``remove all columns but`` Columns.main
+    type Page = 
+        {   PhysVar : PhysVar
+            Feature : Feature
+            TermoPt : TermoPt
+            PressurePt : PressurePt} 
         
-        for gas in ScalePt.values do
-            let s = Property.var (page.Feature, page.PhysVar, gas, page.TermoPt)
-            let col = new DataGridViewTextBoxColumn( DataPropertyName = s,  HeaderText = gas.What)
-            gridProducts.Columns.AddColumn( new DataGridViewTextBoxColumn( DataPropertyName = s,  HeaderText = gas.What) )
+    let mutable private page = { 
+        PhysVar = Sens1.Conc
+        Feature = KefGroup <| LinCoefs Sens1
+        TermoPt = TermoNorm
+        PressurePt = Pnorm}
+
+    let addcol dataPropertyName headerText = 
+        new DataGridViewTextBoxColumn( DataPropertyName = dataPropertyName, HeaderText = headerText)
+        |> gridProducts.Columns.AddColumn
+
+    let update () = 
+        
+        sprintf "%s, %s, %s, %s" page.Feature.What2 page.PhysVar.What 
+            page.TermoPt.Dscr page.PressurePt.What
+        |> setActivePageTitle 
+        gridProducts.Columns.``remove all columns but`` Columns.main
+        let f = page.Feature
+        match f.Gases, f.PhysVars, f.Temeratures, f.Pressures with
+        | _::_::_, [physvar], [TermoNorm], [Pnorm] ->
+            for gas in f.Gases do
+                let var = page.Feature, physvar, gas, TermoNorm, Pnorm
+                addcol (Vars.what var) gas.What
+        | [gas], _::_::_, _::_::_, [Pnorm] ->
+            for physvar in f.PhysVars do
+                let var = page.Feature, physvar, gas, page.TermoPt, Pnorm
+                addcol (Vars.what var) physvar.What
+        | _ -> ()
+        
 
     let private addp () =         
         let p = new Panel(Parent = TabsheetVars.BottomTab, Dock = DockStyle.Top)
         let _ = new Panel(Parent = TabsheetVars.BottomTab, Dock = DockStyle.Top, Height = 10)
         p
 
+    module Press =
+        let get,set, setVisibility = 
+            radioButtons (addp ()) PressurePt.values PressurePt.what <| fun x -> 
+                page <- {page with PressurePt = x }
+                update()
+
     module Termo =
-        let get,set = 
+        let get,set, setVisibility = 
             radioButtons (addp ()) TermoPt.values TermoPt.what <| fun x -> 
                 page <- {page with TermoPt = x }
                 update()
-    module Feat =
-        let get,set = 
-            radioButtons (addp ()) Feature.values Feature.what1 <| fun x -> 
-                page <- {page with Feature = x }
-                update()
+    
     module PhysVar =
-        let get,set = 
-            radioButtons (addp ()) PhysVar.values PhysVar.what <| fun x -> 
+        let get,set, setVisibility = 
+            let vars =
+                Vars.vars |> List.map(fun (_,x,_,_,_) -> x)
+                |> Set.ofList
+                |> Set.toList
+
+            radioButtons (addp ()) vars PhysVar.what <| fun x -> 
                 page <- {page with PhysVar = x }
                 update()
+
+    module Feat =
+        let get,set, setVisibility = 
+            radioButtons (addp ()) Feature.values Feature.what2 <| fun x ->
+             
+                page <- {page with Feature = x }
+
+                match x.PhysVars with
+                | [v] -> page <- {page with PhysVar = v }; []
+                | xs -> xs
+                |> PhysVar.setVisibility 
+
+                let temeratures = Set.ofList <| Feature.temeratures x
+                TermoPt.values 
+                |> List.filter temeratures.Contains 
+                |> Termo.setVisibility
+
+                let physvars = Set.ofList <| Feature.physVars x
+                PhysVar.values 
+                |> List.filter physvars.Contains 
+                |> PhysVar.setVisibility
+
+                let pressures = Set.ofList <| Feature.pressures x
+                PressurePt.values 
+                |> List.filter pressures.Contains 
+                |> Press.setVisibility
+
+                update()
+
+    
 
 module TabsheetChart = 
     
@@ -61,7 +122,7 @@ module TabsheetChart =
         m.MaxY <- None
     
     module PhysVar =
-        let get,set = 
+        let get,set,_ = 
             let panelSelectVar = new Panel(Parent = TabsheetChart.BottomTab, Dock = DockStyle.Top)
             let _ = new Panel(Parent = TabsheetChart.BottomTab, Dock = DockStyle.Top, Height = 10)
         
@@ -70,32 +131,31 @@ module TabsheetChart =
                 update()
 
 module TabsheetErrors =
+    let private pts = 
+        [   SScalePt.Beg1
+            SScalePt.Mid11
+            SScalePt.End1
+            SScalePt.Beg2
+            SScalePt.Mid2
+            SScalePt.End2 ]
     type K = 
-        | Main | Termo | Tex
+        | Main | Termo 
         member x.What = K.what x
         static member what = function
             | Main  -> "Основная"
             | Termo -> "Температурная"
-            | Tex   -> "Техпрогон"
 
         static member props = function
             | Main  -> 
-                [   for gas in ScalePt.values do
-                        yield gas.What, "Основная погрешность", Property.concError gas
-                    for gas in ScalePt.values do
-                        yield gas.What, "Возврат н.к.у.", Property.retNkuError gas ]
+                [   for gas in pts do
+                        yield gas.What, "Основная погрешность", Property.concError gas ]
             | Termo -> 
-                [   for gas in ScalePt.values do
+                [   for gas in pts do
                         yield gas.What + "-", "Погрешность на пониженной температуре", Property.termoError (gas,TermoLow)
-                    for gas in ScalePt.values do
+                    for gas in pts do
                         yield gas.What + "+", "Погрешность на повышенной температуре", Property.termoError (gas,TermoHigh)
-                    for gas in ScalePt.values do
-                        yield gas.What + " 90\"С", "Погрешность на 90\"C", Property.termoError (gas,Termo90) ]
-            | Tex   -> 
-                [   for gas in ScalePt.values do
-                        yield gas.What, "Техпрогон 1", Property.tex1Error gas
-                    for gas in ScalePt.values do
-                        yield gas.What, "Техпрогон 2", Property.tex2Error gas ]
+                     ]
+            
 
     
     
@@ -158,7 +218,7 @@ module TabsheetErrors =
 
     
     
-    let get,set = 
+    let get,set,_ = 
         let p1 = new Panel(Parent = TabsheetErrors.BottomTab, Dock = DockStyle.Top)
         let _ = new Panel(Parent = TabsheetErrors.BottomTab, Dock = DockStyle.Top, Height = 10)
 
@@ -182,7 +242,7 @@ module TabsheetErrors =
                     formatCell page gridProducts e f.s (f.f p)
             
 
-        radioButtons p1 [Main; Termo; Tex] K.what <| fun x -> 
+        radioButtons p1 [Main; Termo] K.what <| fun x -> 
             page <- x
             update()
     
@@ -206,7 +266,7 @@ let private onSelect = function
         TabsheetChart.update()
     | _ -> ()
         
-let getSelected, setSelected =
+let getSelected, setSelected,_ =
     gridProducts.Columns.CollectionChanged.Add(fun _ ->
         gridProducts.Columns.SetDisplayIndexByOrder()
         )

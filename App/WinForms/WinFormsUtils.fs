@@ -128,26 +128,45 @@ let popupConfig title selectedObject propertySort =
             e.Cancel <- true
     popup
 
-let radioButtons<'a when 'a : equality> parent (items : 'a list) (what : 'a -> string ) (handler : 'a -> unit ) = 
+let radioButtons<'a when 'a : comparison> parent (items : 'a list) (what : 'a -> string ) (handler : 'a -> unit ) = 
     let mutable activeItem = items.Head
     let buttons = items |> List.rev |> List.mapi ( fun n item -> 
         let b = new RadioButton( Parent = parent, Dock = DockStyle.Top,
                                     TextAlign = ContentAlignment.MiddleLeft,
                                     Text = what item, AutoSize=true, Appearance = Appearance.Button)
-        let _ = new Panel(Parent = parent, Dock = DockStyle.Top, Height = 3)
+        let bPanel = new Panel(Parent = parent, Dock = DockStyle.Top, Height = 3)
         b.CheckedChanged.Add <| fun _ ->                
             if b.Checked then 
                 handler item
         b.FlatStyle <- FlatStyle.Flat
         activeItem <- item
-        b )
-    let b = buttons.Head
+        b,bPanel )
+    let b = fst buttons.Head 
     parent.Height <- b.Top + b.Height + 3
     let get () = activeItem
-    let set x =
+
+    let btn x =
         let n = items  |> List.findIndex ( (=) x) 
-        buttons.[ items.Length - n - 1].Checked <- true
-    get, set
+        buttons.[ items.Length - n - 1]
+    let (~%%) = btn
+
+    let set x =
+        (fst <| %% x).Checked <- true
+
+    let setVisibility visibleItems =
+        let visibleItems' = Set.ofList visibleItems
+        parent.Height <-
+            items |> List.choose ( fun x -> 
+                let b,p = %% x
+                b.Visible <- visibleItems'.Contains x  
+                p.Visible <- b.Visible 
+                if b.Visible then Some  (b.Height + 3) else None)
+            |> List.reduce (+)
+        if visibleItems'.Contains  activeItem then () else
+            visibleItems 
+            |> List.maybeHead
+            |> Option.iter set
+    get, set, setVisibility
 
 
 let colorFromString x = ColorTranslator.FromHtml(x)

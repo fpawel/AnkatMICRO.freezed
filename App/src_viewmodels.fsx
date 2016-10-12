@@ -45,11 +45,11 @@ type Product(p, getProdType, getPgs, partyId) =
         with get () = x.getVarUi %s
         and set value = x.setVarUi %s value"""  (Property.var var) k1 k1 
         
-    for n in SensorScalePt.values do
+    for n in SScalePt.values do
         yield sprintf """
     member x.%s = x.GetConcError %s """  (Property.concError n) n.Name
         
-    for n,t in SensorScalePt.valuesT do
+    for n,t in SScalePt.valuesT do
         yield sprintf """
     member x.%s = x.GetTermoError (%s, %s) """  (Property.termoError (n,t) ) n.Name t.Name
     for var in PhysVar.values do
@@ -74,8 +74,8 @@ type Party(partyHeader, partyData) =
 
     
         
-    for n in SensorScalePt.values do
-        let whatPgs = SensorScalePt.format n
+    for n in SScalePt.values do
+        let whatPgs = SScalePt.what n
         let whatScale = ScalePt.whatScale n.ScalePt
         
         yield sprintf """

@@ -40,16 +40,6 @@ type PartyInfo =
         [<TypeConverter (typeof<Ankat.ViewModel.ProductTypesConverter>) >]
         mutable ProductType : string
 
-        [<DisplayName("ПГС1")>]    
-        [<Description("Концентрация ПГС1, начало шкалы")>]
-        mutable Pgs1  : decimal
-        [<DisplayName("ПГС2")>]    
-        [<Description("Концентрация ПГС3, середина шкалы")>]
-        mutable Pgs2  : decimal
-        [<DisplayName("ПГС2")>]    
-        [<Description("Концентрация ПГС4, конец шкалы")>]
-        mutable Pgs3  : decimal 
-
         [<DisplayName("Количество приборов")>]    
         [<Description("Количество приборов в партии")>]
         mutable Count  : byte  }
@@ -119,10 +109,7 @@ let deleteProducts (b:Button) =
 let createNewParty (b:Button) = 
     let d = 
         {   Name = "-"
-            ProductType = Ankat.A00.What
-            Pgs1 = 0m
-            Pgs2 = 49m
-            Pgs3 = 98m 
+            ProductType = Ankat.ProductType.first.What
             Count = 1uy}
     let g = new PropertyGrid(SelectedObject = d, 
                                 ToolbarVisible = false, Height = 250,
@@ -138,10 +125,10 @@ let createNewParty (b:Button) =
             ( fun () -> Some () )
             ( fun () ->
                 let prodType = 
-                    ProductType.values 
+                    AppConfig.productTypes
                     |> List.tryFind ( ProductType.what >> (=) d.ProductType)
-                    |> Option.getWith A00
-                let b = Alchemy.createNewParty1 (d.Name, prodType, d.Pgs1, d.Pgs2, d.Pgs3, d.Count)
+                    |> Option.getWith ProductType.first
+                let b = Alchemy.createNewParty1 (d.Name, prodType, d.Count)
                 party.Party <- b
                 AppContent.save()
                 TabPages.TabChart.update()
