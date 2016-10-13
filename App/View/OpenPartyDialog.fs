@@ -189,6 +189,7 @@ module private Helpers =
                 | None -> 
                     Scenary.updateGridViewBinding()
                     TabPages.TabChart.update()
+                    TabPages.TabsheetVars.ProductionPoint.updateVisibility()
                 | Some error -> 
                     MessageBox.Show(sprintf "Не удалось открыть данные партии %A, %A. %s" 
                                         b.Date b.ProductType error, 

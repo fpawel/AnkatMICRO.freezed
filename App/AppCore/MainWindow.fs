@@ -92,6 +92,14 @@ type Tabsheet =
         | TabsheetVars ->    "Данные"
         | TabsheetErrors ->  "Погрешность"   
 
+    static member descr = function
+        | TabsheetParty ->   "Партия настраиваемых приборов"
+        | TabsheetChart ->   "Графики измеряемых параметров приборов партии"
+        | TabsheetKefs ->    "Коэффициенты приборов партии"
+        | TabsheetScenary -> "Сценарий настройки приборов партии"
+        | TabsheetVars ->    "Данные приборов партии"
+        | TabsheetErrors ->  "Измеренная погрешность концентрации приборов партии"   
+
 module private TabPagesHelp =
     let content = 
         Tabsheet.values 
@@ -257,7 +265,7 @@ open AppConfig
 open AppConfig.View
 
 let initialize =
-    let get'grids() = 
+    let getAllDataGridViews() = 
         form.enumControls
             (fun x -> 
                 if x.GetType()=  typeof<DataGridView>  then                     
@@ -266,7 +274,7 @@ let initialize =
             id
     form.FormClosing.Add <| fun _ -> 
         config.View.Grids <-
-            get'grids()
+            getAllDataGridViews()
             |> Seq.map( fun g -> 
                 g.Name,
                     {   ColWidths = [for c in g.Columns -> c.Width]
@@ -277,9 +285,14 @@ let initialize =
     let rec h = EventHandler( fun _ _ -> 
         form.Activated.RemoveHandler h
         
-        for g in get'grids() do 
-            let dt = config.View.Grids.TryFind g.Name
+        for g in getAllDataGridViews() do 
             
+            // настройка стиля таблиц DataGridView
+            let stl = g.DefaultCellStyle
+            stl.SelectionBackColor <- Color.Lavender
+            stl.SelectionForeColor <- Color.Navy
+            
+            let dt = config.View.Grids.TryFind g.Name            
             g.ColumnHeadersHeight <-
                 match dt with
                 | Some { ColumnHeaderHeight = h} -> h
@@ -302,4 +315,6 @@ let initialize =
         (IntRanges.parseSet config.View.VisibleCoefs)
     |> Set.filter ( Ankat.Coef.tryGetByOrder >> Option.isSome )
     |> SelectedCoefsRows.set 
+
+    
     fun () -> ()

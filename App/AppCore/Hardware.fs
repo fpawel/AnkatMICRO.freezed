@@ -27,9 +27,9 @@ module Pneumo =
         
         let port = cfg.ComportPneumo
         let req = 
-            {   R.addy = cfg.PneumoAddy
+            {   R.addy = 16uy
                 R.cmd = 0x10uy
-                R.data = [| 0uy; 0x10uy; 0uy; 1uy; 2uy; 0uy; code |]
+                R.data = [| 0uy; 0x32uy; 0uy; 1uy; 2uy; 0uy; code |]
                 R.what = codeToString code |> sprintf "пневмоблок - %s" }
         let r = Mdbs.getResponse port req (fun _ -> "OK") ( fun _ ->  Ok code )
         clapan.Value <- Some r

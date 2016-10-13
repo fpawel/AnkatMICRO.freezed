@@ -20,14 +20,12 @@ module TabsheetVars =
     type Page = 
         {   PhysVar : PhysVar
             ProductionPoint : ProductionPoint
-            TermoPt : TermoPt
-            PressPt : PressPt} 
+            TermoPt : TermoPt } 
         
     let mutable private page = { 
         PhysVar = Sens1.Conc
         ProductionPoint = Correction <| CorrectionLinScale Sens1
-        TermoPt = TermoNorm
-        PressPt = PressNorm}
+        TermoPt = TermoNorm }
 
     let private addcol dataPropertyName headerText = 
         new DataGridViewTextBoxColumn( DataPropertyName = dataPropertyName, HeaderText = headerText)
@@ -38,47 +36,47 @@ module TabsheetVars =
         | TermoLow -> "-"
         | TermoHigh -> "+"
 
+    let private pressLeter = function
+        | PressNorm -> ""
+        | PressHigh -> "+"
+
     let update () = 
         
-        sprintf "%s, %s, %s, %s" page.ProductionPoint.What2 page.PhysVar.What 
-            page.TermoPt.Dscr page.PressPt.What
-        |> setActivePageTitle 
         gridProducts.Columns.``remove all columns but`` Columns.main
         let f = page.ProductionPoint
         
         match f with
-        | Correction (CorrectionLinScale _ )
+        | Correction (CorrectionLinScale sens ) ->
+            for gas in f.Gases do
+                let var = f, sens.Conc, gas, TermoNorm, PressNorm
+                addcol (Vars.property var) gas.What
+                setActivePageTitle f.What1
         | TestConcErrors _ ->
             for gas in f.Gases do
-                let var = page.ProductionPoint, page.PhysVar, gas, page.TermoPt, page.PressPt
+                let var = page.ProductionPoint, page.PhysVar, gas, page.TermoPt, PressNorm
                 addcol (Vars.property var) gas.What
+                setActivePageTitle <| sprintf "%s, %s, %s" page.ProductionPoint.What2 page.PhysVar.What page.TermoPt.What
         | Correction (CorrectionTermoScale _ | CorrectionTermoPress) -> 
             for t in [TermoNorm; TermoLow; TermoHigh] do
                 for physvar in f.PhysVars do
                     let var = page.ProductionPoint, physvar, f.Gases.Head, t, PressNorm
                     addcol (Vars.property var) (physvar.What + termoLeter t)
+            setActivePageTitle page.ProductionPoint.What1
         | Correction CorrectionPressSens  -> 
             for p in f.Pressures do
                 for physvar in f.PhysVars do                
                     let var = page.ProductionPoint, physvar, ScaleBeg, TermoNorm, p
-                    addcol (Vars.property var) (sprintf "%s.%s" physvar.What p.What)
+                    addcol (Vars.property var) (physvar.What + pressLeter p)
+            setActivePageTitle page.ProductionPoint.What1
         
     let private addp () =         
         let p = new Panel(Parent = TabsheetVars.BottomTab, Dock = DockStyle.Top)
         let _ = new Panel(Parent = TabsheetVars.BottomTab, Dock = DockStyle.Top, Height = 10)
         p
 
-    
-
-    module Press =
-        let get,set, setVisibility = 
-            radioButtons (addp ()) PressPt.values PressPt.what <| fun x -> 
-                page <- {page with PressPt = x }
-                update()
-
     module Termo =
         let get,set, setVisibility = 
-            radioButtons (addp ()) TermoPt.values TermoPt.what <| fun x -> 
+            radioButtons (addp ()) TermoPt.values TermoPt.what TermoPt.dscr <| fun x -> 
                 page <- {page with TermoPt = x }
                 update()
     
@@ -89,37 +87,40 @@ module TabsheetVars =
                 |> Set.ofList
                 |> Set.toList
 
-            radioButtons (addp ()) vars PhysVar.what <| fun x -> 
+            radioButtons (addp ()) vars PhysVar.what PhysVar.dscr <| fun x -> 
                 page <- {page with PhysVar = x }
                 update()
 
-    module Feat =
-        let get,set, setVisibility = 
-            let f set setVis = 
-                function
-                    | [v] -> v,[]
-                    | x::_ as xs -> x,xs
-                >> fun (x,xs) -> 
-                    set x
-                    setVis xs
-
-            radioButtons (addp ()) ProductionPoint.values ProductionPoint.what2 <| fun x ->
-                f PhysVar.set PhysVar.setVisibility x.PhysVars 
-                f Termo.set Termo.setVisibility x.Temperatures 
-                f Press.set Press.setVisibility x.Pressures 
+    module ProductionPoint =
+        let get, set, setVisibility = 
+            let f x y =
+                PhysVar.setVisibility x
+                Termo.setVisibility y
+                    
+            radioButtons (addp ()) ProductionPoint.values ProductionPoint.what2 ProductionPoint.what1 <| fun x ->
                 page <- { page with ProductionPoint = x }
-
-
                 match x with
-                | Correction (CorrectionTermoScale _  | CorrectionTermoPress) ->
+                | TestConcErrors _ -> 
+                    PhysVar.set x.PhysVars.Head 
+                    Termo.set x.Temperatures.Head
+                    PhysVar.setVisibility x.PhysVars
+                    Termo.setVisibility x.Temperatures
+                | _ -> 
                     PhysVar.setVisibility []
-                    Termo.setVisibility []                
-                | Correction CorrectionPressSens  -> 
-                    PhysVar.setVisibility []
-                    Press.setVisibility []
-                | _ -> ()
-
+                    Termo.setVisibility []
+                page <- { page with ProductionPoint = x}
+                
                 update()
+                
+
+        let private vis x = 
+            AppContent.party.getProductType().Sensor2.IsSome ||
+                ProductionPoint.isSens1 x
+
+        let updateVisibility() =             
+            let xs = List.filter vis ProductionPoint.values 
+            setVisibility xs
+            set xs.Head
 
     
 
@@ -139,7 +140,7 @@ module TabsheetChart =
             let panelSelectVar = new Panel(Parent = TabsheetChart.BottomTab, Dock = DockStyle.Top)
             let _ = new Panel(Parent = TabsheetChart.BottomTab, Dock = DockStyle.Top, Height = 10)
         
-            radioButtons panelSelectVar PhysVar.values PhysVar.what <| fun x -> 
+            radioButtons panelSelectVar PhysVar.values PhysVar.what PhysVar.dscr <| fun x -> 
                 Chart.physVar <- x
                 update()
 
@@ -157,6 +158,10 @@ module TabsheetErrors =
         static member what = function
             | Main  -> "Основная"
             | Termo -> "Температурная"
+
+        static member descr = function
+            | Main  -> "Основная погрешность"
+            | Termo -> "Температурная погрешность"
 
         static member props = function
             | Main  -> 
@@ -255,7 +260,7 @@ module TabsheetErrors =
                     formatCell page gridProducts e f.s (f.f p)
             
 
-        radioButtons p1 [Main; Termo] K.what <| fun x -> 
+        radioButtons p1 [Main; Termo] K.what K.descr <| fun x -> 
             page <- x
             update()
     
@@ -268,6 +273,7 @@ let private onSelect = function
     | TabsheetVars ->
         gridProducts.Columns.``remove all columns but`` Products.Columns.main
         gridProducts.Parent <- TabsheetVars.RightTab
+        TabsheetVars.ProductionPoint.updateVisibility()
         TabsheetVars.update()
     | TabsheetErrors ->
         gridProducts.Columns.``remove all columns but`` Products.Columns.main
@@ -290,6 +296,7 @@ let getSelected, setSelected,_ =
         tabButtonsPlaceholder 
         Tabsheet.values
         Tabsheet.title
+        Tabsheet.descr
         (fun tabPage -> 
             setActivePageTitle tabPage.Title
             onSelect tabPage

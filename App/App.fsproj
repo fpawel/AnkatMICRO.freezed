@@ -143,6 +143,7 @@
     <None Include="src_select_pahys_vars_viewmodel.fsx" />
     <None Include="src_viewmodels.fsx" />
     <None Include="src_kefs.fsx" />
+    <None Include="fsi1.fsx" />
     <None Include="App.config" />
     <Content Include="icon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

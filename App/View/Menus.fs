@@ -208,9 +208,9 @@ let initialize =
         let popup = MyWinForms.Utils.popupConfig "Параметры" Ankat.AppContent.party PropertySort.CategorizedAlphabetical
         popup.Font <- form.Font        
         popup.Closed.Add( fun _ ->
-            Ankat.View.Products.updateCoefsGridRowsVisibility()
-            Ankat.View.Products.updatePhysVarsGridColsVisibility()
-            )
+            Products.updateCoefsGridRowsVisibility()
+            Products.updatePhysVarsGridColsVisibility()
+            TabPages.TabsheetVars.ProductionPoint.updateVisibility() )
         popup.Show(buttonSettings)
         
 

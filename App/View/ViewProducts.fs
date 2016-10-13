@@ -18,11 +18,62 @@ module private Helpers =
     let (~%%) x = x :> C
 
 module Columns =
+    type CbBox = MyWinForms.FlatComboBox
     let main = [   
         %% new CheckBoxColumn(DataPropertyName = "IsChecked", Width = 50) 
         %% new TextColumn(DataPropertyName = "Addr", HeaderText = "#", Width = 50) ]
+    
+    let serialPortColumn = 
+
+        let ports() = System.IO.Ports.SerialPort.GetPortNames()
+        let serialPortColumn = new TextColumn(DataPropertyName = "Port", HeaderText = "Порт", 
+                                                Width = 80 )
+
+        let (|P|_|) (columnIndex:int, rowIndex:int)=
+            if obj.ReferenceEquals( gridProducts.Columns.[columnIndex], serialPortColumn) then
+                let row = gridProducts.Rows.[rowIndex]
+                match row.DataBoundItem with
+                | :? ViewModel.Product as p ->
+                    Some (row.Cells.[columnIndex],p)
+                | _ -> None
+            else None
+
+        gridProducts.CellFormatting.Add(fun e -> 
+            match e.ColumnIndex, e.RowIndex with
+            | P (cell,p) ->     
+                
+                match ports() |> Array.tryFind( (=) p.Port ) with
+                | None -> 
+                    e.CellStyle.ForeColor <- Color.Red
+                    e.CellStyle.BackColor <- Color.LightGray
+                | _ -> 
+                    e.CellStyle.ForeColor <- Color.Navy
+            | _ -> ()  )
+
+        gridProducts.CellClick.Add(fun e -> 
+            match e.ColumnIndex, e.RowIndex with
+            | P (cell,p) ->
+                let ports = ports()
+                let cb = myListbox()
+                cb.Height <- ports.Length * cb.ItemHeight + 3                
+                ports |> Array.iter ( cb.Items.Add >> ignore )
+                cb.SelectedIndex <-
+                    ports |> Array.tryFindIndex( (=) p.Port )
+                    |> Option.getWith (-1)
+                cb.SelectedIndexChanged.Add( fun _ ->
+                    p.Port <- cb.Text )
+                let pt = 
+                    let r = gridProducts.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, true);
+                    gridProducts.PointToScreen( Point(r.Left, r.Bottom) )
+                let popup = new MyWinForms.Popup(cb)
+                popup.Closed.Add(fun _ -> gridProducts.EndEdit() |> ignore )                
+                popup.Show(pt.X, pt.Y)
+            | _ -> () )
+
+        serialPortColumn
 
     let sets = [
+        %% serialPortColumn
         %% new TextColumn(DataPropertyName = "SerialNumber", HeaderText = "№", Width = 80)  
         %% new DataGridViewCheckBoxColumn (DataPropertyName = "ProdReady", HeaderText = "Выпуск", Width = 50)  
         %% new TextColumn(DataPropertyName = "MonthYearStr", HeaderText = "Дата", Width = 80)  ]
@@ -30,7 +81,7 @@ module Columns =
 
     let physVars = PhysVar.values|> List.map(fun physvar -> 
         %% new TextColumn
-                (   DataPropertyName = PhysVar.name physvar, 
+                (   DataPropertyName = PhysVar.property physvar, 
                     HeaderText = PhysVar.what physvar,
                     ReadOnly = true) )
 
@@ -55,6 +106,15 @@ let updatePhysVarsGridColsVisibility() =
 
 let initialize = 
     gridProducts.DataSource <- party.Products
+    
+    gridProducts.DataError.Add(fun ev -> 
+        Logging.error """gridProducts.DataError 
+ColumnIndex : %d
+RowIndex : %d
+Context : %A 
+Exception : %A %A""" 
+            ev.ColumnIndex ev.RowIndex ev.Context  ev.Exception ev.Exception.StackTrace
+        )
     
     gridKefs.CellParsing.Add <| fun e ->
         if e.ColumnIndex < 3 then () else

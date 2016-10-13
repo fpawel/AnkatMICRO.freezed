@@ -61,7 +61,7 @@ type Product1(p : P, getProductType, getPgs, partyId) =
 
     let coefValueChangedEvent = Event<Product1 * Coef * decimal option >()
 
-    
+    let port() = { appCfg.ComportProducts with PortName = p.SerialPortName }
     
     [<CLIEvent>]
     member x.CoefValueChanged = coefValueChangedEvent.Publish
@@ -101,7 +101,7 @@ type Product1(p : P, getProductType, getPgs, partyId) =
             Chart.addProductValue p.Id var value
         if Map.tryFind var physVar <> Some value then
             physVar <- Map.add var value physVar
-            x.RaisePropertyChanged <| PhysVar.name var
+            x.RaisePropertyChanged var.Property
             
 
     member x.getPhysVarValueUi var =
@@ -175,7 +175,13 @@ type Product1(p : P, getProductType, getPgs, partyId) =
     member x.ForceCalculateErrors() =        
         List.iter (Property.concError >> x.RaisePropertyChanged ) SScalePt.values
         List.iter (Property.termoError >> x.RaisePropertyChanged ) SScalePt.valuesT
-                    
+
+    member x.Port 
+        with get () = p.SerialPortName
+        and set other =
+            if p.SerialPortName = other then () else
+            p <- {p with SerialPortName = other}
+            x.RaisePropertyChanged "Port"
 
     member x.Product 
         with get () = p
@@ -241,7 +247,7 @@ type Product1(p : P, getProductType, getPgs, partyId) =
 
     
     member x.ReadModbus(ctx) = 
-        let r = Mdbs.read3decimal appCfg.ComportProducts x.Addr (ReadContext.code ctx) (ReadContext.what ctx)
+        let r = Mdbs.read3decimal (port()) x.Addr (ReadContext.code ctx) (ReadContext.what ctx)
         match r, ctx with
         | Ok value, ReadVar var -> 
             x.setPhysVarValue var value
@@ -256,7 +262,7 @@ type Product1(p : P, getProductType, getPgs, partyId) =
 
     member x.WriteModbus (ctx,value) = 
         let what = WriteContext.what ctx
-        let r = Mdbs.write appCfg.ComportProducts x.Addr (WriteContext.code ctx) what value
+        let r = Mdbs.write (port()) x.Addr (WriteContext.code ctx) what value
         match r with 
         | Err e -> Logging.error "%s, %s : %s" x.What what e
         | Ok () -> Logging.info "%s, %s" x.What what

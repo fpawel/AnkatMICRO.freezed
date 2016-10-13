@@ -328,7 +328,7 @@ module private SensorScalePtHelper =
                         yield S.new' sensorIndex gas, t ]
     
     let pneumoBlockCodes = 
-        List.zip values [1uy; 2uy; 3uy; 4uy; 1uy; 5uy; 6uy]
+        List.zip values [0x01uy; 0x02uy; 0x04uy; 0x08uy; 0x01uy; 0x10uy; 0x20uy]
         |> Map.ofList
 
     let Beg1 = S.new' Sens1 ScaleBeg
@@ -466,13 +466,10 @@ type ProductionPoint =
     member x.PhysVars = ProductionPoint.physVars x
     member x.Pressures = ProductionPoint.pressures x
 
-    static member ofSensor sensor = function
-        | TestConcErrors s -> s = sensor
-        | Correction g ->     
-            match g with
-            | CorrectionLinScale s -> s = sensor
-            | CorrectionTermoScale n -> n.SensorIndex = sensor
-            | _ -> sensor = Sens1
+    static member isSens1 = function
+        | TestConcErrors Sens2 
+        | Correction ( CorrectionLinScale Sens2 | CorrectionTermoScale {SensorIndex = Sens2} ) -> false
+        | _ -> true
 
 
     static member physVars = function
@@ -514,8 +511,6 @@ type ProductionPoint =
 
     member x.What1 = ProductionPoint.what1 x
     member x.What2 = ProductionPoint.what2 x
-
-
 
 type WriteContext =
     | WriteKef of Coef
@@ -569,8 +564,6 @@ module Vars =
     let (|SensorIndexOfConcVar|_|) = tryGetSensorIndexOfConcVar
     let (|SensorIndexOfTempVar|_|) = tryGetSensorIndexOfTempVar
 
-    
-
 type DelayContext = 
     | BlowDelay of SScalePt 
     | WarmDelay of TermoPt
@@ -610,6 +603,7 @@ type Product =
     {   Id : Id
         IsChecked : bool        
         ProductSerial : ProductSerial
+        SerialPortName : string
         Addr : byte
         VarValue : Map<Var, decimal> 
         CoefValue : Map<Coef, decimal>  }
@@ -659,7 +653,8 @@ type Product =
             Addr = addy
             IsChecked = true
             VarValue = Map.empty 
-            CoefValue = Map.empty }
+            CoefValue = Map.empty 
+            SerialPortName = "COM1"}
 
     static member tryParseSerailMonthYear s =
         let m = Text.RegularExpressions.Regex.Match(s, @"(\d\d)\s*[\./\s]\s*(\d+)")

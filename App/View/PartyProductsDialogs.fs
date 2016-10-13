@@ -132,7 +132,9 @@ let createNewParty (b:Button) =
                 party.Party <- b
                 AppContent.save()
                 TabPages.TabChart.update()
-                Scenary.updateGridViewBinding() )
+                Scenary.updateGridViewBinding() 
+                TabPages.TabsheetVars.ProductionPoint.updateVisibility()
+                )
     popup1.Closing.Add <| fun e ->
         if MyWinForms.Utils.isPropGridEditing g then
             e.Cancel <- true

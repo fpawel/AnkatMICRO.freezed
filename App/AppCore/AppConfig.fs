@@ -29,11 +29,6 @@ module View =
 [<TypeConverter(typeof<ExpandableObjectConverter>)>]
 type ApplicatioConfig = 
     {   [<Category("Пневмоблок")>] 
-        [<DisplayName("Адрес пневмоблока")>]
-        [<Description("Адрес MODBUS пневмоблока")>]
-        mutable PneumoAddy : byte
-
-        [<Category("Пневмоблок")>] 
         [<DisplayName("Использовать")>]
         [<Description("Использовать пневмоблок при автоматической настройке")>]
         [<TypeConverter(typeof<YesNoConverter>)>]
@@ -53,11 +48,6 @@ type ApplicatioConfig =
         [<DisplayName("Термокамера")>]
         [<Description("Параметры приёмопередачи СОМ порта, к которому подключена термокамера")>]
         ComportTermo : ComportConfig.Config
-
-        [<Category("СОМ порты")>]    
-        [<DisplayName("Подогрев плат")>]
-        [<Description("Параметры приёмопередачи СОМ порта, к которому подключено устройство подогрева плат")>]
-        ComportOven : ComportConfig.Config
 
         [<Category("Термокомпенсация")>]    
         [<DisplayName("Таймаут перевода")>]
@@ -91,7 +81,6 @@ type ApplicatioConfig =
                 SelectedCoefs = "0-150"
                 VisibleCoefs = "0-150"
                 VisiblePhysVars = Set.ofList Ankat.PhysVar.values }
-        PneumoAddy = 100uy
         UseMidleScale = false
         UsePneumoblock = true
         UseTermochamber = true
@@ -99,8 +88,7 @@ type ApplicatioConfig =
         TermoWarmError = 2m
         ComportProducts = ComportConfig.Config.withDescr "приборы"
         ComportPneumo = ComportConfig.Config.withDescr "пневмоблок"
-        ComportTermo = ComportConfig.Config.withDescr "термокамера"
-        ComportOven = ComportConfig.Config.withDescr "ОВЕН"  }
+        ComportTermo = ComportConfig.Config.withDescr "термокамера" }
 
 let config, save = Json.Config.create "app.config.json" ApplicatioConfig.create
 

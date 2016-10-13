@@ -6,12 +6,12 @@
 #I "../../packages/FsPickler.2.3.0/lib/net40/"
 #r "FsPickler.dll"
 
-#I "../../NumericMethod/bin/Release"
+#I "../../NumericMethod/bin/Debug"
 #r "NumericMethod.dll"
 
-#I "../../MyWinForms/bin/Release"
+#I "../../MyWinForms/bin/Debug"
 #r "MyWinForms.dll"
-#I "../../Widgets/bin/Release"
+#I "../../Widgets/bin/Debug"
 #r "Widgets.dll"
 
 #r "System.Windows.Forms.dll"
@@ -26,7 +26,7 @@
 #load "../Utils/Logging.fs"
 #load "../Utils/Utils.fs"
 #load "../Ankat/Coef.fs"
-#load "../Ankat/ProductType.fs"
+#load "../Ankat/ProdType.fs"
 #load "../Ankat/Ankat.fs"
 
 #load "../Utils/Utils.fs" 
@@ -86,7 +86,11 @@ open StrUtils
 #load  "../View/Thread2Views.fs" 
 #load  "../View/ReportView.fs" 
 #load  "../View/ViewChart.fs" 
-#load  "../View/Menus1.fs" 
+
+#load  "../View/SelectScenaryDialog.fs" 
+#load  "../View/PartyProductsDialogs.fs" 
+#load  "../View/OpenPartyDialog.fs" 
+#load  "../View/Menus.fs" 
 
 open System
 open System.IO
@@ -113,7 +117,7 @@ let main () =
         Thread2.initialize()
         ChartDataBindings.initialize()
         Report.initialize()
-        Menus1.initialize()
+        Menus.initialize()
         Ref.``check referencies was initialized``()
         
         Application.Run MainWindow.form 

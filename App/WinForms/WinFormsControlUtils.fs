@@ -14,6 +14,42 @@ module Helpers1 =
         for x in x.Controls do
             yield! loopControls x chooser mapper }
 
+    let myCombobox() = 
+        let cb = new MyWinForms.FlatComboBox(DropDownStyle = ComboBoxStyle.DropDownList, 
+                                    FlatStyle = FlatStyle.Flat, Font = new Font("Consolas", 12.f),
+                                    DrawMode = DrawMode.OwnerDrawFixed )
+        cb.DrawItem.Add(fun e -> 
+            if e.Index < 0 then () else
+            if (e.State &&& DrawItemState.Selected) = DrawItemState.Selected then
+                e.Graphics.FillRectangle(new SolidBrush(Color.LightGray), e.Bounds)
+            else
+                e.Graphics.FillRectangle(new SolidBrush(cb.BackColor), e.Bounds);
+            let str = cb.Items.[e.Index].ToString()
+            let brs = new SolidBrush(cb.ForeColor)
+            let pt = PointF(float32 e.Bounds.X, float32 e.Bounds.Y)
+            e.Graphics.DrawString( str, e.Font, brs, pt)
+
+            e.DrawFocusRectangle() )
+        cb
+
+    let myListbox() = 
+        let cb = new ListBox(Font = new Font("Consolas", 12.f), ItemHeight = 20,
+                              BorderStyle = BorderStyle.None,
+                              DrawMode = DrawMode.OwnerDrawFixed )
+        cb.DrawItem.Add(fun e -> 
+            if e.Index < 0 then () else
+            if (e.State &&& DrawItemState.Selected) = DrawItemState.Selected then
+                e.Graphics.FillRectangle(new SolidBrush(Color.LightGray), e.Bounds)
+            else
+                e.Graphics.FillRectangle(new SolidBrush(cb.BackColor), e.Bounds);
+            let str = cb.Items.[e.Index].ToString()
+            let brs = new SolidBrush(cb.ForeColor)
+            let pt = PointF(float32 e.Bounds.X, float32 e.Bounds.Y)
+            e.Graphics.DrawString( str, e.Font, brs, pt)
+
+            e.DrawFocusRectangle() )
+        cb
+
 type Control with
     static member performThreadSafeAction<'a> (ctrl:Control) (f:unit -> 'a) =
         if ctrl.InvokeRequired then 
@@ -60,4 +96,7 @@ type DataGridView with
         g.DataSource <- d
 
     member x.UpdateBinding() = DataGridView.updateBinding x
+
+
+
         
