@@ -121,7 +121,7 @@ type Party1
     member x.Party 
         with get() = 
             let partyData = { partyData with Products = getProducts() }
-            let partyHeader = { partyHeader with ProductsSerials = partyData.Products |> List.map(fun x -> x.ProductSerial) }
+            let partyHeader = { partyHeader with ProductsSerials = partyData.Products |> List.map(fun x -> x.SerialNumber) }
             partyHeader, partyData
         and set ( otherHeader, otherPartyData) = 
             partyHeader <- otherHeader
@@ -141,10 +141,11 @@ type Party1
             setMainWindowTitle()
             AppConfig.config.View.PartyId <- partyHeader.Id
 
-    member __.NewValidAddr() = products |> Seq.map(fun x -> x.Addr)  |> Party.getNewValidAddy
     
     member x.AddNewProduct() = 
-        Alchemy.createNewProduct (x.NewValidAddr()) x.GetPgs partyHeader.ProductType
+        
+        let serial = Seq.length products + 1
+        Alchemy.createNewProduct serial x.GetPgs partyHeader.ProductType
         |> createProductViewModel getPgs productType (PartyPath.fromPartyHead partyHeader)
         |> products.Add 
         

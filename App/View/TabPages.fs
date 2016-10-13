@@ -242,7 +242,7 @@ module TabsheetErrors =
 
         gridProducts.CellFormatting.Add <| fun e ->
             let column = gridProducts.Columns.[e.ColumnIndex]
-            if column.GetHashCode() = Ankat.View.Products.Columns.interrogate.[0].GetHashCode() then
+            if obj.ReferenceEquals( column, Ankat.View.Products.Columns.columnConnection) then
                 let text, fore, back =
                     match e.Value :?> Result<string,string> option with
                     | Some (Ok s) -> s, Color.Black, Color.White
@@ -268,7 +268,7 @@ module TabsheetErrors =
 let private onSelect = function
     | TabsheetParty -> 
         gridProducts.Columns.``remove all columns but`` Products.Columns.main
-        gridProducts.Columns.AddColumns <| Products.Columns.sets @ Products.Columns.interrogate 
+        gridProducts.Columns.AddColumns Products.Columns.interrogate 
         gridProducts.Parent <- TabsheetParty.RightTab
     | TabsheetVars ->
         gridProducts.Columns.``remove all columns but`` Products.Columns.main
@@ -290,7 +290,6 @@ let getSelected, setSelected,_ =
         gridProducts.Columns.SetDisplayIndexByOrder()
         )
     gridProducts.Columns.AddColumns  Products.Columns.main
-    gridProducts.Columns.AddColumns  Products.Columns.sets
     
     radioButtons 
         tabButtonsPlaceholder 

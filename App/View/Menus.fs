@@ -38,7 +38,7 @@ let popupNumberDialog<'a>
     prompt title tryParse work 
     (btn : Button) 
     (parentPopup : MyWinForms.Popup) =
-    let tb = new TextBox(Width = 290, Text = (party.NewValidAddr() |> string) )                    
+    let tb = new TextBox(Width = 290, Text = "")                    
     let dialog,validate  = 
         popupDialog 
             { Dlg.def() with 
@@ -56,16 +56,7 @@ let popupNumberDialog<'a>
     dialog.Show btn
 
 let modbusToolsPopup = 
-    let setAddr = 
-        popupNumberDialog 
-            "Ведите адрес MODBUS от 1 до 127" 
-            "Установка адреса MODBUS"
-            ( fun s ->
-                let b,v = Byte.TryParse s
-                if b  && v > 0uy && v<128uy then Some v else None)
-            (decimal >> setAddr)
-    
-    [   yield "Установка адреса", setAddr
+    [   yield "Установка адреса", (fun _ _ -> setAddr())
         yield!
             Command.values
             |> List.filter( (<>) CmdSetAddr ) 
@@ -213,5 +204,6 @@ let initialize =
             TabPages.TabsheetVars.ProductionPoint.updateVisibility() )
         popup.Show(buttonSettings)
         
+    Thread2.scenary.Set (production())
 
     fun () -> ()

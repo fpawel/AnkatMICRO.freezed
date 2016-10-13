@@ -42,7 +42,7 @@ type PartyInfo =
 
         [<DisplayName("Количество приборов")>]    
         [<Description("Количество приборов в партии")>]
-        mutable Count  : byte  }
+        mutable Count  : int  }
 
 let addProducts (b:Button) = 
     let tb = new TextBox(Width = 200, Dock = DockStyle.Left, Text = "1")
@@ -110,7 +110,7 @@ let createNewParty (b:Button) =
     let d = 
         {   Name = "-"
             ProductType = Ankat.ProductType.first.What
-            Count = 1uy}
+            Count = 1}
     let g = new PropertyGrid(SelectedObject = d, 
                                 ToolbarVisible = false, Height = 250,
                                 PropertySort = PropertySort.Alphabetical)

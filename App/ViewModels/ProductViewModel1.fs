@@ -133,44 +133,14 @@ type Product1(p : P, getProductType, getPgs, partyId) =
                             PSr.Party = partyId
                             PSr.Name = p.What}                else 
                     Chart.removeProductSeries p.Id |> ignore
-    member x.Addr
-        with get () = p.Addr          
-        and set v = 
-            if v <> p.Addr then
-                p <- { p with Addr = v}
-                x.RaisePropertyChanged "Addr"
-                x.RaisePropertyChanged "What"
-                Chart.setProductLegend p.Id x.What
-
     member x.SerialNumber
-        with get () = p.ProductSerial.SerialNumber
+        with get () = p.SerialNumber
         and set v = 
-            if v <> p.ProductSerial.SerialNumber then
-                p <- { p with ProductSerial = {p.ProductSerial with SerialNumber = v} }
+            if v <> p.SerialNumber then
+                p <- { p with SerialNumber = v }
                 x.RaisePropertyChanged "What"
                 x.RaisePropertyChanged "SerialNumber"
                 Chart.setProductLegend p.Id x.What
-
-    member x.ProdReady
-        with get () = p.ProductSerial.ProdMonthYear.IsSome
-        and set v = 
-            if v <> x.ProdReady then
-                let ym =
-                    if v then 
-                        let now = DateTime.Now
-                        Some ( byte now.Month, byte (now.Year - 2000) )
-                    else None 
-                p <- { p with ProductSerial = {p.ProductSerial with ProdMonthYear = ym } }
-                x.RaisePropertyChanged "ProdReady"
-                x.RaisePropertyChanged "MonthYearStr"
-
-    member x.MonthYearStr
-        with get () = 
-            p.ProductSerial.ProdMonthYear
-            |> Option.map(fun (m,y) ->
-                let m = if m<10uy then sprintf "0%d" m else m.ToString()
-                sprintf "%s.20%d" m y )
-            |> Option.getWith ""
 
     member x.ForceCalculateErrors() =        
         List.iter (Property.concError >> x.RaisePropertyChanged ) SScalePt.values
@@ -247,7 +217,7 @@ type Product1(p : P, getProductType, getPgs, partyId) =
 
     
     member x.ReadModbus(ctx) = 
-        let r = Mdbs.read3decimal (port()) x.Addr (ReadContext.code ctx) (ReadContext.what ctx)
+        let r = Mdbs.read3decimal (port()) 1uy (ReadContext.code ctx) (ReadContext.what ctx)
         match r, ctx with
         | Ok value, ReadVar var -> 
             x.setPhysVarValue var value
@@ -262,7 +232,7 @@ type Product1(p : P, getProductType, getPgs, partyId) =
 
     member x.WriteModbus (ctx,value) = 
         let what = WriteContext.what ctx
-        let r = Mdbs.write (port()) x.Addr (WriteContext.code ctx) what value
+        let r = Mdbs.write (port()) 1uy (WriteContext.code ctx) what value
         match r with 
         | Err e -> Logging.error "%s, %s : %s" x.What what e
         | Ok () -> Logging.info "%s, %s" x.What what
@@ -271,6 +241,21 @@ type Product1(p : P, getProductType, getPgs, partyId) =
             |> Result.map(fun v -> sprintf "%s <-- %s" (WriteContext.what ctx) (Decimal.toStr6 value))
             |> Some 
         r
+
+    member x.SetModbusAddr () = 
+        let what = "Установка адреса MODBUS 1"
+        let r = Mdbs.write (port()) 0uy CmdSetAddr.Code what 1m
+        match r with 
+        | Err e -> Logging.error "%s, %s : %s" x.What what e
+        | Ok () -> Logging.info "%s, %s" x.What what
+        x.Connection <- 
+            r 
+            |> Result.map(fun () -> what )
+            |> Some 
+        match x.ReadModbus(ReadVar CCh0) with
+        | Ok _ -> None
+        | Err err -> Some err
+        
 
     member x.ComputeKefGroup kefGroup = 
         x.Product <- snd <| runState (Alchemy.compute kefGroup getPgs (getProductType())) p

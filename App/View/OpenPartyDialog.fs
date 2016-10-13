@@ -158,14 +158,14 @@ module private Helpers =
                 let n = cbType.SelectedIndex - 1
                 if n>(-1) && n < AppConfig.productTypes.Length then Some AppConfig.productTypes.[n] else None
             let serial = 
-                let b,v = UInt16.TryParse tbSerialNumber.Text
-                if b then Some v else None
+                let b,v = Int32.TryParse tbSerialNumber.Text
+                if b && v > 0 then Some v else None
             let month = 
                 let n = cbMonth.SelectedIndex
-                if n>0 && n<13 then Some (byte n) else None
+                if n>0 && n<13 then Some n else None
             let year = 
                 let b,v = Int32.TryParse tbYear.Text
-                if b then (v - 2000) |> byte |> Some  else None
+                if b then (v - 2000)  |> Some  else None
             updateTreeView treeview nodes prodType serial month year
             buttonAccept.Enabled <- getBatch().IsSome
 

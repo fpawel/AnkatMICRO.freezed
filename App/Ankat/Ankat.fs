@@ -595,24 +595,19 @@ module Property =
         sprintf "TermoError_%s_%s" (SScalePt.property n) (TermoPt.property termoPt)
     
 
-type ProductSerial = 
-    {   SerialNumber : uint16
-        ProdMonthYear : (byte * byte) option }
-
 type Product = 
     {   Id : Id
         IsChecked : bool        
-        ProductSerial : ProductSerial
+        SerialNumber : int
         SerialPortName : string
-        Addr : byte
         VarValue : Map<Var, decimal> 
         CoefValue : Map<Coef, decimal>  }
 
     member x.What = Product.what x
     static member id x = x.Id
-    static member productSerial x = x.ProductSerial
+    static member productSerial x = x.SerialNumber
     static member createNewId() = String.getUniqueKey 12
-    static member what x = sprintf "№%d.#%d" x.ProductSerial.SerialNumber x.Addr 
+    static member what x = sprintf "А%d" x.SerialNumber 
 
     static member getVar k p =p.VarValue.TryFind k 
 
@@ -644,13 +639,10 @@ type Product =
         for kef,value in kefsVals do
             do! Product.setKef kef (Some value)  }
 
-    static member createNew addy = 
+    static member createNew serialNumber = 
         let now = DateTime.Now
         {   Id = Product.createNewId()
-            ProductSerial =
-                {   SerialNumber = 0us
-                    ProdMonthYear = None }
-            Addr = addy
+            SerialNumber = serialNumber
             IsChecked = true
             VarValue = Map.empty 
             CoefValue = Map.empty 
@@ -705,7 +697,7 @@ module Party =
             Date : DateTime
             ProductType : ProductType
             Name : string
-            ProductsSerials : ProductSerial list   }
+            ProductsSerials : int list   }
         static member id x = x.Id 
     type Data = {
         Products : Product list

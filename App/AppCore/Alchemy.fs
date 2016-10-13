@@ -261,13 +261,13 @@ type Product with
         |> Option.map3( fun (c,c20,limit) -> 
             { Value = c; Nominal = c20; Limit = limit } )
 
-let createNewProduct addr getPgs productType =
+let createNewProduct serialNumber getPgs productType =
     let prodstate = state {
         let! product = getState
         do!
             initKefsValues getPgs productType
             |> Product.setKefs  }
-    runState prodstate (Product.createNew addr )
+    runState prodstate (Product.createNew serialNumber)
     |> snd
 
 
@@ -275,9 +275,9 @@ let createNewParty() =
     let h,d = Party.createNewEmpty()
     let getPgsConc = d.BallonConc.TryFind >> Option.getWith 0m
     let productType = h.ProductType
-    let product = createNewProduct 1uy getPgsConc productType
+    let product = createNewProduct 1 getPgsConc productType
     let products = [ product ]
-    { h with ProductsSerials = [product.ProductSerial] }, { d with Products = products }
+    { h with ProductsSerials = [product.SerialNumber] }, { d with Products = products }
 
 let createNewParty1( name, productType, count) : Party.Content = 
         let pgs =
@@ -286,8 +286,8 @@ let createNewParty1( name, productType, count) : Party.Content =
             |> Map.ofList 
         let getPgsConc = pgs.TryFind >> Option.getWith 0m
         let products = 
-            [1uy..count] 
-            |> List.map( fun addr ->  createNewProduct addr getPgsConc productType )
+            [1..count] 
+            |> List.map( fun n ->  createNewProduct n getPgsConc productType )
         
         {   Id = Product.createNewId()
             ProductsSerials = List.map Product.productSerial products

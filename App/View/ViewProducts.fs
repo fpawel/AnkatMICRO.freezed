@@ -21,7 +21,7 @@ module Columns =
     type CbBox = MyWinForms.FlatComboBox
     let main = [   
         %% new CheckBoxColumn(DataPropertyName = "IsChecked", Width = 50) 
-        %% new TextColumn(DataPropertyName = "Addr", HeaderText = "#", Width = 50) ]
+        %% new TextColumn(DataPropertyName = "SerialNumber", HeaderText = "№", Width = 80)   ]
     
     let serialPortColumn = 
 
@@ -72,22 +72,20 @@ module Columns =
 
         serialPortColumn
 
-    let sets = [
-        %% serialPortColumn
-        %% new TextColumn(DataPropertyName = "SerialNumber", HeaderText = "№", Width = 80)  
-        %% new DataGridViewCheckBoxColumn (DataPropertyName = "ProdReady", HeaderText = "Выпуск", Width = 50)  
-        %% new TextColumn(DataPropertyName = "MonthYearStr", HeaderText = "Дата", Width = 80)  ]
-        
-
+    
     let physVars = PhysVar.values|> List.map(fun physvar -> 
         %% new TextColumn
                 (   DataPropertyName = PhysVar.property physvar, 
                     HeaderText = PhysVar.what physvar,
                     ReadOnly = true) )
 
+    let columnConnection = 
+        %% new TextColumn(DataPropertyName = "Connection", HeaderText = "Связь", Width = 80) 
+
     let interrogate =    
-        %% new TextColumn(DataPropertyName = "Connection", HeaderText = "Связь", Width = 80)
-        :: physVars
+        %% serialPortColumn ::
+        %% columnConnection ::
+        physVars
 
 let updateCoefsGridRowsVisibility _ =   
     let v = AppConfig.config.View

@@ -116,22 +116,23 @@ type Ankat.ViewModel.Party with
         if Seq.isEmpty xs then
             return "приборы не отмечены"
         else
-            do! Comport.testPort AppConfig.config.ComportProducts
+            
             for p in xs do 
                 if isKeepRunning() && p.IsChecked then                         
                     do! p.Interrogate() }
 
     member x.WriteModbus(cmd,value) = maybeErr{
-        do! Comport.testPort appCfg.ComportProducts
+        
         do! x.DoForEachProduct (fun p -> p.WriteModbus(SendCommand cmd,value) |> ignore  ) }
 
+    member x.SetModbusAddrs() = maybeErr{
+        do! x.DoForEachProduct (fun p -> p.SetModbusAddr() |> ignore  ) }
+
     member x.WriteKefs(kefs) = maybeErr{
-        do! Comport.testPort appCfg.ComportProducts
         do! x.DoForEachProduct (fun p -> 
             p.WriteKefs kefs |> ignore ) }
 
     member x.ReadKefs(kefs) = maybeErr{
-        do! Comport.testPort appCfg.ComportProducts
         do! x.DoForEachProduct (fun p -> 
             p.ReadKefs kefs |> ignore ) }
 
@@ -476,11 +477,7 @@ let runInterrogate() = "Опрос" -->> fun () -> maybeErr{
         do! party.Interrogate() }
 
 
-let setAddr addr = sprintf "Установка адреса %A" addr -->> fun () -> maybeErr{ 
-    
-    do! Mdbs.write appCfg.ComportProducts 0uy CmdSetAddr.Code "установка адреса" addr
-    let! _ =  Mdbs.read3decimal appCfg.ComportProducts (byte addr) 0 "проверка установки адреса"
-    () }
+let setAddr() = "Установка адреса 1" -->> party.SetModbusAddrs
 
 let sendCommand (cmd,value as x) = 
     sprintf "%s <- %M" (Command.what cmd) value -->> fun () -> 

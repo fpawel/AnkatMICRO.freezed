@@ -96,18 +96,14 @@ let getParties prodType serial month year =
         | _ -> true  )
     |> List.filter( fun p ->
         match serial with 
-        | Some serial -> p.ProductsSerials |> List.exists(fun y -> y.SerialNumber = serial)
+        | Some serial -> p.ProductsSerials |> List.exists( (=) serial)
         | _ -> true  )
     |> List.filter( fun p ->
         match month with 
-        | Some month -> p.ProductsSerials |> List.exists(function 
-            | {ProdMonthYear = Some (month',_)} -> month'=month 
-            | _ -> false)
+        | Some month -> p.Date.Month = month
         | _ -> true )
     |> List.filter( fun p ->
         match year with 
-        | Some year -> p.ProductsSerials |> List.exists(function  
-            | {ProdMonthYear = Some (_,y')} -> y'=year 
-            | _ -> false)
+        | Some year -> p.Date.Year = year
         | _ -> true )
     |> Repository.partiesHeadersDateTree 
