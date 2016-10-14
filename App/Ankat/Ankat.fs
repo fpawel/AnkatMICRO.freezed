@@ -216,6 +216,7 @@ type SensorIndex =
     member x.N = SensorIndex.n x
     member x.Name = SensorIndex.name x
     member x.Property = SensorIndex.property x
+    member x.What = SensorIndex.what x
 
     member x.SensorOfProdTypeByIndex prodType =
         SensorIndex.sensorOfProdTypeByIndex prodType x
@@ -251,7 +252,7 @@ type SensorIndex =
 
     static member coefsLin = function
         | Sens1 -> [CLin1_0; CLin1_1; CLin1_2; CLin1_3]
-        | Sens2 -> [CLin2_0; CLin1_2; CLin2_2; CLin2_3]
+        | Sens2 -> [CLin2_0; CLin2_1; CLin2_2; CLin2_3]
 
     static member sensorOfProdTypeByIndex prodType sensorIndex = 
         match sensorIndex, prodType.Sensor2 with
@@ -267,8 +268,8 @@ type SensorIndex =
         | Sens2 -> CmdNorm2
 
     static member what = function
-        | Sens1 -> "Канал 1"
-        | Sens2 -> "Канал 2"
+        | Sens1 -> "к.1"
+        | Sens2 -> "к.2"
 
 // точка шкалы датчика концентрации
 type SScalePt = 

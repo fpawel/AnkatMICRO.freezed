@@ -215,9 +215,8 @@ let compute group getPgsConc productType = state {
     | Err e -> 
         Logging.error "%s : %s" (Product.what product) e
     | Ok result ->
-        do! result |> List.zip groupCoefs |> Product.setKefs   }
+        do! result |> List.zipCuty 0m groupCoefs |> Product.setKefs   }
 
-    
 let getProductTermoErrorlimit channel pgs (gas,t) product =
     let concVar = channel.ChannelIndex.Conc
     let f = TestConcErrors channel.ChannelIndex

@@ -63,15 +63,13 @@ let bottomLayer =
     x
 
 module HardwareInfo = 
-    let private (~%%) x = MyWinForms.Components.LeftInfoBlock(bottomLayer, x)
-    let oven = %% "Подогрев плат"
+    type private C = MyWinForms.Components.LeftInfoBlock
+    let private (~%%) x = C(bottomLayer, x)
     let termo = %% "Термокамера"
-    let peumo = %% "ПГС"
+    let peumo = %% "Пневмоблок"
 
     let initialize = 
-        [   oven;  termo; peumo 
-        ] |> List.iter (fun x -> 
-            x.hide() )
+        List.iter C.hide [ termo; peumo ]
         fun() -> ()
 
 

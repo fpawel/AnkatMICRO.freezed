@@ -208,7 +208,7 @@ module private Helpers1 =
                 |> List.map(fun x -> x, None)
                 |> party.WriteKefs ]
 
-    type OpConfig = Config
+    
     type Op = Operation
 
     let switchPneumo gas = maybeErr{
@@ -271,18 +271,21 @@ module private Helpers1 =
         
     let isSens2() = party.getProductType().Sensor2.IsSome
 
-    let blowAir = 
+    let blowAir() = 
         "Продувка воздухом" <||> [   
             blow 1 SScalePt.Beg1 "Продуть воздух"
             "Закрыть пневмоблок" <|> fun () -> switchPneumo None
         ]
+
+    let formatIsSens2() = 
+        if isSens2() then "к.1,2" else "к.1"
 
     let adjust() =
         "Калибровка" <||> [   
             yield Sens1.Adjust
             if isSens2() then
                 yield Sens2.Adjust 
-            yield blowAir]
+            yield blowAir()]
 
     let goNku = "Установка НКУ" <|> fun () -> warm TermoNorm
 
@@ -323,7 +326,7 @@ module private Helpers1 =
                     yield blow 3 gas ("Продувка " + gas.What)                    
                     for feat in feats do                        
                         yield readVars (feat, gas.ScalePt, temp, press) 
-                yield blowAir ]
+                yield blowAir() ]
 
     let warmAndRead featsGasesList temp  =
 
@@ -385,18 +388,13 @@ let production() =
             if isSens2() then
                 yield SScalePt.Beg2
                 yield SScalePt.End2 ]
-    let title = if isSens2() then "двухканальный" else "одноканальный"
-    "Анкат-7664МИКРО " + title <||> [
-        "Установка к-тов исп." <|> fun () -> maybeErr{
+    "Анкат" + (if isSens2() then "2" else "1") <||> [
+        "Установка к-тов исплнения" <|> fun () -> maybeErr{
             do! party.DoForEachProduct (fun p -> 
                 p.WriteKefsInitValues()
                 |> ignore ) }
         goNku
-        blowAir
-        "Нормировка" <|> fun () -> maybeErr{
-            do! party.WriteModbus( Sens1.CmdNorm, 100m ) 
-            if isSens2() then
-                do! party.WriteModbus( Sens2.CmdNorm, 100m )  }
+        blowAir()
         norming()
         adjust()
         lin()
@@ -404,48 +402,9 @@ let production() =
             warmAndRead termoFeatsGases TermoLow 
             warmAndRead termoFeatsGases TermoHigh 
             warmAndRead termoFeatsGases TermoNorm  
-            "Ввод" <||> ( gases |> List.map (CorrectionTermoScale >> computeAndWriteGroup) ) 
-            
-            ]
+            "Ввод" <||> ( gases |> List.map (CorrectionTermoScale >> computeAndWriteGroup) )  ]
         test() ]
 
-module Config =
-    [<AutoOpen>]
-    module private Helpers =
-        let dummy msg = 
-            Logging.debug "%s" msg
-            Ankat.ViewModel.Operations.Config.CreateNew()
-        let fileName() = 
-            let n = if isSens2() then 1 else 2
-            IO.Path.Combine(IO.Path.ofExe, sprintf "scenary%d.json" n)
-
-        let config() = 
-            let fileName = fileName()
-            if IO.File.Exists fileName |> not then                
-                dummy <| sprintf "не найден файл сценария %A" fileName 
-            else                
-                try
-                    match Json.Serialization.parse<OpConfig> (IO.File.ReadAllText(fileName)) with
-                    | Ok x -> x
-                    | Err error ->
-                        dummy <| sprintf "ошибла файла сценария %s\n%s" fileName error                    
-                with e ->             
-                    dummy <| sprintf "ошибла файла сценария %s\n%A" fileName e 
-            
-    let apply() =
-        let productionWork =  production()
-        Op.SetConfig (productionWork,config())
-        Thread2.scenary.Set productionWork   
-
-    let save() =
-        let config = Op.GetConfig (production())
-        let fileName = fileName()
-        try
-            IO.File.WriteAllText(fileName, Json.Serialization.stringify config ) 
-        with e ->             
-            Logging.error "ошибла сохранения файла сценария %s\n%A" fileName e 
-        
-    
 
 module Works =
     let all() = Op.MapReduce Some (production()) 

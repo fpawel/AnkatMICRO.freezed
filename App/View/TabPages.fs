@@ -17,28 +17,37 @@ type private VE = Ankat.Alchemy.ValueError
 
 
 module TabsheetVars =
-    type Page = 
-        {   PhysVar : PhysVar
-            ProductionPoint : ProductionPoint
-            TermoPt : TermoPt } 
+
+    [<AutoOpen>]
+    module private Helpers =
+
+        type Page = 
+            {   PhysVar : PhysVar
+                ProductionPoint : ProductionPoint
+                TermoPt : TermoPt } 
         
-    let mutable private page = { 
-        PhysVar = Sens1.Conc
-        ProductionPoint = Correction <| CorrectionLinScale Sens1
-        TermoPt = TermoNorm }
+        let mutable page = { 
+            PhysVar = Sens1.Conc
+            ProductionPoint = Correction <| CorrectionLinScale Sens1
+            TermoPt = TermoNorm }
 
-    let private addcol dataPropertyName headerText = 
-        new DataGridViewTextBoxColumn( DataPropertyName = dataPropertyName, HeaderText = headerText)
-        |> gridProducts.Columns.AddColumn
+        let addcol dataPropertyName headerText = 
+            new DataGridViewTextBoxColumn( DataPropertyName = dataPropertyName, HeaderText = headerText)
+            |> gridProducts.Columns.AddColumn
 
-    let private termoLeter = function
-        | TermoNorm -> ""
-        | TermoLow -> "-"
-        | TermoHigh -> "+"
+        let termoLeter = function
+            | TermoNorm -> ""
+            | TermoLow -> "-"
+            | TermoHigh -> "+"
 
-    let private pressLeter = function
-        | PressNorm -> ""
-        | PressHigh -> "+"
+        let pressLeter = function
+            | PressNorm -> ""
+            | PressHigh -> "+"
+
+        let addp () = 
+            let p = new Panel(Parent = TabsheetVars.BottomTab, Dock = DockStyle.Top)
+            let _ = new Panel(Parent = TabsheetVars.BottomTab, Dock = DockStyle.Top, Height = 10)
+            p
 
     let update () = 
         
@@ -68,11 +77,6 @@ module TabsheetVars =
                     let var = page.ProductionPoint, physvar, ScaleBeg, TermoNorm, p
                     addcol (Vars.property var) (physvar.What + pressLeter p)
             setActivePageTitle page.ProductionPoint.What1
-        
-    let private addp () =         
-        let p = new Panel(Parent = TabsheetVars.BottomTab, Dock = DockStyle.Top)
-        let _ = new Panel(Parent = TabsheetVars.BottomTab, Dock = DockStyle.Top, Height = 10)
-        p
 
     module Termo =
         let get,set, setVisibility = 
@@ -122,8 +126,6 @@ module TabsheetVars =
             setVisibility xs
             set xs.Head
 
-    
-
 module TabsheetChart = 
     
     let update() =
@@ -152,117 +154,119 @@ module TabsheetErrors =
             SScalePt.Beg2
             SScalePt.Mid2
             SScalePt.End2 ]
-    type K = 
-        | Main | Termo 
-        member x.What = K.what x
-        static member what = function
-            | Main  -> "Основная"
-            | Termo -> "Температурная"
-
-        static member descr = function
-            | Main  -> "Основная погрешность"
-            | Termo -> "Температурная погрешность"
-
-        static member props = function
-            | Main  -> 
-                [   for gas in pts do
-                        yield gas.What, "Основная погрешность", Property.concError gas ]
-            | Termo -> 
-                [   for gas in pts do
-                        yield gas.What + "-", "Погрешность на пониженной температуре", Property.termoError (gas,TermoLow)
-                    for gas in pts do
-                        yield gas.What + "+", "Погрешность на повышенной температуре", Property.termoError (gas,TermoHigh)
-                     ]
-            
 
     
-    
-    let getProductOfRow (g:DataGridView) (e:DataGridViewCellFormattingEventArgs) =
-        g.Rows.[e.RowIndex].DataBoundItem :?> P
 
-    type private Fn = { 
-        f : P -> VE option
-        s : string }
-    let private colsFns = 
-        let x = Dictionary<int, Fn>()
-        gridProducts.ColumnRemoved.Add(fun e -> 
-            x.Remove(e.Column.GetHashCode()) |> ignore
-            )
-        x
+    [<AutoOpen>]
+    module private Helpers =
 
-         
+        type Page = 
+            {   SensorIndex  : SensorIndex
+                TermoPt : TermoPt } 
 
-    let formatCell page (g:DataGridView) (e:DataGridViewCellFormattingEventArgs) s ve =  
-        let row = g.Rows.[e.RowIndex]
-        let col = g.Columns.[e.ColumnIndex]        
-        let cell = row.Cells.[e.ColumnIndex]
-        let p = getProductOfRow g e
-        let decToStr = Decimal.toStr "0.###"
-        let what = sprintf "%s, %s" p.What s
-        
-        ve |> Option.map( fun (ve : VE) ->  
             
-            let foreColor, backColor = if ve.IsError then Color.Red, Color.LightGray else Color.Navy, Color.Azure 
-            let toolTip = 
-                [|  yield "Снятое значение", decToStr ve.Value                     
-                    yield "Номинал", decToStr ve.Nominal
-                    yield "Предел погрешности", decToStr ve.Limit  |]
-                |> Array.map( fun (p,v) -> sprintf "%s = %s" p v)
-                |> fun v -> String.Join("\n", v)                
-            ve.Value, foreColor, backColor, toolTip  )
-        |> function
-        | None -> cell.ToolTipText <- sprintf "%s - нет данных" what
-        | Some (value, foreColor, backColor, text) ->
-            cell.Style.ForeColor <- foreColor
-            cell.Style.BackColor <- backColor
-            cell.ToolTipText <- sprintf "%s\n%s" what text
-            e.Value <- decToStr value
-            e.FormattingApplied <- true
-             
+            static member ctx x = 
+                match x.TermoPt with
+                | TermoNorm ->
+                    x.SensorIndex.ScalePts
+                    |> List.map (fun gas -> 
+                        let n = SScalePt.new' x.SensorIndex gas
+                        n.What, Property.concError n )
+                | t ->
+                    x.SensorIndex.ScalePts
+                    |> List.map (fun gas -> 
+                        let n = SScalePt.new' x.SensorIndex gas
+                        n.What, Property.termoError (n, t) )
+                
+        let mutable page = { 
+            TermoPt = TermoNorm 
+            SensorIndex = Sens1 }
 
-    let mutable private page = Main
-    let update () = 
-        setActivePageTitle (page.What + " погрешность")
+        let addp () = 
+            let p = new Panel(Parent = TabsheetErrors.BottomTab, Dock = DockStyle.Top)
+            let _ = new Panel(Parent = TabsheetErrors.BottomTab, Dock = DockStyle.Top, Height = 10)
+            p
+
+        type Fn = P -> VE option
+        let colsFns = 
+            let x = Dictionary<int, Fn>()
+            gridProducts.ColumnRemoved.Add(fun e -> 
+                x.Remove(e.Column.GetHashCode()) |> ignore
+                )
+            x
+
+        let getProductOfRow (g:DataGridView) (e:DataGridViewCellFormattingEventArgs) =
+            g.Rows.[e.RowIndex].DataBoundItem :?> P         
+
+        let formatCell (g:DataGridView) (e:DataGridViewCellFormattingEventArgs) ve =  
+            let row = g.Rows.[e.RowIndex]
+            let col = g.Columns.[e.ColumnIndex]        
+            let cell = row.Cells.[e.ColumnIndex]
+            let p = getProductOfRow g e
+            let decToStr = Decimal.toStr "0.###"
+            ve |> Option.map( fun (ve : VE) ->  
+            
+                let foreColor, backColor = if ve.IsError then Color.Red, Color.LightGray else Color.Navy, Color.Azure 
+                let toolTip = 
+                    [|  yield "Снятое значение", decToStr ve.Value                     
+                        yield "Номинал", decToStr ve.Nominal
+                        yield "Предел погрешности", decToStr ve.Limit  |]
+                    |> Array.map( fun (p,v) -> sprintf "%s = %s" p v)
+                    |> fun v -> String.Join("\n", v)                
+                ve.Value, foreColor, backColor, toolTip  )
+            |> function
+            | None -> cell.ToolTipText <- sprintf "%s - нет данных" p.What
+            | Some (value, foreColor, backColor, text) ->
+                cell.Style.ForeColor <- foreColor
+                cell.Style.BackColor <- backColor
+                cell.ToolTipText <- sprintf "%s\n%s" p.What text
+                e.Value <- decToStr value
+                e.FormattingApplied <- true
+
+    let update () =
+        setActivePageTitle (sprintf "Погрешность %s, %s"  page.SensorIndex.What page.TermoPt.What)
         gridProducts.Columns.``remove all columns but`` Columns.main
-        for h,s,p in K.props page do
+        for h,p in Page.ctx page do
             let col = new DataGridViewTextBoxColumn( DataPropertyName = p,  HeaderText = h)
-            colsFns.[col.GetHashCode()] <- 
-                {   f = fun product ->
-                        let t = typeof<P>
-                        let prop = t.GetProperty p
-                        prop.GetValue(product,null) :?> VE option
-                    s = s }
+            colsFns.[col.GetHashCode()] <- fun product ->
+                let t = typeof<P>
+                let prop = t.GetProperty p
+                prop.GetValue(product,null) :?> VE option
             gridProducts.Columns.AddColumn col
 
     
     
-    let get,set,_ = 
-        let p1 = new Panel(Parent = TabsheetErrors.BottomTab, Dock = DockStyle.Top)
-        let _ = new Panel(Parent = TabsheetErrors.BottomTab, Dock = DockStyle.Top, Height = 10)
 
-        gridProducts.CellFormatting.Add <| fun e ->
-            let column = gridProducts.Columns.[e.ColumnIndex]
-            if obj.ReferenceEquals( column, Ankat.View.Products.Columns.columnConnection) then
-                let text, fore, back =
-                    match e.Value :?> Result<string,string> option with
-                    | Some (Ok s) -> s, Color.Black, Color.White
-                    | Some (Err s) -> s, Color.Red, Color.LightGray
-                    | _ -> "", Color.Black, Color.White
-                e.Value <- text
-                let row = gridProducts.Rows.[e.RowIndex]
-                let cell = row.Cells.[e.ColumnIndex]
-                cell.Style.ForeColor <- fore
-                cell.Style.BackColor <- back
-            else
-                let b,f = colsFns.TryGetValue (column.GetHashCode())
-                if b then 
-                    let p = getProductOfRow gridProducts e
-                    formatCell page gridProducts e f.s (f.f p)
-            
+    module Termo =
+        let get,set, _ = 
+            radioButtons (addp ()) TermoPt.values TermoPt.what TermoPt.dscr <| fun x -> 
+                page <- {page with TermoPt = x }
+                update()
 
-        radioButtons p1 [Main; Termo] K.what K.descr <| fun x -> 
-            page <- x
-            update()
+    module SensorIndex =
+        let get,set, _ = 
+            gridProducts.CellFormatting.Add <| fun e ->
+                let column = gridProducts.Columns.[e.ColumnIndex]
+                if obj.ReferenceEquals( column, Ankat.View.Products.Columns.columnConnection) then
+                    let text, fore, back =
+                        match e.Value :?> Result<string,string> option with
+                        | Some (Ok s) -> s, Color.Black, Color.White
+                        | Some (Err s) -> s, Color.Red, Color.LightGray
+                        | _ -> "", Color.Black, Color.White
+                    e.Value <- text
+                    let row = gridProducts.Rows.[e.RowIndex]
+                    let cell = row.Cells.[e.ColumnIndex]
+                    cell.Style.ForeColor <- fore
+                    cell.Style.BackColor <- back
+                else
+                    let b,f = colsFns.TryGetValue (column.GetHashCode())
+                    if b then 
+                        let p = getProductOfRow gridProducts e
+                        formatCell gridProducts e (f p)
+
+            radioButtons (addp ()) SensorIndex.values SensorIndex.what SensorIndex.what <| fun x -> 
+                page <- {page with SensorIndex = x }
+                update()
     
 
 let private onSelect = function
@@ -278,6 +282,8 @@ let private onSelect = function
     | TabsheetErrors ->
         gridProducts.Columns.``remove all columns but`` Products.Columns.main
         gridProducts.Parent <- TabsheetErrors.RightTab
+        TabsheetErrors.Termo.set TermoNorm
+        TabsheetErrors.SensorIndex.set Sens1
         TabsheetErrors.update()
         
     | TabsheetChart ->

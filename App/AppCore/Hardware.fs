@@ -32,11 +32,14 @@ module Pneumo =
                 R.data = [| 0uy; 0x32uy; 0uy; 1uy; 2uy; 0uy; code |]
                 R.what = codeToString code |> sprintf "пневмоблок - %s" }
         let r = Mdbs.getResponse port req (fun _ -> "OK") ( fun _ ->  Ok code )
-        clapan.Value <- Some r
+        
+        
         match r with
-        | Ok _ -> sprintf "%d" code, None
+        | Ok _ -> string code, None
         | Err e -> "Ошибка", Some e
         |> MainWindow.HardwareInfo.peumo.setTextSafe r.Level 
+
+        clapan.Value <- Some r
         r |> Result.map(fun _ -> ())
 
 module Termo =   

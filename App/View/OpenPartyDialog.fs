@@ -187,7 +187,8 @@ module private Helpers =
             | Some b -> 
                 match AppContent.load b.Id with
                 | None -> 
-                    Scenary.updateGridViewBinding()
+                    Thread2.scenary.Set <| PartyWorks.production() 
+                    Scenary.updateGridViewBinding()                    
                     TabPages.TabChart.update()
                     TabPages.TabsheetVars.ProductionPoint.updateVisibility()
                 | Some error -> 

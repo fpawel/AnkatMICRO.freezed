@@ -32,9 +32,11 @@ type LeftInfoBlock(par, caption) =
         if not p.Visible then
             p.Visible <- true
 
-    member __.hide() =
+    member __.Hide() =
         p.Visible <- false
 
     member x.setTextSafe level text =
         par.PerformThreadSafeAction <| fun () ->
             x.setText level text
+
+    static member hide (x:LeftInfoBlock) = x.Hide()

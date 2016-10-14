@@ -146,7 +146,7 @@ and Operation =
         | _ -> ()
         match x, cfg.Items with
         | Scenary (_,xitems), Some items  -> 
-            List.zip2 xitems items |> List.iter Operation.SetConfig
+            List.zipCut xitems items |> List.iter Operation.SetConfig
         | _ -> ()  
 
     static member CreateScenary (name,getParent) items =

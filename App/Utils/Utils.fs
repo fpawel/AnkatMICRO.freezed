@@ -140,13 +140,23 @@ let iterate n f =
 
 
 module List =
-    let zip2 xs ys = 
+    let zipCut xs ys = 
         let rec loop r xs ys =
             match xs,ys with 
             | [],_         -> r
             | _,[]         -> r
             | xh::xt,yh::yt -> loop ((xh,yh)::r) xt yt
         loop [] xs ys |> List.rev
+
+    let zipCuty ydef xs ys  = 
+        let rec loop r xs ys =
+            match xs,ys with 
+            | [],_         -> r
+            | xh :: xt, []         -> loop ((xh, ydef) :: r) xt []
+            | xh::xt,yh::yt -> loop ((xh,yh)::r) xt yt
+        
+        loop [] xs ys |> List.rev
+
     let rec tryGetWith f = function
         | [] -> None
         | x::xs ->
