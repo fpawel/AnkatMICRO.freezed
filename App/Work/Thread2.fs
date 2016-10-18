@@ -23,7 +23,7 @@ let isKeepRunning () = scenaryKeepRunning.Get()
 let notKeepRunning() = not (scenaryKeepRunning.Get())
 let forceStop() = scenaryKeepRunning.Value <- false
 
-let add'keep'running f = 
+let addKeepRunningHandler f = 
     scenaryKeepRunning.AddChanged f
 
 
@@ -264,9 +264,7 @@ let run needStopHardwareOrNot  (x : Operation) =
         
     let dostart, dostop = MyWinForms.Utils.timer 10000 AppContent.save
     dostart()
-
     //let task = new Threading.Tasks.Task(
-
     Async.Start <| async{    
         let result = Operation.Perform do'beg isKeepRunning x
         let scenaryWasBreakedByUser = (scenaryKeepRunning.Value = false)

@@ -294,7 +294,6 @@ module private Helpers1 =
             sprintf "Снятие %A, %s, %s, %s" (ProductionPoint.what2 feat ) 
                 (ScalePt.what gas ) (TermoPt.what t) (PressPt.what press)
         what <|> fun () -> maybeErr{
-            do! Comport.testPort appCfg.ComportProducts
             do! party.DoForEachProduct(fun p -> 
                 maybeErr{
                     for physVar in feat.PhysVars do
@@ -427,11 +426,10 @@ module Works =
 module private Helpers3 =
     let ( -->> ) s f =
         s <|> f
-        |> Thread2.run (false)
+        |> Thread2.run DontNeedStopHardware
 
     
 let runInterrogate() = "Опрос" -->> fun () -> maybeErr{ 
-    do! Comport.testPort appCfg.ComportProducts
     while Thread2.isKeepRunning() do
         do! party.Interrogate() }
 

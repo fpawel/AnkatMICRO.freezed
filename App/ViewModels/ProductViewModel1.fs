@@ -244,17 +244,16 @@ type Product1(p : P, getProductType, getPgs, partyId) =
 
     member x.SetModbusAddr () = 
         let what = "Установка адреса MODBUS 1"
-        let r = Mdbs.write (port()) 0uy CmdSetAddr.Code what 1m
-        match r with 
-        | Err e -> Logging.error "%s, %s : %s" x.What what e
-        | Ok () -> Logging.info "%s, %s" x.What what
+        let r = result{        
+            do! Mdbs.write (port()) 0uy CmdSetAddr.Code what 1m
+            let! _ = x.ReadModbus(ReadVar CCh0) 
+            return () }
         x.Connection <- 
-            r 
-            |> Result.map(fun () -> what )
-            |> Some 
-        match x.ReadModbus(ReadVar CCh0) with
-        | Ok _ -> None
-        | Err err -> Some err
+            r |> Result.map(fun () -> what ) |> Some         
+        match r with 
+        | Err e ->  Logging.error "%s, %s : %s" x.What what e                
+        | Ok () -> Logging.info "%s, %s" x.What what
+        Result.someErr r
         
 
     member x.ComputeKefGroup kefGroup = 

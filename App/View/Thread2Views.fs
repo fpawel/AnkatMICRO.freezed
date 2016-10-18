@@ -104,7 +104,7 @@ let initialize =
 
     Delay.initialize()
 
-    Thread2.add'keep'running <| function
+    Thread2.addKeepRunningHandler <| function
         | _, false ->                 
             form.PerformThreadSafeAction <| fun () ->
                 modal'message'bar.Visible <- false
@@ -164,7 +164,7 @@ let initialize =
         closing'bar.DoUpdate <| fun () ->
             closing'bar.Title <- Thread2.scenary.Value.Name
         
-    Thread2.add'keep'running <| fun (_,keep'running) ->
+    Thread2.addKeepRunningHandler <| fun (_,keep'running) ->
         form.PerformThreadSafeAction <| fun () ->
             btnStop.Visible <- keep'running 
 

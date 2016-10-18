@@ -103,7 +103,7 @@ let initialize =
     TopBar.thread1ButtonsBar.Controls.Add <| new Panel(Dock = DockStyle.Left, Width = 3)
     MainWindow.setTooltip buttonRun ("Выполнить " + buttonRun.Text)
     buttonRun.Click.Add <| fun _ ->  
-        Thread2.run true Thread2.scenary.Value
+        Thread2.run NeedStopHardware Thread2.scenary.Value
     Thread2.scenary.AddChanged <| fun (_,x) ->
         buttonRun.Text <- sprintf "%A" x.FullName
         MainWindow.setTooltip buttonRun ("Выполнить " + buttonRun.Text)
@@ -133,6 +133,12 @@ let initialize =
 
     ("Термокамера", "Ручное управление термокамерой") <== fun x ->
         termoToolsPopup.Show x   
+
+    Thread2.addKeepRunningHandler <| fun (_,isKeepRunning) -> 
+        form.PerformThreadSafeAction <| fun () ->
+            modbusToolsPopup.Content.Enabled <- not isKeepRunning
+            pneumoToolsPopup.Content.Enabled <- not isKeepRunning
+            termoToolsPopup.Content.Enabled <- not isKeepRunning
 
     do
         let x = 
