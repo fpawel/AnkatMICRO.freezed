@@ -1,96 +1,105 @@
 ﻿namespace Ankat
 
 type Units =
-    | UnitsmGpm3 
     | UnitsVolume 
     | UnitsNkpr 
 
     member x.Code = Units.context x |> fst
     
     static member context = function
-        | UnitsmGpm3 ->     2m, "мг/м3"
-        | UnitsVolume ->    7m, "%об"
-        | UnitsNkpr ->      14m, "%НКПР"
+        | UnitsVolume ->    3m, "%об"
+        | UnitsNkpr ->      4m, "%НКПР"
     static member code = Units.context >> fst
     static member what = Units.context >> snd
 
     member x.What = Units.context x |> snd 
     
 
-    
-
-
-type Gas =
-    | CO2 | CH4 | C3H8 | SumCH
-    
-    member x.What = sprintf "%A" x
-    
-    member x.Code = Gas.code x
-
-    member x.IsCH = Gas.isCH x
-
-    static member code = function
-        | CO2 ->    4m
-        | CH4 ->    5m
-        | SumCH ->  6m
-        | C3H8 ->   7m
-    static member what (x:Gas) = x.What
-    static member values = 
-        [CH4; C3H8; SumCH; CO2 ]
-    static member isCH = function
-        | CO2 ->    false
-        | CH4 
-        | SumCH 
-        | C3H8 ->   true
-    
-
 type Scale =     
-    | Sc4 | Sc10 | Sc20 | Sc50 | Sc100 
+    | Sc2
+    | Sc5 
+    | Sc10 
+    | Sc100 
 
     member x.Code = Scale.code x
     member x.Value = Scale.value x
     member x.What = Scale.what x
     static member context = function
-        | Sc4   -> 57m, 4m
-        | Sc10  -> 7m,  10m
-        | Sc20  -> 9m,  20m 
-        | Sc50  -> 0m,  50m 
+        | Sc2   -> 2m, 2m
+        | Sc5   -> 6m, 5m
+        | Sc10  -> 7m,  10m 
         | Sc100 -> 21m, 100m 
     static member code = Scale.context >> fst
     static member value = Scale.context >> snd
     static member what = Scale.context >> snd >> sprintf "0-%M"
 
-    static member values = FSharpType.unionCasesList<Scale>
+    static member values = FSharpType.unionCasesList<Scale>    
 
-// датчик концентрации
+
 type Sensor =
-    {   Gas : Gas
-        Units : Units
-        Scale : Scale }
-    member x.What = Sensor.what x
+    | CO2_2 
+    | CO2_5
+    | CO2_10
+    | CH4 
+    | C3H8 
+    | SumCH
     
+    member x.What = Sensor.what
+    
+    member x.Code = Sensor.code x 
+
+    member x.IsCH = Sensor.isCH x
+
+    member x.Scale = Sensor.scale
+
+    static member code = function
+        | CO2_2     -> 11m
+        | CO2_5     -> 12m
+        | CO2_10    -> 13m
+        | C3H8      -> 14m
+        | SumCH     -> 15m
+        | CH4       -> 16m
+
+    static member what = function
+        | CO2_2     -> "CO₂2"
+        | CO2_5     -> "CO₂5"
+        | CO2_10    -> "CO₂10"
+        | C3H8      -> "C₃H₈"
+        | SumCH     -> "∑CH"
+        | CH4       -> "CH₄"
+        
+    
+    static member values = 
+        FSharpType.unionCasesList<Sensor>
+
+    static member isCH = function
+        | CH4 | C3H8 | SumCH -> true
+        | _ -> false
+
+    static member units = function
+        | CH4 | C3H8 | SumCH -> UnitsNkpr
+        | _ -> UnitsVolume
+
+    static member scale = function
+        | CO2_2     -> Sc2
+        | CO2_5     -> Sc5
+        | CO2_10    -> Sc10
+        | _         -> Sc100
+
     member x.ConcErrorlimit = Sensor.concErrorlimit x
 
-    static member errorLimit x conc = 
-        match x.Gas, x.Scale with
-        | (CH4 | C3H8), _
-        | _, Sc4  -> 2.5m+0.05m*( abs conc) 
-        | _, Sc10 -> 0.5m
-        | _, Sc20 -> 1m
-        | _ -> 1m
-    static member what x = 
-        sprintf "%s, %s" x.Gas.What x.Scale.What
-    static member new' gas units scale = { Gas = gas; Scale = scale; Units = units }
-
+    static member errorLimit (x:Sensor) conc = 
+        match x with
+        | CH4 | C3H8 | SumCH -> 
+            2.5m+0.05m*( abs conc) 
+        | _  -> 0.5m
+    
     static member concErrorlimit x concValue =        
-        match x.Gas, x.Scale with
-        | CH4,_ 
-        | SumCH,_ 
-        | C3H8,_ ->     2.5m+0.05m * concValue
-        | CO2, Sc4 ->   0.2m + 0.05m * concValue
-        | CO2, Sc10 ->  0.5m
-        | CO2, Sc20 ->  1m
-        | _ -> 0m
+        match x with
+        | CH4
+        | SumCH 
+        | C3H8 ->     2.5m+0.05m * concValue
+        | _ ->   0.2m + 0.05m * concValue
         
 
 type ProductType =   
@@ -113,5 +122,5 @@ type ProductType =
         |> sprintf "%d, %s" x.TypeNumber
     static member first = 
         {   TypeNumber = 10
-            Sensor = Sensor.new' CO2 UnitsVolume Sc100  
-            Sensor2 = Some <| Sensor.new' CH4 UnitsVolume Sc100   }
+            Sensor = CO2_2
+            Sensor2 = Some CH4   }
