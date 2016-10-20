@@ -60,6 +60,8 @@
             this.imageList1.Images.SetKeyName(20, "clear");
             this.imageList1.Images.SetKeyName(21, "add");
             this.imageList1.Images.SetKeyName(22, "tools");
+            this.imageList1.Images.SetKeyName(23, "about");
+            this.imageList1.Images.SetKeyName(24, "todo");
             // 
             // Icons
             // 

@@ -125,7 +125,7 @@ let createNewParty (b:Button) =
             ( fun () -> Some () )
             ( fun () ->
                 let prodType = 
-                    AppConfig.productTypes
+                    ProductType.values
                     |> List.tryFind ( ProductType.what >> (=) d.ProductType)
                     |> Option.getWith ProductType.first
                 let b = Alchemy.createNewParty1 (d.Name, prodType, d.Count)

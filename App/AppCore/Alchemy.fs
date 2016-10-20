@@ -37,7 +37,7 @@ let initKefsValues pgs prodType =
             yield shkK, sensor.Scale.Value
             yield shk, sensor.Scale.Code  
             yield units, sensor.Units.Code
-            yield gastype, sensor.Gas.Code 
+            yield gastype, sensor.SensorCode
             yield! List.zip (SensorIndex.coefsLin sensInd) [0m; 1m; 0m; 0m] 
 
             yield! List.zip n0.CoefsTermo [0m; 0m; 0m] 
@@ -220,7 +220,7 @@ let compute group getPgsConc productType = state {
 let getProductTermoErrorlimit channel pgs (gas,t) product =
     let concVar = channel.ChannelIndex.Conc
     let f = TestConcErrors channel.ChannelIndex
-    if not channel.ChannelSensor.Gas.IsCH then         
+    if not channel.ChannelSensor.IsCH then         
         let tempVar = channel.ChannelIndex.Termo
         
         (Product.getVar (f, concVar, gas,t,PressNorm) product, Product.getVar (f, tempVar, gas, t,PressNorm) product) 
@@ -264,7 +264,8 @@ let createNewProduct serialNumber getPgs productType =
     let prodstate = state {
         let! product = getState
         do!
-            initKefsValues getPgs productType
+            (SER_NUMBER, decimal serialNumber)
+            :: ( initKefsValues getPgs productType )
             |> Product.setKefs  }
     runState prodstate (Product.createNew serialNumber)
     |> snd

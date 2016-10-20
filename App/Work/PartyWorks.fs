@@ -487,5 +487,5 @@ module TermoChamber =
         Hardware.Termo.setSetpoint value
     let read () = "Замер" -->> fun () -> 
         let r = Hardware.Termo.read ()
-        Logging.write (Result.level r) "%A" r
+        Logging.write (Logging.resultToLevel r) "%A" r
         Result.map (fun _ -> () ) r

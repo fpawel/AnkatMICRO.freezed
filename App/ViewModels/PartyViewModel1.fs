@@ -57,7 +57,7 @@ type ProductTypesConverter() =
     override this.GetStandardValuesSupported _ = true
     override this.GetStandardValuesExclusive _ = true
     override this.GetStandardValues _ =       
-        AppConfig.productTypes
+        ProductType.values
         |> Seq.toArray
         |> Array.map ProductType.what
         |> TypeConverter.StandardValuesCollection
@@ -200,7 +200,7 @@ type Party1
         and set v = 
             if v <> x.ProductType then
                 let t = 
-                    AppConfig.productTypes
+                    ProductType.values
                     |> List.tryFind( ProductType.what >> (=) v)
                     |> Option.getWith ProductType.first
                 partyHeader <- { partyHeader with ProductType = t}

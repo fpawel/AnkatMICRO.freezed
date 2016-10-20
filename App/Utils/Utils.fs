@@ -89,16 +89,13 @@ module Result =
         member b.Delay(f ) = f
         member x.Run(f) = bind f (Ok ())
 
-    let level = function
-        | Ok _ -> Logging.Info
-        | Err _ -> Logging.Error
+    
 
     
 
 let result = Result.Builder()
 
-type Result<'T, 'E> with
-    member x.Level = Result.level x
+
 
 module Option = 
 

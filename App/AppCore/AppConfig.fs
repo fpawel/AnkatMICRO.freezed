@@ -92,8 +92,3 @@ type ApplicatioConfig =
 
 let config, save = Json.Config.create "app.config.json" ApplicatioConfig.create
 
-
-
-let productTypes, saveProductTypes = 
-    Json.Config.create "productTypes.json" ( fun () -> [ Ankat.ProductType.first ] )
-

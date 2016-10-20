@@ -151,11 +151,14 @@ let initialize =
             SelectScenaryDialog.showSelectScenaryDialog x
         TopBar.thread1ButtonsBar.Controls.Add <| new Panel(Dock = DockStyle.Left, Width = 3)
 
+    Thread2.IsRunningChangedEvent.addHandler <| fun (_,isRunning) ->
+        TabsheetParty.BottomTab.Enabled <- not isRunning
+
     
 
-    let imgbtn1 key tooltip f1 f = 
+    let imgbtn1 left top key tooltip f1 f = 
         let x = 
-            new Button( Parent = productsToolsLayer, Dock = DockStyle.Top, AutoSize = true,
+            new Button( Parent = TabsheetParty.BottomTab, Left = left, Top = top,
                         ImageKey = key, Width = 40, Height = 40,
                         FlatStyle = FlatStyle.Flat,
                         ImageList = Widgets.Icons.instance.imageList1)
@@ -163,23 +166,32 @@ let initialize =
         MainWindow.setTooltip x tooltip
         x.Click.Add <| fun _ ->  
             f x
-        productsToolsLayer.Controls.Add <| new Panel(Dock = DockStyle.Top, Height = 3)
 
-    let imgbtn key tooltip f = imgbtn1 key tooltip (fun _ -> ()) f 
+    let imgbtn left top key tooltip f = imgbtn1 left top key tooltip (fun _ -> ()) f 
 
-    imgbtn1 "removeitem" "Удалить выбранные приборы из партии" 
+    imgbtn 3 3 "open" "Открыть ранее сохранённую партию" OpenPartyDialog.showDialog
+    imgbtn 46 3 "add" "Создать новую партию" PartyProductsDialogs.createNewParty
+
+    imgbtn 3 46 "additem" "Добавить в партию новые приборы" PartyProductsDialogs.addProducts
+    imgbtn1 46 46 "removeitem" "Удалить выбранные приборы из партии" 
         ( fun b ->
             b.Visible <- false
             let g = gridProducts
             g.SelectionChanged.Add <| fun _ ->
                 b.Visible <- g.SelectedCells.Count > 0 ) 
         PartyProductsDialogs.deleteProducts
-    
-    imgbtn "additem" "Добавить в партию новые приборы" PartyProductsDialogs.addProducts
 
-    imgbtn "open" "Открыть ранее сохранённую партию" OpenPartyDialog.showDialog
-
-    imgbtn "add" "Создать новую партию" PartyProductsDialogs.createNewParty
+    imgbtn 3 89 "todo" "Выбрать опрашиваемые параметры" ( fun b -> 
+        
+        let popup = 
+            MyWinForms.Utils.popupConfig 
+                "Опрашиваемые параметры" 
+                (ViewModel.SelectPhysVars()) 
+                PropertySort.Alphabetical
+        popup.Font <- form.Font        
+        popup.Closed.Add( fun _ ->
+           View.Products.updatePhysVarsGridColsVisibility()  )
+        popup.Show b )    
 
     let buttonStendSettings = 
         new Button( Parent = right, Height = 40, Width = 40, Visible = true,
@@ -207,10 +219,16 @@ let initialize =
         popup.Closed.Add( fun _ ->
             Thread2.scenary.Set <| PartyWorks.production() 
             Scenary.updateGridViewBinding()            
-            TabPages.TabChart.update()
-            TabPages.TabsheetVars.ProductionPoint.updateVisibility()
+            match TabPages.getSelected() with
+            | TabsheetChart -> 
+                TabPages.TabChart.update()
+            | TabsheetVars ->
+                TabPages.TabsheetVars.ProductionPoint.updateVisibility()
+            | _ -> ()
+            View.Products.updatePhysVarsGridColsVisibility() 
             )
         popup.Show(buttonSettings)
+
         
     Thread2.scenary.Set (production())
 

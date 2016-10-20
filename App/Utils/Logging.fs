@@ -13,9 +13,9 @@ type Level =
     static member toString (x:Level) = 
         (sprintf "%A" x).ToUpper()
 
-//let resultToLevel<'a,'e> = function
-//    | Ok (_ : 'a) -> Info 
-//    | Err (_ : 'e) -> Error
+let resultToLevel<'a,'e> = function
+    | Ok (_ : 'a) -> Info 
+    | Err (_ : 'e) -> Error
 
 
 let addLogger, getLoggers = 
@@ -66,4 +66,6 @@ let backColor = function
     | Info -> Color.Azure
     | Debug -> Color.White
     | Warn -> Color.White
+
+
 

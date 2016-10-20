@@ -46,13 +46,17 @@ type Sensor =
     
     member x.What = Sensor.what
     
-    member x.Code = Sensor.code x 
+    member x.SensorCode = Sensor.sensorCode x 
+
+    //member x.GasCode = Sensor.gasGode x 
 
     member x.IsCH = Sensor.isCH x
 
-    member x.Scale = Sensor.scale
+    member x.Scale = Sensor.scale x
 
-    static member code = function
+    member x.Units = Sensor.units x
+
+    static member sensorCode = function
         | CO2_2     -> 11m
         | CO2_5     -> 12m
         | CO2_10    -> 13m
@@ -75,6 +79,13 @@ type Sensor =
     static member isCH = function
         | CH4 | C3H8 | SumCH -> true
         | _ -> false
+
+
+//    static member gasGode = function
+//        | CH4   -> 5m
+//        | C3H8  -> 7m 
+//        | SumCH -> 6m
+//        | _     -> 4m
 
     static member units = function
         | CH4 | C3H8 | SumCH -> UnitsNkpr
@@ -120,7 +131,36 @@ type ProductType =
         x |> ProductType.sensors 
         |> Seq.toStr ", " Sensor.what
         |> sprintf "%d, %s" x.TypeNumber
-    static member first = 
-        {   TypeNumber = 10
-            Sensor = CO2_2
-            Sensor2 = Some CH4   }
+    
+    static member new2 n s1 s2 = 
+        {   TypeNumber = n
+            Sensor = s1
+            Sensor2 = Some s2   }
+
+    static member new1 n s1 = 
+        {   TypeNumber = n
+            Sensor = s1
+            Sensor2 = None   }
+
+
+
+    
+
+module private Helper =
+    let prodTypes = 
+        let co2 = [CO2_2; CO2_5; CO2_10]
+        let ch = [CH4; C3H8; SumCH]
+        [   for x in co2 do
+                yield ProductType.new1 10 x
+            for x in co2 do
+                yield ProductType.new2 11 x CH4
+
+            yield ProductType.new1 12 SumCH
+            yield ProductType.new1 13 C3H8
+            yield ProductType.new1 14 CH4 ]
+
+type ProductType with
+   static member first = 
+        Helper.prodTypes.Head
+   static member values = 
+        Helper.prodTypes

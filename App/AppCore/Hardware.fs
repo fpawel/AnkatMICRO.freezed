@@ -37,7 +37,7 @@ module Pneumo =
         match r with
         | Ok _ -> string code, None
         | Err e -> "Ошибка", Some e
-        |> MainWindow.HardwareInfo.peumo.setTextSafe r.Level 
+        |> MainWindow.HardwareInfo.peumo.setTextSafe (Logging.resultToLevel r)
 
         clapan.Value <- Some r
         r |> Result.map(fun _ -> ())
@@ -131,7 +131,7 @@ module Termo =
         match r with
         | Ok (x,y) -> sprintf "%M (%M)" x y, None
         | Err e -> "Ошибка", Some e
-        |> MainWindow.HardwareInfo.termo.setTextSafe r.Level 
+        |> MainWindow.HardwareInfo.termo.setTextSafe (Logging.resultToLevel r)
 
         r
 
@@ -143,7 +143,7 @@ module Termo =
         match r with
         | Ok () -> newstate.What, None
         | Err e -> "Ошибка", Some e
-        |> MainWindow.HardwareInfo.termo.setTextSafe r.Level 
+        |> MainWindow.HardwareInfo.termo.setTextSafe (Logging.resultToLevel r)
 
         r
 

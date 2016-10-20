@@ -56,14 +56,16 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
+    <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Utils\FsharpRuntime.fs" />
     <Compile Include="Utils\State.fs" />
     <Compile Include="Utils\StrUtils.fs" />
+    <Compile Include="Utils\Utils.fs" />
+    <Compile Include="Utils\Assembly.fs" />
     <Compile Include="Utils\PathUtils.fs" />
     <Compile Include="Utils\DateTimeUtils.fs" />
     <Compile Include="Utils\Logging.fs" />
     <Compile Include="Utils\IntRanges.fs" />
-    <Compile Include="Utils\Utils.fs" />
     <Compile Include="Utils\Ref.fs" />
     <Compile Include="Utils\Tree.fs" />
     <Compile Include="Utils\Html.fs" />

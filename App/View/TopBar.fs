@@ -17,6 +17,15 @@ let right = new Panel(Parent = placeHolder, Dock = DockStyle.Right, AutoSize = t
 let thread1ButtonsBar = new Panel(Parent = placeHolder, Dock = DockStyle.Left, AutoSize = true)
     
 
+let buttonAbout = 
+    let x =
+        new Button( Parent = right, Height = 40, Width = 40, Visible = true,
+                    ImageList = Widgets.Icons.instance.imageList1,
+                    FlatStyle = FlatStyle.Flat,
+                    Dock = DockStyle.Right, ImageKey = "about")
+    right.Controls.Add <| new Panel(Dock = DockStyle.Right, Width = 3)
+    x
+
 let buttonReport = 
     let x =
         new Button( Parent = right, Height = 40, Width = 40, Visible = true,
@@ -46,7 +55,9 @@ let initialize =
         Ankat.AppContent.save()
     
     
-        
+    buttonAbout.Click.Add <| fun _ ->
+        MainWindow.aboutForm.ShowDialog()  
+        |> ignore  
     
     
     fun () -> ()

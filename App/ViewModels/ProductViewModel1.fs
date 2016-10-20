@@ -91,7 +91,8 @@ type Product1(p : P, getProductType, getPgs, partyId) =
         let prodstate = state {
             let! product = getState
             do!
-                initKefsValues getPgs productType
+                (SER_NUMBER, decimal x.SerialNumber)
+                :: ( initKefsValues getPgs productType )
                 |> Product.setKefs  }        
         x.Product <- snd <| runState  prodstate x.Product
             
@@ -141,6 +142,7 @@ type Product1(p : P, getProductType, getPgs, partyId) =
                 x.RaisePropertyChanged "What"
                 x.RaisePropertyChanged "SerialNumber"
                 Chart.setProductLegend p.Id x.What
+                x.setKef SER_NUMBER  (Some <| decimal v)
 
     member x.ForceCalculateErrors() =        
         List.iter (Property.concError >> x.RaisePropertyChanged ) SScalePt.values

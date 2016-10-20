@@ -99,8 +99,7 @@ module Delay =
         fun () -> ()
 
 let initialize = 
-    Thread2.IsRunningChangedEvent.addHandler <| fun (_,isRunning) ->
-        productsToolsLayer.Enabled <- not isRunning
+    
 
     Delay.initialize()
 

@@ -17,6 +17,12 @@ module private Helpers =
 
     let tooltip = new ToolTip(AutoPopDelay = 5000, InitialDelay = 1000,  ReshowDelay = 500, ShowAlways = true)
 
+
+let aboutForm = 
+    let x = new Widgets.AboutForm()        
+    x.LabelVersion.Text <-  Assembly.version |> Option.map string |> Option.getWith "-"
+    x
+
 let form =     
     let x = new Form(Font = new Font("Consolas", 12.f), WindowState = FormWindowState.Maximized )
     let path = IO.Path.Combine( IO.Path.ofExe, "icon.ico")
@@ -25,7 +31,8 @@ let form =
         x.Icon <- customIcon
     with e ->
         Logging.error "fail to set icon.ico from %A : %A" path e
-    let mutable isClosed = false    
+    let mutable isClosed = false
+
     x
 
 let setTooltip<'a when 'a :> Control > (x:'a) text = 
@@ -172,7 +179,7 @@ let gridProducts =
 
     
 
-let productsToolsLayer = new Panel(Parent = TabsheetParty.BottomTab, Dock = DockStyle.Left, Width = 40 ) 
+
 
 let gridKefs =  
     let x = 
@@ -263,6 +270,20 @@ open AppConfig
 open AppConfig.View
 
 let initialize =
+    let rec h = EventHandler(fun _ _ -> 
+        aboutForm.Hide()
+        aboutForm.FormBorderStyle <- FormBorderStyle.FixedDialog
+        aboutForm.ControlBox <- true
+        aboutForm.ShowInTaskbar <- false
+        aboutForm.ShowIcon <- true
+        form.Activated.RemoveHandler h
+        )
+
+    form.Activated.AddHandler h
+    aboutForm.Show()
+    
+
+
     let getAllDataGridViews() = 
         form.enumControls
             (fun x -> 
@@ -278,7 +299,6 @@ let initialize =
                     {   ColWidths = [for c in g.Columns -> c.Width]
                         ColumnHeaderHeight = g.ColumnHeadersHeight } )     
             |> Map.ofSeq
-        
 
     let rec h = EventHandler( fun _ _ -> 
         form.Activated.RemoveHandler h

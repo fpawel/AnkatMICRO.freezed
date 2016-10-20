@@ -4,13 +4,13 @@ module PathUtils
 open System
 open System.IO
 
+
+
+    
+
 type Path with
 
-    static member ofExe =     
-        try
-            IO.Path.GetDirectoryName(Reflection.Assembly.GetExecutingAssembly().Location)
-        with _ -> 
-            Environment.CurrentDirectory
+    static member ofExe =  Assembly.exePath
 
     static member ofDateTime(root) =
         let (~%%) = sprintf "%d"

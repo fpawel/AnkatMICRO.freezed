@@ -665,7 +665,7 @@ type Product =
     static member termoErrorlimit channel pgs (gas,t) product =
         let concVar = channel.ChannelIndex.Conc
         let f = TestConcErrors channel.ChannelIndex
-        if not channel.ChannelSensor.Gas.IsCH then         
+        if not channel.ChannelSensor.IsCH then         
             let tempVar = channel.ChannelIndex.Termo
             (Product.getVar (f, concVar, gas,t,PressNorm) product, Product.getVar (f, tempVar, gas, t,PressNorm) product) 
             |> Option.map2(fun(c,t) -> 
