@@ -150,14 +150,18 @@ module private Helper =
     let prodTypes = 
         let co2 = [CO2_2; CO2_5; CO2_10]
         let ch = [CH4; C3H8; SumCH]
-        [   for x in co2 do
-                yield ProductType.new1 10 x
-            for x in co2 do
-                yield ProductType.new2 11 x CH4
+        let all = co2 @ ch
+        let n1 = ProductType.new1
+        let n2 n ch1 = ProductType.new2 n ch1 CH4
+        let (<==) = List.map
 
-            yield ProductType.new1 12 SumCH
-            yield ProductType.new1 13 C3H8
-            yield ProductType.new1 14 CH4 ]
+        [   yield!  n1 10 <== co2
+            yield!  n2 11 <== co2
+            yield   n1 12 SumCH
+            yield   n1 13 C3H8
+            yield   n1 14 CH4 
+            yield!  n1 15 <== all
+            yield!  n1 16 <== all ]
 
 type ProductType with
    static member first = 

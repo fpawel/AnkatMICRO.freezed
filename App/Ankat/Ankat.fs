@@ -67,7 +67,7 @@ type ScalePt =
     static member what = function
         | ScaleBeg -> "ПГС1"
         | ScaleMid1 -> "ПГС2"
-        | ScaleMid2 -> "ПГС3"
+        | ScaleMid2 -> "ПГС2"
         | ScaleEnd -> "ПГС4"
     static member whatScale = function
         | ScaleBeg -> "начало шкалы"

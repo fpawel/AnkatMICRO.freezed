@@ -387,11 +387,14 @@ let production() =
             if isSens2() then
                 yield SScalePt.Beg2
                 yield SScalePt.End2 ]
-    "Анкат" + (if isSens2() then "2" else "1") <||> [
-        "Установка к-тов исплнения" <|> fun () -> maybeErr{
-            do! party.DoForEachProduct (fun p -> 
+    "ИКД" + (if isSens2() then "2" else "1") <||> [
+        "Установка к-тов исплнения" <|> fun () -> 
+            party.DoForEachProduct (fun p -> 
                 p.WriteKefsInitValues()
-                |> ignore ) }
+                |> ignore ) 
+            |> Result.someErr
+                
+                
         goNku
         blowAir()
         norming()

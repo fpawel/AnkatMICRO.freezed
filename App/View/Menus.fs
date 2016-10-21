@@ -91,6 +91,114 @@ let termoToolsPopup =
     
 open Ankat.View.TopBar
 
+
+
+let private initPgsSens1Edit pgsPt =
+    let x = new TextBox( Parent = TabsheetParty.BottomTab, Dock = DockStyle.Top )
+    let _ = new Panel(Parent = TabsheetParty.BottomTab, Dock = DockStyle.Top, Height = 3 )
+
+
+    let _ = new Panel(Parent = TabsheetParty.BottomTab, Dock = DockStyle.Top, Height = 3 )
+    let _ = new Label(Parent = TabsheetParty.BottomTab, Dock = DockStyle.Top, AutoSize = true,
+                      Text = ScalePt.what pgsPt)
+    
+    fun () -> ()
+  
+let private initComboBoxProdType = 
+    let x = myCombobox()
+    x.Dock <- DockStyle.Top 
+    x.Parent <- TabsheetParty.BottomTab
+    let types = ProductType.values
+
+    types |> List.iter(ProductType.what >> x.Items.Add >> ignore )
+
+    let upd() = 
+        let h,_ = party.Party
+        
+        x.SelectedIndex <- 
+            ProductType.values 
+            |> List.tryFindIndex ( (=) h.ProductType ) 
+            |> Option.getWith (-1)
+        
+    let rec selectedIndexChangedHandler = EventHandler( fun _ _ ->
+        Runtime.PropertyChanged.removeAction party productTypePropertyChangedHandler        
+        let n = x.SelectedIndex
+        let t = if n < 0 || n > types.Length - 1 then ProductType.first else types.[n]
+        let h,xs = party.Party
+        party.Party <- {h with ProductType = t}, xs
+        Runtime.PropertyChanged.addHandler party productTypePropertyChangedHandler 
+        )
+
+    and productTypePropertyChangedHandler = PropertyChangedEventHandler(fun _ evt -> 
+        if evt.PropertyName = "ProductType" then
+            x.SelectedIndexChanged.RemoveHandler selectedIndexChangedHandler
+            upd()
+            x.SelectedIndexChanged.AddHandler selectedIndexChangedHandler
+        )
+    upd()
+    Runtime.PropertyChanged.addHandler party productTypePropertyChangedHandler
+    x.SelectedIndexChanged.AddHandler selectedIndexChangedHandler
+
+    let _ = new Panel(Parent = TabsheetParty.BottomTab, Dock = DockStyle.Top, Height = 1 )
+    
+    let _ = new Label(Parent = TabsheetParty.BottomTab, Dock = DockStyle.Top, AutoSize = true,
+                      Text = "Исполнение")
+    let _ = new Panel(Parent = TabsheetParty.BottomTab, Dock = DockStyle.Top, Height = 1 )
+
+    Thread2.IsRunningChangedEvent.addHandler <| fun (_,isRunning) ->
+        x.Enabled <- not isRunning 
+
+    fun () -> ()
+
+let private initButtons1 = 
+    let buttons1placeholder = 
+        new Panel
+            (   Parent = TabsheetParty.BottomTab, Dock = DockStyle.Top, Height = 89 )
+
+    let imgbtn1 left top key tooltip f = 
+        let x = 
+            new Button( Parent = buttons1placeholder, Left = left, Top = top,
+                        ImageKey = key, Width = 40, Height = 40,
+                        FlatStyle = FlatStyle.Flat,
+                        ImageList = Widgets.Icons.instance.imageList1)
+        MainWindow.setTooltip x tooltip
+        x.Click.Add <| fun _ ->  
+            f x
+        x
+
+    let imgbtn left top key tooltip f = imgbtn1 left top key tooltip f 
+
+    let btnOpenParty = imgbtn 3 3 "open" "Открыть ранее сохранённую партию" OpenPartyDialog.showDialog
+    let btnNewParty = imgbtn 46 3 "add" "Создать новую партию" PartyProductsDialogs.createNewParty
+
+    let btnAddProd = imgbtn 3 46 "additem" "Добавить в партию новые приборы" PartyProductsDialogs.addProducts
+    let btnDelProd = 
+        let b = imgbtn1 46 46 "removeitem" "Удалить выбранные приборы из партии" PartyProductsDialogs.deleteProducts
+        b.Visible <- false
+        let g = gridProducts
+        g.SelectionChanged.Add <| fun _ ->
+            b.Visible <- g.SelectedCells.Count > 0 
+        b
+
+    Thread2.IsRunningChangedEvent.addHandler <| fun (_,isRunning) ->
+        [btnOpenParty; btnNewParty; btnAddProd; btnDelProd ]
+        |> Seq.iter(fun b -> b.Enabled <- not isRunning )
+
+    let _ = imgbtn 89 3 "todo" "Выбрать опрашиваемые параметры" ( fun b ->
+        let popup = 
+            MyWinForms.Utils.popupConfig 
+                "Опрашиваемые параметры" 
+                (ViewModel.SelectPhysVars()) 
+                PropertySort.Alphabetical
+        popup.Font <- form.Font        
+        popup.Closed.Add( fun _ ->
+           View.Products.updatePhysVarsGridColsVisibility()  )
+        popup.Show b )    
+
+    fun () -> ()
+
+
+
 let initialize =
     let buttonRun = new Button( Parent = TopBar.thread1ButtonsBar, Dock = DockStyle.Left, AutoSize = true,
                                 ImageKey = "run",
@@ -151,47 +259,9 @@ let initialize =
             SelectScenaryDialog.showSelectScenaryDialog x
         TopBar.thread1ButtonsBar.Controls.Add <| new Panel(Dock = DockStyle.Left, Width = 3)
 
-    Thread2.IsRunningChangedEvent.addHandler <| fun (_,isRunning) ->
-        TabsheetParty.BottomTab.Enabled <- not isRunning
-
-    
-
-    let imgbtn1 left top key tooltip f1 f = 
-        let x = 
-            new Button( Parent = TabsheetParty.BottomTab, Left = left, Top = top,
-                        ImageKey = key, Width = 40, Height = 40,
-                        FlatStyle = FlatStyle.Flat,
-                        ImageList = Widgets.Icons.instance.imageList1)
-        f1 x
-        MainWindow.setTooltip x tooltip
-        x.Click.Add <| fun _ ->  
-            f x
-
-    let imgbtn left top key tooltip f = imgbtn1 left top key tooltip (fun _ -> ()) f 
-
-    imgbtn 3 3 "open" "Открыть ранее сохранённую партию" OpenPartyDialog.showDialog
-    imgbtn 46 3 "add" "Создать новую партию" PartyProductsDialogs.createNewParty
-
-    imgbtn 3 46 "additem" "Добавить в партию новые приборы" PartyProductsDialogs.addProducts
-    imgbtn1 46 46 "removeitem" "Удалить выбранные приборы из партии" 
-        ( fun b ->
-            b.Visible <- false
-            let g = gridProducts
-            g.SelectionChanged.Add <| fun _ ->
-                b.Visible <- g.SelectedCells.Count > 0 ) 
-        PartyProductsDialogs.deleteProducts
-
-    imgbtn 3 89 "todo" "Выбрать опрашиваемые параметры" ( fun b -> 
-        
-        let popup = 
-            MyWinForms.Utils.popupConfig 
-                "Опрашиваемые параметры" 
-                (ViewModel.SelectPhysVars()) 
-                PropertySort.Alphabetical
-        popup.Font <- form.Font        
-        popup.Closed.Add( fun _ ->
-           View.Products.updatePhysVarsGridColsVisibility()  )
-        popup.Show b )    
+    //initPgsSens1Edit()
+    initComboBoxProdType()
+    initButtons1()
 
     let buttonStendSettings = 
         new Button( Parent = right, Height = 40, Width = 40, Visible = true,
