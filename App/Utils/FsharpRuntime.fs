@@ -27,10 +27,16 @@ module FSharpValue =
         Option.map( fun atr -> atr :?> 'T )
 
 module FSharpType =
+    
     let inline unionCasesList<'T> =
         FSharpType.GetUnionCases typeof<'T> 
         |> Array.toList 
         |> List.map( fun case -> FSharpValue.MakeUnion(case,[||]) :?> 'T )
+
+    let inline caseOrder<'T> case=
+        FSharpType.GetUnionCases typeof<'T> 
+        |> Array.findIndex ( (=) case )
+
 
 type Activator with
     static member makeGenericType (baseType : Type) (types : Type list) =  

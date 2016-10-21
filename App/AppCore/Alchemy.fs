@@ -19,29 +19,30 @@ let encodeDate (date : DateTime) =
     let day = decimal date.Day
     year * 10000m + month * 100m + day
 
-let initKefsValues pgs prodType =
+type GetPgsConcFun = SensorIndex -> ScaleEdgePt -> decimal
+
+let initKefsValues (getPgsConc : GetPgsConcFun) prodType =
     let chans = [ 
         yield Sens1, prodType.Sensor
         match prodType.Sensor2 with
         | Some ch -> yield Sens2, ch 
         | _ -> () ]  
 
-    [   for sensInd, sensor in chans do
-            let n0 = SScalePt.new' sensInd ScaleBeg
-            let nk = SScalePt.new' sensInd ScaleEnd
+    [   for n, sensor in chans do
 
-            let pgs0, pgsK, shk0, shkK, shk, units, gastype = SensorIndex.prodTypeCoefs sensInd
-            yield pgs0, pgs n0
-            yield pgsK, pgs nk
+            
+            
+            let pgs0, pgsK, shk0, shkK, shk, units, gastype = SensorIndex.prodTypeCoefs n
+            yield pgs0, getPgsConc n ScaleBeg
+            yield pgsK, getPgsConc n ScaleEnd
             yield shk0, 0m
             yield shkK, sensor.Scale.Value
             yield shk, sensor.Scale.Code  
             yield units, sensor.Units.Code
             yield gastype, sensor.SensorCode
-            yield! List.zip (SensorIndex.coefsLin sensInd) [0m; 1m; 0m; 0m] 
-
-            yield! List.zip n0.CoefsTermo [0m; 0m; 0m] 
-            yield! List.zip nk.CoefsTermo [1m; 0m; 0m]  
+            yield! List.zip (SensorIndex.coefsLin n) [0m; 1m; 0m; 0m] 
+            yield! List.zip (Correction.coefsTermo n ScaleBeg) [0m; 0m; 0m] 
+            yield! List.zip (Correction.coefsTermo n ScaleEnd) [1m; 0m; 0m]  
             
             let now = DateTime.Now
             yield YEAR, decimal now.Year ]
@@ -53,10 +54,10 @@ module private PivateComputeProduct =
     let tup3 = function [x;y;z] -> Some(x,y,z) | _ -> None
     
     type C = 
-        | V of Var
+        | V of ProdDataPt * PhysVar
         | K of Coef
     
-    let getVarsValues p vars =         
+    let getVarsValues vars p =         
         let oks, errs =
             vars |> List.map( fun k ->
                 match Product.getVar k p with 
@@ -70,7 +71,7 @@ module private PivateComputeProduct =
             |> List.map ( Result.Unwrap.err  >> V)
             |> Err
     
-    let getKefsValues p kefs = 
+    let getKefsValues kefs p  = 
         let oks, errs =
             kefs |> List.map( fun k ->
                 match Product.getKef k p with 
@@ -90,39 +91,42 @@ module private PivateComputeProduct =
             xs |> List.rev |> Seq.toStr ", " fmt     
             |> sprintf "точках %s"
 
-    let getValuesTermo chan var gas p   =
+    let getValuesTermo n gas var  =
         TermoPt.values
-        |> List.map( fun t -> Correction( CorrectionTermoScale( SScalePt.new' chan gas)) , var, gas, t, PressNorm) |> getVarsValues p
+        |> List.map( fun t -> TermoScalePt ( n,gas,t) , var  ) 
+        |> getVarsValues 
 
-    let getTermoT chan = getValuesTermo chan chan.Termo
+    let getTermoT n gas = getValuesTermo n gas n.Termo
 
-    let getVar1T chan = getValuesTermo chan chan.Var1
+    let getVar1T n gas = getValuesTermo n gas n.Var1
 
     let calculatePressureSensCoefs (p:Product) =
-        let ctx v p = Correction CorrectionPressSens , v, ScaleBeg, TermoNorm, p
-        match getVarsValues p [ ctx Pmm PressNorm; ctx Pmm PressHigh; ctx VdatP PressNorm;  ctx VdatP PressHigh ]  with
+        let vs = 
+            [   PressSensPt PressNorm, Pmm
+                PressSensPt PressHigh, Pmm
+                PressSensPt PressNorm, VdatP
+                PressSensPt PressHigh, VdatP ]
+        match getVarsValues vs p  with
         | Ok [x0; x1; y0; y1] -> 
             let k0 = (y1-y0)/( x1 - x0 )
             let k1 = y0 - x0*k0
-            Logging.info "%s : расчёт коэффициентов %A ==> %M, %M" p.What CorrectionPressSens.Dscr k0 k1
+            Logging.info "%s : расчёт коэффициентов %A ==> %M, %M" p.What CorPressSens.Descr k0 k1
             Ok [ k0; k1 ]
         | _ -> "не достаточно исходных данных" |> Err
 
     let getGaussXY p getPgsConc  = function
-        | CorrectionPressSens -> failwith "PressureSensCoefs is not for gauss!"
-        | CorrectionTermoPress ->
+        | CorPressSens -> failwith "PressureSensCoefs is not for gauss!"
+        | CorTermoPress ->
             // [ Termo1, ch1.Tpp, Air; Termo1, ch1.Var1, Air ]
-            let g = Correction CorrectionTermoPress
-            let xs var = 
-                TermoPt.values
-                |> List.map( fun t -> g , var, ScaleBeg, t, PressNorm) 
-                |> getVarsValues p
+            let xs var =
+                getVarsValues (List.map( fun t -> TermoPressPt t, var) TermoPt.values) p
+                
             result {
-                let! temps = xs Sens1.Termo
+                let! temps = xs TppCh0
                 let! vars = xs VdatP
                 return List.zip temps vars }
             |> Result.mapErr( 
-                fmtErr (function  V(_,_,_,t,_) -> sprintf "%A" t)
+                fmtErr (function  V(x,v) -> sprintf "%A" t)
                 >> sprintf "нет значения %A в %s" CorrectionTermoPress.Dscr )
 
         | CorrectionLinScale chan -> 
