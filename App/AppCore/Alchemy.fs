@@ -6,35 +6,23 @@ type private P = Product
 type private T = ProductType
 
 
-[<AutoOpen>]
-module ReportHelper = 
-    type Content = 
-        | Info of string
-        | Error of string
-        | Bitmap of System.IO.MemoryStream
 
-let encodeDate (date : DateTime) = 
-    let year = decimal date.Year - 2000m
-    let month = decimal date.Month 
-    let day = decimal date.Day
-    year * 10000m + month * 100m + day
-
-type GetPgsConcFun = SensorIndex -> ScaleEdgePt -> decimal
-
-let initKefsValues (getPgsConc : GetPgsConcFun) prodType =
+let initKefsValues getPgsConc  prodType =
     let chans = [ 
         yield Sens1, prodType.Sensor
         match prodType.Sensor2 with
         | Some ch -> yield Sens2, ch 
         | _ -> () ]  
 
+    let scalePt = ScaleEdge >> ScalePt.toLinPt 
+
     [   for n, sensor in chans do
 
             
             
             let pgs0, pgsK, shk0, shkK, shk, units, gastype = SensorIndex.prodTypeCoefs n
-            yield pgs0, getPgsConc n ScaleBeg
-            yield pgsK, getPgsConc n ScaleEnd
+            yield pgs0, getPgsConc (n, scalePt ScaleBeg)
+            yield pgsK, getPgsConc (n, scalePt ScaleEnd)
             yield shk0, 0m
             yield shkK, sensor.Scale.Value
             yield shk, sensor.Scale.Code  
@@ -57,7 +45,7 @@ module private PivateComputeProduct =
         | V of ProdDataPt * PhysVar
         | K of Coef
     
-    let getVarsValues vars p =         
+    let getVarsValues p vars  =         
         let oks, errs =
             vars |> List.map( fun k ->
                 match Product.getVar k p with 
@@ -91,81 +79,80 @@ module private PivateComputeProduct =
             xs |> List.rev |> Seq.toStr ", " fmt     
             |> sprintf "точках %s"
 
-    let getValuesTermo n gas var  =
+    let getValuesTermo p n gas var  =
         TermoPt.values
         |> List.map( fun t -> TermoScalePt ( n,gas,t) , var  ) 
-        |> getVarsValues 
+        |> getVarsValues p
 
-    let getTermoT n gas = getValuesTermo n gas n.Termo
+    let fmtCorrErr f = 
+        Result.mapErr( function        
+            | [V(CorrectionOfProdDataPt cor, var)] -> 
+                sprintf "нет значения %s, %s" cor.What var.What
+            | xs -> 
+                let strCor = 
+                    xs 
+                    |> List.map( fun (V(CorrectionOfProdDataPt x,_)) -> x.What ) 
+                    |> List.head
+                xs |> List.rev |> Seq.toStr ", " (fun (V(prodPt, var)) -> sprintf "(%s,%s)" (f prodPt) var.What )     
+                |> sprintf "нет значений %s в точках %s" strCor )
 
-    let getVar1T n gas = getValuesTermo n gas n.Var1
-
+    
     let calculatePressureSensCoefs (p:Product) =
-        let vs = 
-            [   PressSensPt PressNorm, Pmm
-                PressSensPt PressHigh, Pmm
-                PressSensPt PressNorm, VdatP
-                PressSensPt PressHigh, VdatP ]
-        match getVarsValues vs p  with
-        | Ok [x0; x1; y0; y1] -> 
+        
+        [   PressSensPt PressNorm, Pmm
+            PressSensPt PressHigh, Pmm
+            PressSensPt PressNorm, VdatP
+            PressSensPt PressHigh, VdatP ]
+        |> getVarsValues p
+        |> Result.map (  fun [x0; x1; y0; y1] -> 
             let k0 = (y1-y0)/( x1 - x0 )
             let k1 = y0 - x0*k0
             Logging.info "%s : расчёт коэффициентов %A ==> %M, %M" p.What CorPressSens.Descr k0 k1
-            Ok [ k0; k1 ]
-        | _ -> "не достаточно исходных данных" |> Err
+            [ k0; k1 ] )
+        |> fmtCorrErr ( fun (PressSensPt press) -> press.What) 
 
-    let getGaussXY p getPgsConc  = function
+    let getGaussXY p getPgsConc prodType  = function
         | CorPressSens -> failwith "PressureSensCoefs is not for gauss!"
         | CorTermoPress ->
             // [ Termo1, ch1.Tpp, Air; Termo1, ch1.Var1, Air ]
             let xs var =
-                getVarsValues (List.map( fun t -> TermoPressPt t, var) TermoPt.values) p
-                
+                getVarsValues p (List.map( fun t -> TermoPressPt t, var) TermoPt.values)                
             result {
                 let! temps = xs TppCh0
                 let! vars = xs VdatP
-                return List.zip temps vars }
-            |> Result.mapErr( 
-                fmtErr (function  V(x,v) -> sprintf "%A" t)
-                >> sprintf "нет значения %A в %s" CorrectionTermoPress.Dscr )
+                return List.zip temps vars }     
+            |> fmtCorrErr ( fun (TermoPressPt t) -> t.What)                      
 
-        | CorrectionLinScale chan -> 
-            chan.ScalePts 
-            |> List.map( fun gas -> Correction( CorrectionLinScale chan ), chan.Conc, gas, TermoNorm, PressNorm )
-            |> getVarsValues p
-            |> Result.map ( fun xs -> 
-                List.zip xs ( chan.ScalePts |> List.map ( SScalePt.new' chan >> getPgsConc )  ) )
-            |> Result.mapErr( 
-                fmtErr (function  V(_,_,gas,_,_) -> sprintf "%A" gas)
-                >> sprintf "нет значения LIN в %s" )
-
-        | CorrectionTermoScale { SensorIndex = Sens1; ScalePt = ScaleBeg} -> 
+        | CorLin n -> 
+            let xs1 = 
+                match prodType.Sensor with
+                | IsCO2Sensor true -> [Lin1; Lin2; Lin3; Lin4]
+                | _ -> [Lin1; Lin2; Lin4]
+            let ys = List.map (getPgsConc n) xs1 
+            let xs2 = List.map( fun pt -> LinPt (n,pt), n.Conc ) xs1                
+            getVarsValues p xs2
+            |> Result.map ( fun xs -> List.zip xs ys )
+            |> fmtCorrErr ( fun (LinPt (_,lin) ) -> FSharpType.caseOrder lin |> string) 
+        
+        | CorTermoScale ( n, ScaleBeg ) -> 
+            let (~%%) = getValuesTermo p n ScaleBeg 
             result {
-                let! t = getTermoT Sens1 ScaleBeg p
-                let! var = getVar1T Sens1 ScaleBeg p
+                let! t = %% n.Termo
+                let! var = %% n.Var1
                 return List.zip t var }
-            |> Result.mapErr( 
-                fmtErr (function V(_,var,_,t,_) -> sprintf "%s.%s" (PhysVar.what var) (TermoPt.what t) )                
-                >> sprintf "нет значения T0.к1 в %s" )
+            |> Result.map( fun xy ->            
+                match prodType.Sensor with
+                | IsCO2Sensor true -> List.map (fun (x,y) ->  x, -y) xy
+                | _ -> xy )
+            |> fmtCorrErr ( fun (TermoScalePt (_,_,t) ) -> t.What)
 
-        | CorrectionTermoScale { SensorIndex = Sens2; ScalePt = ScaleBeg} -> 
+        | CorTermoScale ( n, ScaleEnd ) as corr -> 
             result {
-                let! t = getTermoT Sens2 ScaleBeg p
-                let! var = getVar1T Sens2 ScaleBeg p
-                return List.zip t ( List.map (fun var -> - var) var) }
-            |> Result.mapErr( 
-                fmtErr (function V(_,var,_,t,_) -> sprintf "%s.%s" (PhysVar.what var) (TermoPt.what t) )                
-                >> sprintf "нет значения T0.к2 в %s" )
-
-        | CorrectionTermoScale { SensorIndex = chan; ScalePt = ScaleEnd} -> 
-            result {
-                let! t = getTermoT chan ScaleEnd p
-                let! var = getVar1T chan ScaleEnd p
-                let! var0 = getVar1T chan ScaleBeg p
+                let! t = getValuesTermo p n ScaleEnd n.Termo
+                let! var = getValuesTermo p n ScaleEnd n.Var1
+                let! var0 = getValuesTermo p n ScaleBeg n.Var1
                 return List.zip3 t var0 var}
-            |> Result.mapErr( 
-                fmtErr (function V(_,var,_,t,_) -> sprintf "%s.%s" (PhysVar.what var) (TermoPt.what t) )
-                >> sprintf "нет значения TK.к%d в %s" chan.N )
+            |> fmtCorrErr ( fun (TermoScalePt (_,_,t) ) -> t.What)
             |> Result.bind( fun xs ->
                 let errs =
                     xs |> List.zip TermoPt.values 
@@ -179,10 +166,10 @@ module private PivateComputeProduct =
                     errs 
                     |> List.map Option.get
                     |> fmtErr TermoPt.what 
-                    |> sprintf "при расчёте TK.к%d деление на ноль в %s" chan.N
+                    |> sprintf "при расчёте %s деление на ноль в точке %s" corr.What
                     |> Err )
-        | CorrectionTermoScale { ScalePt = ScaleMid1} 
-        | CorrectionTermoScale { ScalePt = ScaleMid2} ->  failwith "there is no TermoCoefs (_,ScaleMid) in AnkatMICRO!!"
+
+        
 
 
     let doValuesGaussXY group xy =
@@ -197,47 +184,44 @@ module private PivateComputeProduct =
         Array.toList result 
         
 
-let compute group getPgsConc productType = state {
+let compute group getPgsConc prodType = state {
     let! product = getState
     let groupCoefs = Correction.coefs group
     let groupCoefsSet = Set.ofList groupCoefs
     let strGroupCoefs = Seq.toStr ", " (Coef.order >> string) groupCoefs
     Logging.info "%s : расчёт коэффициентов %A, %s" (Product.what product) (Correction.what group) strGroupCoefs
     do!
-        initKefsValues getPgsConc productType
+        initKefsValues getPgsConc prodType
         |> List.filter(fst >> groupCoefsSet.Contains)
         |> Product.setKefs 
-
     let result = 
         match group with
-        | CorrectionPressSens -> calculatePressureSensCoefs product
+        | CorPressSens -> calculatePressureSensCoefs product
         | _ ->
-            getGaussXY product getPgsConc group
+            getGaussXY product (apply2 getPgsConc) prodType group
             |> Result.map (doValuesGaussXY group)
-
     match result with
     | Err e -> 
         Logging.error "%s : %s" (Product.what product) e
     | Ok result ->
         do! result |> List.zipCuty 0m groupCoefs |> Product.setKefs   }
 
-let getProductTermoErrorlimit channel pgs (gas,t) product =
-    let concVar = channel.ChannelIndex.Conc
-    let f = TestConcErrors channel.ChannelIndex
-    if not channel.ChannelSensor.IsCH then         
-        let tempVar = channel.ChannelIndex.Termo
-        
-        (Product.getVar (f, concVar, gas,t,PressNorm) product, Product.getVar (f, tempVar, gas, t,PressNorm) product) 
-        |> Option.map2(fun(c,t) -> 
-            let dt = t - 20m     
-            let maxc = channel.ChannelSensor.ConcErrorlimit pgs
-            0.5m * abs( maxc*dt ) / 10.0m )
-    else
+let getProductTermoErrorlimit sensor getPgsConc (n,gas,t)  product =
+    let f = TestPt (n,gas,t) 
+    match sensor with
+    | IsCHSensor true ->
         match gas with
-        | ScaleBeg -> Some 5m
+        | ScaleEdge ScaleBeg -> Some 5m
         | _ ->
-            Product.getVar (f,concVar,gas,TermoNorm,PressNorm) product
+            Product.getVar (f, n.Conc) product
             |> Option.map(fun conc20 -> conc20 * 0.15m |> abs  |> decimal )
+    | _ ->
+        (Product.getVar (f, n.Conc) product, Product.getVar (f, n.Termo) product) 
+        |> Option.map2(fun(c,t) -> 
+            let dt = t - 20m             
+            let maxc = sensor.ConcErrorlimit (ScalePt.mapLin getPgsConc gas)
+            0.5m * abs( maxc*dt ) / 10.0m )
+    
 
 type ValueError = 
     {   Value : decimal
@@ -251,16 +235,19 @@ type ValueError =
 
 type Product with
 
-    static member concError channel pgs gas product = 
-        Product.getVar (TestConcErrors channel.ChannelIndex, channel.ChannelIndex.Conc, gas, TermoNorm, PressNorm) product 
+    static member concError sensor getPgsConc (n,gas) product = 
+        Product.getVar (TestPt(n,gas,TermoNorm), n.Conc) product 
         |> Option.map(fun conc ->                 
-            { Value = conc; Nominal = pgs; Limit = channel.ChannelSensor.ConcErrorlimit pgs } ) 
+            let pgs = ScalePt.mapLin getPgsConc gas
+            {   Value = conc
+                Nominal = pgs
+                Limit = Sensor.concErrorlimit sensor pgs  }  ) 
 
-    static member termoError channel pgs (gas,t) p = 
-        let concVar = channel.ChannelIndex.Conc
-        (   Product.getVar (TestConcErrors channel.ChannelIndex,concVar,gas,t, PressNorm) p,
-            Product.getVar (TestConcErrors channel.ChannelIndex,concVar,gas,TermoNorm, PressNorm) p,
-            Product.termoErrorlimit channel pgs (gas,t) p )
+
+    static member termoError sensor getPgsConc ((n,gas,t) as pt) product = 
+        (   Product.getVar (TestPt pt, n.Conc) product,
+            Product.getVar (TestPt (n,gas,TermoNorm), n.Conc) product,
+            getProductTermoErrorlimit sensor getPgsConc pt product )
         |> Option.map3( fun (c,c20,limit) -> 
             { Value = c; Nominal = c20; Limit = limit } )
 
@@ -277,28 +264,27 @@ let createNewProduct serialNumber getPgs productType =
 
 let createNewParty() = 
     let h,d = Party.createNewEmpty()
-    let getPgsConc = d.BallonConc.TryFind >> Option.getWith 0m
+    let getPgsConc = d.Pgs.TryFind >> Option.getWith 0m
     let productType = h.ProductType
     let product = createNewProduct 1 getPgsConc productType
     let products = [ product ]
     { h with ProductsSerials = [product.SerialNumber] }, { d with Products = products }
 
 let createNewParty1( name, productType, count) : Party.Content = 
-        let pgs =
-            SScalePt.values
-            |> List.map(fun pt -> pt, ScalePt.defaultBallonConc pt.ScalePt )             
-            |> Map.ofList 
-        let getPgsConc = pgs.TryFind >> Option.getWith 0m
-        let products = 
-            [1..count] 
-            |> List.map( fun n ->  createNewProduct n getPgsConc productType )
+    let sensor1 = productType.Sensor
+                
+    let products = 
+        [1..count] 
+        |> List.map( fun n ->  createNewProduct n productType.GetPgsConc productType )
+
+    
         
-        {   Id = Product.createNewId()
-            ProductsSerials = List.map Product.productSerial products
-            Date=DateTime.Now 
-            Name = name
-            ProductType = productType }, 
-                {   Products = products
-                    BallonConc = pgs
-                    TermoTemperature = Map.empty
-                    PerformingJournal = Map.empty}
+    {   Id = Product.createNewId()
+        ProductsSerials = List.map Product.productSerial products
+        Date=DateTime.Now 
+        Name = name
+        ProductType = productType }, 
+            {   Products = products
+                Pgs = productType.DefaultPgsConcMap
+                Temperature = Map.empty
+                Journal = Map.empty}

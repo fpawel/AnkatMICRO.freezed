@@ -1,12 +1,14 @@
 ﻿#load "Utils/FsharpRuntime.fs"
 #load "Utils/State.fs"
-#load "Utils/StrUtils.fs"
-#load "Utils/PathUtils.fs"
-#load "Utils/DateTimeUtils.fs"
-#load "Utils/Logging.fs"
 #load "Utils/Utils.fs"
+#load "Utils/StrUtils.fs"
+#load "Utils/DateTimeUtils.fs"
+#load "Utils/Assembly.fs"
+#load "Utils/PathUtils.fs"
+#load "Utils/Logging.fs"
+
 #load "Ankat/Coef.fs"
-#load "Ankat/ProdType.fs"
+#load "Ankat/Sensor.fs"
 #load "Ankat/Ankat.fs"
 
 open System
@@ -35,26 +37,22 @@ type Product(p, getProdType, getPgs, partyId) =
     override x.RaisePropertyChanged propertyName = 
         ViewModelBase.raisePropertyChanged x propertyName"""
 
-    for ((f,v,gas,t,p) as var) in Vars.vars do
+    for ((prodData,var) as k) in dataPoints do
         let k1 = 
-            sprintf "(%s, %s, %s, %s, %s)" 
-                (ProductionPoint.name f) (PhysVar.name v) (ScalePt.name gas) (TermoPt.name t) (PressPt.name p)
+            sprintf "(%s)" (Name.dataPoint k) 
         yield sprintf """
     member x.%s
         with get () = x.getVarUi %s
-        and set value = x.setVarUi %s value"""  (Vars.property var) k1 k1 
+        and set value = x.setVarUi %s value"""  (Prop.dataPoint k) k1 k1 
         
-    for n in SScalePt.values do
+    for n in sens_gas_t_points do
         yield sprintf """
-    member x.%s = x.GetConcError %s """  (Property.concError n) n.Name
-        
-    for n,t in SScalePt.valuesT do
+    member x.%s = x.GetConcError %s """  (Prop.concError n) (Name.sens_gas_t n)
+       
+    
+    for x in PhysVar.values do        
         yield sprintf """
-    member x.%s = x.GetTermoError (%s, %s) """  (Property.termoError (n,t) ) n.Name t.Name
-    for var in PhysVar.values do
-        
-        yield sprintf """
-    member x.%s = x.getPhysVarValueUi %s """ var.Property var.Name |]
+    member x.%s = x.getPhysVarValueUi %s """ (Prop.physVar x)  (Name.physVar x) |]
 
     |> createSourcefile "ViewModels/ProductViewModel.fs" 
 
@@ -71,10 +69,8 @@ type Party(partyHeader, partyData) =
     override x.RaisePropertyChanged propertyName = 
         ViewModelBase.raisePropertyChanged x propertyName"""
 
-    
-        
-    for n in SScalePt.values do
-        let whatPgs = SScalePt.what n
+    for n,gas in sens_gas_points do
+        let whatPgs = gas.What
         let whatScale = ScalePt.whatScale n.ScalePt
         
         yield sprintf """

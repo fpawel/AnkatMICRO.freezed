@@ -1,80 +1,256 @@
 namespace Ankat.ViewModel
+
 open System
 open System.ComponentModel
+open System.Collections.Generic
+
 open Ankat
 
-type Party(partyHeader, partyData) =
+[<AutoOpen>]
+module private ViewModelPartyHelpers =
 
-    inherit ViewModel.Party1(partyHeader, partyData) 
-    override x.RaisePropertyChanged propertyName = 
-        ViewModelBase.raisePropertyChanged x propertyName
+    type PartyPath = Repository.PartyPath
 
-    [<Category("Концентрация ПГС")>] 
-    [<DisplayName("ПГС1/1")>]    
-    [<Description("Концентрация ПГС1/1, канал 1, начало шкалы")>]
-    member x.Sens1_ScaleBeg
-        with get() = x.GetPgs {SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg}
-        and set v = x.SetPgs ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg}, v) 
+    type P = Ankat.ViewModel.Product
+    type Col = System.Windows.Forms.DataGridViewTextBoxColumn
+    type Cols = System.Windows.Forms.DataGridViewColumnCollection
 
-    [<Category("Концентрация ПГС")>] 
-    [<DisplayName("ПГС2/1")>]    
-    [<Description("Концентрация ПГС2/1, канал 1, 1-ая середина шкалы")>]
-    member x.Sens1_ScaleMid1
-        with get() = x.GetPgs {SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleMid1}
-        and set v = x.SetPgs ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleMid1}, v) 
+    let getKefCol (p:P) =
+        [ for c in MainWindow.gridKefs.Columns -> c ]
+        |> List.filter ( fun c -> Object.ReferenceEquals(p, c.Tag) ) 
+        |> List.head
 
-    [<Category("Концентрация ПГС")>] 
-    [<DisplayName("ПГС3/1")>]    
-    [<Description("Концентрация ПГС3/1, канал 1, 2-ая середина шкалы")>]
-    member x.Sens1_ScaleMid2
-        with get() = x.GetPgs {SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleMid2}
-        and set v = x.SetPgs ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleMid2}, v) 
+    let removeKefCol p =
+        MainWindow.gridKefs.Columns.Remove (getKefCol p)
 
-    [<Category("Концентрация ПГС")>] 
-    [<DisplayName("ПГС4/1")>]    
-    [<Description("Концентрация ПГС4/1, канал 1, конец шкалы")>]
-    member x.Sens1_ScaleEnd
-        with get() = x.GetPgs {SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd}
-        and set v = x.SetPgs ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd}, v) 
+    let updKef (p:P) (colIndex:int) (kef : Coef) = 
+        let n = kef.Order
+        let row = MainWindow.getRowOfCoef kef
 
-    [<Category("Концентрация ПГС")>] 
-    [<DisplayName("ПГС1/2")>]    
-    [<Description("Концентрация ПГС1/2, канал 2, начало шкалы")>]
-    member x.Sens2_ScaleBeg
-        with get() = x.GetPgs {SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg}
-        and set v = x.SetPgs ({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg}, v) 
+        let cell = row.Cells.[colIndex]
+        let value = p.getKefUi kef
+        if cell.Value=null || (string) cell.Value <> value then
+            row.Cells.[colIndex].Value <- value
 
-    [<Category("Концентрация ПГС")>] 
-    [<DisplayName("ПГС2/2")>]    
-    [<Description("Концентрация ПГС2/2, канал 2, 1-ая середина шкалы")>]
-    member x.Sens2_ScaleMid1
-        with get() = x.GetPgs {SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleMid1}
-        and set v = x.SetPgs ({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleMid1}, v) 
+    let createProductViewModel getPgs productType partyId p  = 
 
-    [<Category("Концентрация ПГС")>] 
-    [<DisplayName("ПГС4/2")>]    
-    [<Description("Концентрация ПГС4/2, канал 2, конец шкалы")>]
-    member x.Sens2_ScaleEnd
-        with get() = x.GetPgs {SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd}
-        and set v = x.SetPgs ({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd}, v) 
+        let col = new Col(HeaderText = Ankat.Product.what p, Visible = p.IsChecked)
+        MainWindow.gridKefs.Columns.Add( col ) |> ignore
+        let x = ViewModel.Product(p, productType, getPgs, partyId)     
+        Runtime.PropertyChanged.add x <| fun e ->
+            match e.PropertyName with
+            | "IsChecked" -> col.Visible <- x.IsChecked
+            | "What" -> col.HeaderText <- x.What
+            | _ -> ()
 
-    [<Category("Температура")>] 
-    [<DisplayName("НКУ")>]    
-    [<Description("Нормальная температура")>]
-    member x.TermoNorm 
-        with get() = x.GetTermoTemperature TermoPt.TermoNorm
-        and set v = x.SetTermoTemperature (TermoPt.TermoNorm,v) 
+        x.CoefValueChanged.Add(fun (_, coef, _) -> 
+            updKef x col.Index coef
+            )
+                
+        Ankat.Coef.coefs |> List.iter( updKef x col.Index )
+        col.Tag <- x
+        x
 
-    [<Category("Температура")>] 
-    [<DisplayName("T-")>]    
-    [<Description("Пониженная температура")>]
-    member x.TermoLow 
-        with get() = x.GetTermoTemperature TermoPt.TermoLow
-        and set v = x.SetTermoTemperature (TermoPt.TermoLow,v) 
 
-    [<Category("Температура")>] 
-    [<DisplayName("T+")>]    
-    [<Description("Повышенная температура")>]
-    member x.TermoHigh 
-        with get() = x.GetTermoTemperature TermoPt.TermoHigh
-        and set v = x.SetTermoTemperature (TermoPt.TermoHigh,v) 
+type ProductTypesConverter() = 
+    inherit StringConverter()
+    override this.GetStandardValuesSupported _ = true
+    override this.GetStandardValuesExclusive _ = true
+    override this.GetStandardValues _ =       
+        ProductType.values
+        |> Seq.toArray
+        |> Array.map ProductType.what
+        |> TypeConverter.StandardValuesCollection
+        
+[<AbstractClass>]
+type Party
+        (   partyHeader:Ankat.Party.Head, 
+            partyData : Ankat.Party.Data ) =
+    inherit AppConfigViewModel() 
+
+    let mutable partyHeader = partyHeader
+    let mutable partyData = partyData
+    let productType() = partyHeader.ProductType 
+    let getPgsConc n = 
+        Party.getPgsConc (partyHeader,partyData) n
+    let getTermoTemperature t = 
+        partyData.Temperature
+        |> Map.tryFind t
+        |> Option.getWith (TermoPt.defaultTermoTemperature t)
+    let products, setProducts = 
+        let x = BindingList<P>()
+        let setProducts xs = 
+            x.Clear()
+            xs 
+            |> List.map (createProductViewModel getPgsConc productType (PartyPath.fromPartyHead partyHeader))
+            |> List.iter x.Add
+        setProducts partyData.Products
+        x, setProducts
+    let getProducts() = products |> Seq.map(fun x -> x.Product) |> Seq.toList
+    let updateProductsTypeAlchemy() = 
+        for p in products do
+            p.ForceCalculateErrors()
+
+    let getChecked() =
+        let xs = getProducts()
+        if xs |> List.forall( fun x -> x.IsChecked ) then Nullable<bool>(true) else
+        if xs |> List.forall( fun x -> not x.IsChecked ) then Nullable<bool>(false) else
+        Nullable<bool>()
+    let mutable productsChecked = Nullable<bool>()
+
+    let setMainWindowTitle() = 
+        MainWindow.form.Text <- 
+            sprintf "Партия %s %s %A" 
+                (DateTime.format "dd/MM/yy" partyHeader.Date)
+                partyHeader.ProductType.What  
+                partyHeader.Name
+  
+    do
+        setMainWindowTitle()
+
+    let addLoggingEvent = new Event<_>()
+
+    [<Browsable(false)>]
+    member private __.AddLoggingEvent = addLoggingEvent
+
+    [<CLIEvent>]
+    member __.OnAddLogging = addLoggingEvent.Publish
+            
+    [<Browsable(false)>]
+    member __.Products = products
+
+    [<Browsable(false)>]
+    member x.Party 
+        with get() = 
+            let partyData = { partyData with Products = getProducts() }
+            let partyHeader = { partyHeader with ProductsSerials = partyData.Products |> List.map(fun x -> x.SerialNumber) }
+            partyHeader, partyData
+        and set ( otherHeader, otherPartyData) = 
+            partyHeader <- otherHeader
+            partyData <- otherPartyData
+            products
+            |> Seq.toList
+            |> List.iter x.DeleteProduct
+            setProducts otherPartyData.Products
+
+            SScalePt.values
+            |> List.iter (SScalePt.property >> x.RaisePropertyChanged)
+
+            for t in TermoPt.values do
+                x.RaisePropertyChanged <| TermoPt.name t
+            x.RaisePropertyChanged "ProductType"
+            x.RaisePropertyChanged "Name"
+            setMainWindowTitle()
+            AppConfig.config.View.PartyId <- partyHeader.Id
+
+    
+    member x.AddNewProduct() = 
+        
+        let serial = Seq.length products + 1
+        Alchemy.createNewProduct serial x.GetPgs partyHeader.ProductType
+        |> createProductViewModel getPgs productType (PartyPath.fromPartyHead partyHeader)
+        |> products.Add 
+        
+    member __.DeleteProduct(product) = 
+        let r = products.Remove( product )
+        if not r then            
+            failwith "Ankat.ViewModel.Party.DeleteProduct : missing element"
+        removeKefCol product
+
+    member x.UpdateProductsTypeAlchemy _ = updateProductsTypeAlchemy()
+    member x.HasOneCheckedProduct() =
+        products
+        |> Seq.exists( fun p -> p.IsChecked )
+    member x.HasNotOneCheckedProduct() =
+        products
+        |> Seq.exists( fun p -> p.IsChecked )
+        |> not
+
+
+    member x.SetPgs (gas,value) =
+        if Some value <>  partyData.BallonConc.TryFind gas then
+            partyData <- { partyData with BallonConc = Map.add gas value partyData.BallonConc }
+            x.RaisePropertyChanged <| SScalePt.property gas
+            setMainWindowTitle()
+            updateProductsTypeAlchemy()
+
+    member x.SetTermoTemperature (t,value) =
+        if Some value <>  partyData.TermoTemperature.TryFind t then
+            partyData <- { partyData with TermoTemperature = Map.add t value partyData.TermoTemperature }
+            x.RaisePropertyChanged <| TermoPt.name t
+
+    member __.GetPgs pgs = getPgs pgs
+    
+    member __.GetTermoTemperature t = getTermoTemperature t
+
+    member x.ComputeKefGroup (kefGroup) = 
+        products 
+        |> Seq.filter(fun p -> p.IsChecked)
+        |> Seq.iter( fun p ->
+            p.Product <- 
+                runState (Alchemy.compute kefGroup getPgs partyHeader.ProductType ) p.Product
+                |> snd )
+
+    member __.getProductType() = partyHeader.ProductType
+
+    [<Category("Партия")>]
+    [<DisplayName("Исполнение")>]    
+    [<Description("Исполнение приборов партии")>]
+    [<TypeConverter (typeof<ProductTypesConverter>) >]
+    member x.ProductType 
+        with get() = partyHeader.ProductType.What
+        and set v = 
+            if v <> x.ProductType then
+                let t = 
+                    ProductType.values
+                    |> List.tryFind( ProductType.what >> (=) v)
+                    |> Option.getWith ProductType.first
+                partyHeader <- { partyHeader with ProductType = t}
+                x.RaisePropertyChanged "ProductType"
+                setMainWindowTitle()
+                updateProductsTypeAlchemy()
+            
+    [<Category("Партия")>]
+    [<DisplayName("Наименование")>]    
+    [<Description("Наименование партии")>]
+    member x.Name 
+        with get() = partyHeader.Name
+        and set v = 
+            if v <> x.Name then
+                partyHeader <- { partyHeader with Name = v}
+                x.RaisePropertyChanged "Name"
+                setMainWindowTitle()
+
+    [<Browsable(false)>]
+    member x.Journal 
+        with get() = partyData.PerformingJournal
+        and set value =
+            if value <> partyData.PerformingJournal then
+                partyData <- { partyData with PerformingJournal =  value }
+                x.RaisePropertyChanged "Journal"
+
+    
+[<AutoOpen>]
+module private RunInfoHelpers =
+    let private getHash (x:string) = x.GetHashCode()
+    let now() = Some DateTime.Now
+    let upd op y (x:Party1) = 
+        x.Journal <- Map.add (getHash op) y x.Journal
+    let tryGetOp op (x:Party1) = x.Journal.TryFind (getHash op)
+    let getOp x party  = tryGetOp x party |> Option.getWithf PerformingOperation.createNew
+
+type Party1 with
+    
+    member x.TryGetLogOperation operation  = tryGetOp operation x
+    member x.GetLogOperation operation  = getOp operation x
+
+    member x.LogStartOperation operation  = 
+        upd operation  { RunStart = now(); RunEnd = None; LoggingRecords = []} x
+
+    member x.LogStopOperation operation =
+        upd operation { getOp operation x  with RunEnd = now() } x
+    
+    member x.WriteJournal operation level text = 
+        let perfOp = getOp operation x
+        upd operation { perfOp with LoggingRecords = (DateTime.Now,level,text)::perfOp.LoggingRecords } x
+        x.AddLoggingEvent.Trigger (operation,level,text)

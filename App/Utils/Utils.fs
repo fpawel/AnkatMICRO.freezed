@@ -13,6 +13,8 @@ open System.Globalization
 
 let flip f a b = f b a
 
+let apply2 f x y = f (x,y)
+
 let revpair (a,b) = (b,a)
 
 let rec exnRoot (exn:System.Exception) = 

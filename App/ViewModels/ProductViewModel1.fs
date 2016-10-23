@@ -12,44 +12,50 @@ module private ViewModelProductHelpers =
     let appCfg = AppConfig.config
     type PSr = Chart.ProductSeriesInfo
 
+    let uu<'a> = FSharpType.unionCasesList<'a>
+    //let nCase<'a when 'a : equality> = FSharpType.caseOrder<'a>
+
 
 type private K = PhysVarValues.K
 
 [<AbstractClass>]
-type Product1(p : P, getProductType, getPgs, partyId) =
+type Product1(p : P, getProductType, getPgsConc, partyId) =
     inherit ViewModelBase()    
     let mutable p = p
 
     let mutable connection : Result<string,string> option = None
     
-    let getTermoError (n, termoPt) = 
-        SensorIndex.sensorOfProdTypeByIndex (getProductType()) n.SensorIndex
+    let getTermoError ((n, _, _) as pt) = 
+        SensorIndex.sensorOfProdTypeByIndex (getProductType()) n
         |> Option.bind( fun sensor ->
             P.termoError 
-                {ChannelSensor = sensor; ChannelIndex = n.SensorIndex} 
-                (getPgs n) 
-                (n.ScalePt, termoPt) p )
+                sensor
+                (apply2 getPgsConc n)
+                pt p )
 
-    let getConcError n = 
-        SensorIndex.sensorOfProdTypeByIndex (getProductType()) n.SensorIndex
+    let getConcError ((n, _) as pt) = 
+        SensorIndex.sensorOfProdTypeByIndex (getProductType()) n
         |> Option.bind( fun sensor ->
             P.concError 
-                {ChannelSensor = sensor; ChannelIndex = n.SensorIndex} 
-                (getPgs n) n.ScalePt p )
+                sensor
+                (apply2 getPgsConc n)
+                pt p )
 
     let getConcErrors () = 
-        SScalePt.values
-        |> List.map(fun k -> k, getConcError k )
-        |> Map.ofList
+        let xs1 =
+            List.zip uu<SensorIndex> ScalePt.values
+            |> List.map (fun (n,gas) -> (n,gas,TermoNorm), getConcError (n,gas) )
 
-    let getTermoErrors () = 
-        SScalePt.valuesT
-        |> List.map(fun k -> k, getTermoError k )
-        |> Map.ofList
+        let xs2 = 
+            List.zip3 uu<SensorIndex> ScalePt.values [TermoLow; TermoHigh]
+            |> List.map (fun k -> k, getTermoError k )
+
+        Map.ofList (xs1 @ xs2)
+            
                
     let getVarsValues() = 
-        Vars.vars
-        |> List.map(fun ctx -> ctx, P.getVar ctx p )
+        dataPoints
+        |> List.map (fun pt -> pt, Product.getVar pt p)
         |> Map.ofList
 
     let getKefsValues() = 
@@ -68,22 +74,22 @@ type Product1(p : P, getProductType, getPgs, partyId) =
 
     member x.andThenUpdateAllErrors(f) = 
         let prevConcErrors =  getConcErrors()                
-        let prevTermoError = getTermoErrors()
         let prevVarsValues = getVarsValues()
         let prevKefsValues = getKefsValues()
         f()
         let concErrors =  getConcErrors()
-        let termoError = getTermoErrors()
         let varsValues = getVarsValues()
         let kefsValues = getKefsValues()
 
-        SScalePt.values
-        |> List.filter(fun gas -> prevConcErrors.[gas] <> concErrors.[gas] )
-        |> List.iter (Property.concError >> x.RaisePropertyChanged)
+        listOf {
+            let! n = [ Sens1; Sens2 ]
+            let! scale = ScalePt.values
+            let! t = TermoPt.values
+            return n,scale,t }
+        |> List.filter(fun k -> prevConcErrors.[k] <> concErrors.[k] )
+        |> List.iter (Prop.concError >> x.RaisePropertyChanged)
 
-        SScalePt.valuesT
-        |> List.filter(fun var -> prevTermoError.[var] <> termoError.[var] )
-        |> List.iter (Property.termoError >> x.RaisePropertyChanged) 
+        
 
     member x.setKefsInitValues () = 
         let productType = getProductType()    
@@ -92,7 +98,7 @@ type Product1(p : P, getProductType, getPgs, partyId) =
             let! product = getState
             do!
                 (SER_NUMBER, decimal x.SerialNumber)
-                :: ( initKefsValues getPgs productType )
+                :: ( initKefsValues getPgsConc productType )
                 |> Product.setKefs  }        
         x.Product <- snd <| runState  prodstate x.Product
             
@@ -102,7 +108,7 @@ type Product1(p : P, getProductType, getPgs, partyId) =
             Chart.addProductValue p.Id var value
         if Map.tryFind var physVar <> Some value then
             physVar <- Map.add var value physVar
-            x.RaisePropertyChanged var.Property
+            x.RaisePropertyChanged (Prop.physVar var)
             
 
     member x.getPhysVarValueUi var =
@@ -145,8 +151,12 @@ type Product1(p : P, getProductType, getPgs, partyId) =
                 x.setKef SER_NUMBER  (Some <| decimal v)
 
     member x.ForceCalculateErrors() =        
-        List.iter (Property.concError >> x.RaisePropertyChanged ) SScalePt.values
-        List.iter (Property.termoError >> x.RaisePropertyChanged ) SScalePt.valuesT
+        listOf {
+            let! n = [ Sens1; Sens2 ]
+            let! scale = ScalePt.values
+            let! t = TermoPt.values
+            return n,scale,t }
+        |> List.iter (Prop.concError >> x.RaisePropertyChanged ) 
 
     member x.Port 
         with get () = p.SerialPortName
@@ -168,9 +178,9 @@ type Product1(p : P, getProductType, getPgs, partyId) =
             let varsValues = getVarsValues()
             let kefsValues = getKefsValues()
 
-            Vars.vars
+            dataPoints
             |> List.filter(fun var -> prevVarsValues.[var] <> varsValues.[var] )
-            |> List.iter (Vars.property >> x.RaisePropertyChanged) 
+            |> List.iter (Prop.dataPoint >> x.RaisePropertyChanged) 
 
             Coef.coefs
             |> List.filter(fun coef -> prevKefsValues.[coef] <> kefsValues.[coef] )
@@ -190,13 +200,13 @@ type Product1(p : P, getProductType, getPgs, partyId) =
         coefValueChangedEvent.Trigger(x,kef,value)
 
     member x.getVar var = P.getVar var p
-    member x.setVar ( (feat, physVar, scalePt, termoPt, presPt) as var) value =
+    member x.setVar ( var) value =
         if P.getVar var p = value then () else
 
         x.andThenUpdateAllErrors <| fun () ->
             let s = state{ do! P.setVar var value}
             p <- runState s p |> snd
-            var |> Vars.property |> x.RaisePropertyChanged
+            var |> Prop.dataPoint |> x.RaisePropertyChanged
 
         
     member x.getKefUi kef = 
@@ -259,4 +269,4 @@ type Product1(p : P, getProductType, getPgs, partyId) =
         
 
     member x.ComputeKefGroup kefGroup = 
-        x.Product <- snd <| runState (Alchemy.compute kefGroup getPgs (getProductType())) p
+        x.Product <- snd <| runState (Alchemy.compute kefGroup getPgsConc (getProductType())) p

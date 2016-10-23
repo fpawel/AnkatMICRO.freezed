@@ -33,8 +33,9 @@ module FSharpType =
         |> Array.toList 
         |> List.map( fun case -> FSharpValue.MakeUnion(case,[||]) :?> 'T )
 
-    let inline caseOrder<'T> case=
+    let inline caseOrder<'T when 'T: equality> (case:  'T)=
         FSharpType.GetUnionCases typeof<'T> 
+        |> Array.map( fun x -> FSharpValue.MakeUnion(x,[||]) :?> 'T )
         |> Array.findIndex ( (=) case )
 
 

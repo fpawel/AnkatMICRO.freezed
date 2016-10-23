@@ -142,6 +142,18 @@ type ProductType =
             Sensor = s1
             Sensor2 = None   }
 
+    
+
+[<AutoOpen>]
+module Helper1 =
+    let (|IsCO2Sensor|) = function
+        | CO2_2 | CO2_5 | CO2_10 -> true
+        | _ -> false
+
+    let (|IsCHSensor|) = function
+        | CH4 | C3H8 | SumCH -> true
+        | _ -> false
+
 
 
     
@@ -164,7 +176,9 @@ module private Helper =
             yield!  n1 16 <== all ]
 
 type ProductType with
-   static member first = 
+    static member first = 
         Helper.prodTypes.Head
-   static member values = 
+    static member values = 
         Helper.prodTypes
+
+    
