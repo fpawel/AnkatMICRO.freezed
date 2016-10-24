@@ -113,7 +113,7 @@ let readPartiesHeaders() =
 type PhysVar with
     static member filePath (canCreate,h,productId,var : PhysVar) = 
         let productPath = Product.folderPath(canCreate,h,productId)
-        let fileName = sprintf "%s.series" <| FSharpValue.unionCaseName var
+        let fileName = sprintf "%A.series" var
         Path.Combine(productPath, fileName ) 
 
 module Party =

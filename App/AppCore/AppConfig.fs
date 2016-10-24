@@ -11,6 +11,8 @@ open System.Drawing.Design
 
 open MyWinForms.Converters
 
+open Ankat
+
 module View = 
     type Grid =  
         {   mutable ColWidths : int list
@@ -80,7 +82,7 @@ type ApplicatioConfig =
                 ScnDetailTextSplitterDistance = 0 
                 SelectedCoefs = "0-150"
                 VisibleCoefs = "0-150"
-                VisiblePhysVars = Set.ofList Ankat.PhysVar.values }
+                VisiblePhysVars = Set.ofList [CCh0; CCh1; CCh2] }
         UseMidleScale = false
         UsePneumoblock = true
         UseTermochamber = true

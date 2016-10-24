@@ -11,7 +11,11 @@ let private assembly =
 
 let exePath = 
     assembly
-    |> Option.map (fun a -> IO.Path.GetDirectoryName  a.Location)
+    |> Option.bind (fun a -> 
+        try
+            Some <| IO.Path.GetDirectoryName  a.Location
+        with _ ->
+            None)
     |> Option.getWith Environment.CurrentDirectory
 
 

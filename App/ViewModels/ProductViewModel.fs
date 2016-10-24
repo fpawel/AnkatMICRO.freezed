@@ -8,458 +8,550 @@ type Product(p, getProdType, getPgs, partyId) =
     override x.RaisePropertyChanged propertyName = 
         ViewModelBase.raisePropertyChanged x propertyName
 
-    member x.Var_Correction_CorrectionLinScale_Sens1_CCh0_ScaleBeg_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionLinScale(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionLinScale(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionLinScale_Sens1_CCh0_ScaleMid1_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionLinScale(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionLinScale(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionLinScale_Sens1_CCh0_ScaleMid2_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionLinScale(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionLinScale(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionLinScale_Sens1_CCh0_ScaleEnd_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionLinScale(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionLinScale(SensorIndex.Sens1)), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionLinScale_Sens2_CCh1_ScaleBeg_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionLinScale(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionLinScale(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionLinScale_Sens2_CCh1_ScaleMid1_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionLinScale(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionLinScale(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionLinScale_Sens2_CCh1_ScaleEnd_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionLinScale(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionLinScale(SensorIndex.Sens2)), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens1_ScaleBeg_TppCh0_ScaleBeg_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens1_ScaleBeg_TppCh0_ScaleBeg_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens1_ScaleBeg_TppCh0_ScaleBeg_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens1_ScaleBeg_Var1Ch0_ScaleBeg_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens1_ScaleBeg_Var1Ch0_ScaleBeg_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens1_ScaleBeg_Var1Ch0_ScaleBeg_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens1_ScaleEnd_TppCh0_ScaleEnd_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens1_ScaleEnd_TppCh0_ScaleEnd_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens1_ScaleEnd_TppCh0_ScaleEnd_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens1_ScaleEnd_Var1Ch0_ScaleEnd_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens1_ScaleEnd_Var1Ch0_ScaleEnd_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens1_ScaleEnd_Var1Ch0_ScaleEnd_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens2_ScaleBeg_TppCh1_ScaleBeg_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens2_ScaleBeg_TppCh1_ScaleBeg_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens2_ScaleBeg_TppCh1_ScaleBeg_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens2_ScaleBeg_Var1Ch1_ScaleBeg_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens2_ScaleBeg_Var1Ch1_ScaleBeg_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens2_ScaleBeg_Var1Ch1_ScaleBeg_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg})), PhysVar.Var1Ch1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens2_ScaleEnd_TppCh1_ScaleEnd_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens2_ScaleEnd_TppCh1_ScaleEnd_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens2_ScaleEnd_TppCh1_ScaleEnd_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens2_ScaleEnd_Var1Ch1_ScaleEnd_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens2_ScaleEnd_Var1Ch1_ScaleEnd_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoScale_Sens2_ScaleEnd_Var1Ch1_ScaleEnd_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoScale({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd})), PhysVar.Var1Ch1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoPress_TppCh0_ScaleBeg_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoPress), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoPress), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoPress_TppCh0_ScaleBeg_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoPress), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoPress), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoPress_TppCh0_ScaleBeg_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoPress), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoPress), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoPress_VdatP_ScaleBeg_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoPress), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoPress), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoPress_VdatP_ScaleBeg_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoPress), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoPress), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionTermoPress_VdatP_ScaleBeg_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionTermoPress), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionTermoPress), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionPressSens_TppCh0_ScaleBeg_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionPressSens), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionPressSens), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionPressSens_TppCh0_ScaleBeg_TermoNorm_PressHigh
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionPressSens), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressHigh)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionPressSens), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressHigh) value
-
-    member x.Var_Correction_CorrectionPressSens_VdatP_ScaleBeg_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionPressSens), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionPressSens), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_Correction_CorrectionPressSens_VdatP_ScaleBeg_TermoNorm_PressHigh
-        with get () = x.getVarUi (ProductionPoint.Correction(Correction.CorrectionPressSens), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressHigh)
-        and set value = x.setVarUi (ProductionPoint.Correction(Correction.CorrectionPressSens), PhysVar.VdatP, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressHigh) value
-
-    member x.Var_TestConcErrors_Sens1_CCh0_ScaleBeg_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_TestConcErrors_Sens1_CCh0_ScaleBeg_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm) value
-
-    member x.Var_TestConcErrors_Sens1_CCh0_ScaleBeg_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm) value
-
-    member x.Var_TestConcErrors_Sens1_CCh0_ScaleMid1_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_TestConcErrors_Sens1_CCh0_ScaleMid1_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoLow, PressPt.PressNorm) value
-
-    member x.Var_TestConcErrors_Sens1_CCh0_ScaleMid1_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressPt.PressNorm) value
-
-    member x.Var_TestConcErrors_Sens1_CCh0_ScaleMid2_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_TestConcErrors_Sens1_CCh0_ScaleMid2_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoLow, PressPt.PressNorm) value
-
-    member x.Var_TestConcErrors_Sens1_CCh0_ScaleMid2_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleMid2, TermoPt.TermoHigh, PressPt.PressNorm) value
-
-    member x.Var_TestConcErrors_Sens1_CCh0_ScaleEnd_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_TestConcErrors_Sens1_CCh0_ScaleEnd_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressPt.PressNorm) value
-
-    member x.Var_TestConcErrors_Sens1_CCh0_ScaleEnd_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.CCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressPt.PressNorm) value
-
-    member x.Var_TestConcErrors_Sens1_TppCh0_ScaleBeg_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_TestConcErrors_Sens1_TppCh0_ScaleBeg_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm) value
-
-    member x.Var_TestConcErrors_Sens1_TppCh0_ScaleBeg_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm) value
-
-    member x.Var_TestConcErrors_Sens1_TppCh0_ScaleMid1_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressPt.PressNorm) value
-
-    member x.Var_TestConcErrors_Sens1_TppCh0_ScaleMid1_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoLow, PressPt.PressNorm) value
-
-    member x.Var_TestConcErrors_Sens1_TppCh0_ScaleMid1_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressPt.PressNorm) value
+    member x.Var_LIN0_0_CCh0
+        with get () = x.getVarUi (LinPt(Sens1,Lin1), CCh0)
+        and set value = x.setVarUi (LinPt(Sens1,Lin1), CCh0) value
+
+    member x.Var_LIN0_1_CCh0
+        with get () = x.getVarUi (LinPt(Sens1,Lin2), CCh0)
+        and set value = x.setVarUi (LinPt(Sens1,Lin2), CCh0) value
+
+    member x.Var_LIN0_2_CCh0
+        with get () = x.getVarUi (LinPt(Sens1,Lin3), CCh0)
+        and set value = x.setVarUi (LinPt(Sens1,Lin3), CCh0) value
+
+    member x.Var_LIN0_3_CCh0
+        with get () = x.getVarUi (LinPt(Sens1,Lin4), CCh0)
+        and set value = x.setVarUi (LinPt(Sens1,Lin4), CCh0) value
+
+    member x.Var_LIN1_0_CCh1
+        with get () = x.getVarUi (LinPt(Sens2,Lin1), CCh1)
+        and set value = x.setVarUi (LinPt(Sens2,Lin1), CCh1) value
+
+    member x.Var_LIN1_1_CCh1
+        with get () = x.getVarUi (LinPt(Sens2,Lin2), CCh1)
+        and set value = x.setVarUi (LinPt(Sens2,Lin2), CCh1) value
+
+    member x.Var_LIN1_2_CCh1
+        with get () = x.getVarUi (LinPt(Sens2,Lin3), CCh1)
+        and set value = x.setVarUi (LinPt(Sens2,Lin3), CCh1) value
+
+    member x.Var_LIN1_3_CCh1
+        with get () = x.getVarUi (LinPt(Sens2,Lin4), CCh1)
+        and set value = x.setVarUi (LinPt(Sens2,Lin4), CCh1) value
+
+    member x.Var_T00_0_TppCh0
+        with get () = x.getVarUi (TermoScalePt(Sens1, ScaleBeg, TermoLow), TppCh0)
+        and set value = x.setVarUi (TermoScalePt(Sens1, ScaleBeg, TermoLow), TppCh0) value
+
+    member x.Var_T00_0_Var1Ch0
+        with get () = x.getVarUi (TermoScalePt(Sens1, ScaleBeg, TermoLow), Var1Ch0)
+        and set value = x.setVarUi (TermoScalePt(Sens1, ScaleBeg, TermoLow), Var1Ch0) value
+
+    member x.Var_T00_1_TppCh0
+        with get () = x.getVarUi (TermoScalePt(Sens1, ScaleBeg, TermoNorm), TppCh0)
+        and set value = x.setVarUi (TermoScalePt(Sens1, ScaleBeg, TermoNorm), TppCh0) value
+
+    member x.Var_T00_1_Var1Ch0
+        with get () = x.getVarUi (TermoScalePt(Sens1, ScaleBeg, TermoNorm), Var1Ch0)
+        and set value = x.setVarUi (TermoScalePt(Sens1, ScaleBeg, TermoNorm), Var1Ch0) value
+
+    member x.Var_T00_2_TppCh0
+        with get () = x.getVarUi (TermoScalePt(Sens1, ScaleBeg, TermoHigh), TppCh0)
+        and set value = x.setVarUi (TermoScalePt(Sens1, ScaleBeg, TermoHigh), TppCh0) value
+
+    member x.Var_T00_2_Var1Ch0
+        with get () = x.getVarUi (TermoScalePt(Sens1, ScaleBeg, TermoHigh), Var1Ch0)
+        and set value = x.setVarUi (TermoScalePt(Sens1, ScaleBeg, TermoHigh), Var1Ch0) value
+
+    member x.Var_TK0_0_TppCh0
+        with get () = x.getVarUi (TermoScalePt(Sens1, ScaleEnd, TermoLow), TppCh0)
+        and set value = x.setVarUi (TermoScalePt(Sens1, ScaleEnd, TermoLow), TppCh0) value
+
+    member x.Var_TK0_0_Var1Ch0
+        with get () = x.getVarUi (TermoScalePt(Sens1, ScaleEnd, TermoLow), Var1Ch0)
+        and set value = x.setVarUi (TermoScalePt(Sens1, ScaleEnd, TermoLow), Var1Ch0) value
+
+    member x.Var_TK0_1_TppCh0
+        with get () = x.getVarUi (TermoScalePt(Sens1, ScaleEnd, TermoNorm), TppCh0)
+        and set value = x.setVarUi (TermoScalePt(Sens1, ScaleEnd, TermoNorm), TppCh0) value
+
+    member x.Var_TK0_1_Var1Ch0
+        with get () = x.getVarUi (TermoScalePt(Sens1, ScaleEnd, TermoNorm), Var1Ch0)
+        and set value = x.setVarUi (TermoScalePt(Sens1, ScaleEnd, TermoNorm), Var1Ch0) value
+
+    member x.Var_TK0_2_TppCh0
+        with get () = x.getVarUi (TermoScalePt(Sens1, ScaleEnd, TermoHigh), TppCh0)
+        and set value = x.setVarUi (TermoScalePt(Sens1, ScaleEnd, TermoHigh), TppCh0) value
+
+    member x.Var_TK0_2_Var1Ch0
+        with get () = x.getVarUi (TermoScalePt(Sens1, ScaleEnd, TermoHigh), Var1Ch0)
+        and set value = x.setVarUi (TermoScalePt(Sens1, ScaleEnd, TermoHigh), Var1Ch0) value
+
+    member x.Var_T01_0_TppCh1
+        with get () = x.getVarUi (TermoScalePt(Sens2, ScaleBeg, TermoLow), TppCh1)
+        and set value = x.setVarUi (TermoScalePt(Sens2, ScaleBeg, TermoLow), TppCh1) value
+
+    member x.Var_T01_0_Var1Ch1
+        with get () = x.getVarUi (TermoScalePt(Sens2, ScaleBeg, TermoLow), Var1Ch1)
+        and set value = x.setVarUi (TermoScalePt(Sens2, ScaleBeg, TermoLow), Var1Ch1) value
+
+    member x.Var_T01_1_TppCh1
+        with get () = x.getVarUi (TermoScalePt(Sens2, ScaleBeg, TermoNorm), TppCh1)
+        and set value = x.setVarUi (TermoScalePt(Sens2, ScaleBeg, TermoNorm), TppCh1) value
+
+    member x.Var_T01_1_Var1Ch1
+        with get () = x.getVarUi (TermoScalePt(Sens2, ScaleBeg, TermoNorm), Var1Ch1)
+        and set value = x.setVarUi (TermoScalePt(Sens2, ScaleBeg, TermoNorm), Var1Ch1) value
+
+    member x.Var_T01_2_TppCh1
+        with get () = x.getVarUi (TermoScalePt(Sens2, ScaleBeg, TermoHigh), TppCh1)
+        and set value = x.setVarUi (TermoScalePt(Sens2, ScaleBeg, TermoHigh), TppCh1) value
+
+    member x.Var_T01_2_Var1Ch1
+        with get () = x.getVarUi (TermoScalePt(Sens2, ScaleBeg, TermoHigh), Var1Ch1)
+        and set value = x.setVarUi (TermoScalePt(Sens2, ScaleBeg, TermoHigh), Var1Ch1) value
+
+    member x.Var_TK1_0_TppCh1
+        with get () = x.getVarUi (TermoScalePt(Sens2, ScaleEnd, TermoLow), TppCh1)
+        and set value = x.setVarUi (TermoScalePt(Sens2, ScaleEnd, TermoLow), TppCh1) value
+
+    member x.Var_TK1_0_Var1Ch1
+        with get () = x.getVarUi (TermoScalePt(Sens2, ScaleEnd, TermoLow), Var1Ch1)
+        and set value = x.setVarUi (TermoScalePt(Sens2, ScaleEnd, TermoLow), Var1Ch1) value
+
+    member x.Var_TK1_1_TppCh1
+        with get () = x.getVarUi (TermoScalePt(Sens2, ScaleEnd, TermoNorm), TppCh1)
+        and set value = x.setVarUi (TermoScalePt(Sens2, ScaleEnd, TermoNorm), TppCh1) value
+
+    member x.Var_TK1_1_Var1Ch1
+        with get () = x.getVarUi (TermoScalePt(Sens2, ScaleEnd, TermoNorm), Var1Ch1)
+        and set value = x.setVarUi (TermoScalePt(Sens2, ScaleEnd, TermoNorm), Var1Ch1) value
+
+    member x.Var_TK1_2_TppCh1
+        with get () = x.getVarUi (TermoScalePt(Sens2, ScaleEnd, TermoHigh), TppCh1)
+        and set value = x.setVarUi (TermoScalePt(Sens2, ScaleEnd, TermoHigh), TppCh1) value
+
+    member x.Var_TK1_2_Var1Ch1
+        with get () = x.getVarUi (TermoScalePt(Sens2, ScaleEnd, TermoHigh), Var1Ch1)
+        and set value = x.setVarUi (TermoScalePt(Sens2, ScaleEnd, TermoHigh), Var1Ch1) value
+
+    member x.Var_PT0_TppCh0
+        with get () = x.getVarUi (TermoPressPt(TermoLow), TppCh0)
+        and set value = x.setVarUi (TermoPressPt(TermoLow), TppCh0) value
+
+    member x.Var_PT1_TppCh0
+        with get () = x.getVarUi (TermoPressPt(TermoNorm), TppCh0)
+        and set value = x.setVarUi (TermoPressPt(TermoNorm), TppCh0) value
+
+    member x.Var_PT2_TppCh0
+        with get () = x.getVarUi (TermoPressPt(TermoHigh), TppCh0)
+        and set value = x.setVarUi (TermoPressPt(TermoHigh), TppCh0) value
+
+    member x.Var_PS0_Pmm
+        with get () = x.getVarUi (PressSensPt(PressNorm), Pmm)
+        and set value = x.setVarUi (PressSensPt(PressNorm), Pmm) value
+
+    member x.Var_PS0_VdatP
+        with get () = x.getVarUi (PressSensPt(PressNorm), VdatP)
+        and set value = x.setVarUi (PressSensPt(PressNorm), VdatP) value
+
+    member x.Var_PS1_Pmm
+        with get () = x.getVarUi (PressSensPt(PressHigh), Pmm)
+        and set value = x.setVarUi (PressSensPt(PressHigh), Pmm) value
+
+    member x.Var_PS1_VdatP
+        with get () = x.getVarUi (PressSensPt(PressHigh), VdatP)
+        and set value = x.setVarUi (PressSensPt(PressHigh), VdatP) value
+
+    member x.Var_TEST0_0_0_CCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoLow), CCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoLow), CCh0) value
+
+    member x.Var_TEST0_0_0_TppCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoLow), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoLow), TppCh0) value
+
+    member x.Var_TEST0_0_0_CCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoLow), CCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoLow), CCh1) value
+
+    member x.Var_TEST0_0_0_TppCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoLow), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoLow), TppCh1) value
+
+    member x.Var_TEST0_0_1_CCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoNorm), CCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoNorm), CCh0) value
+
+    member x.Var_TEST0_0_1_TppCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoNorm), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoNorm), TppCh0) value
+
+    member x.Var_TEST0_0_1_CCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoNorm), CCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoNorm), CCh1) value
+
+    member x.Var_TEST0_0_1_TppCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoNorm), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoNorm), TppCh1) value
+
+    member x.Var_TEST0_0_2_CCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoHigh), CCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoHigh), CCh0) value
+
+    member x.Var_TEST0_0_2_TppCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoHigh), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoHigh), TppCh0) value
+
+    member x.Var_TEST0_0_2_CCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoHigh), CCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoHigh), CCh1) value
+
+    member x.Var_TEST0_0_2_TppCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoHigh), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoHigh), TppCh1) value
+
+    member x.Var_TEST0_1_0_CCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoLow), CCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoLow), CCh0) value
+
+    member x.Var_TEST0_1_0_TppCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoLow), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoLow), TppCh0) value
+
+    member x.Var_TEST0_1_0_CCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoLow), CCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoLow), CCh1) value
+
+    member x.Var_TEST0_1_0_TppCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoLow), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoLow), TppCh1) value
+
+    member x.Var_TEST0_1_1_CCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoNorm), CCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoNorm), CCh0) value
+
+    member x.Var_TEST0_1_1_TppCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoNorm), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoNorm), TppCh0) value
+
+    member x.Var_TEST0_1_1_CCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoNorm), CCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoNorm), CCh1) value
+
+    member x.Var_TEST0_1_1_TppCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoNorm), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoNorm), TppCh1) value
+
+    member x.Var_TEST0_1_2_CCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoHigh), CCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoHigh), CCh0) value
+
+    member x.Var_TEST0_1_2_TppCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoHigh), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoHigh), TppCh0) value
+
+    member x.Var_TEST0_1_2_CCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoHigh), CCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoHigh), CCh1) value
+
+    member x.Var_TEST0_1_2_TppCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoHigh), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoHigh), TppCh1) value
+
+    member x.Var_TEST0_2_0_CCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoLow), CCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoLow), CCh0) value
+
+    member x.Var_TEST0_2_0_TppCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoLow), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoLow), TppCh0) value
+
+    member x.Var_TEST0_2_0_CCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoLow), CCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoLow), CCh1) value
+
+    member x.Var_TEST0_2_0_TppCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoLow), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoLow), TppCh1) value
+
+    member x.Var_TEST0_2_1_CCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoNorm), CCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoNorm), CCh0) value
+
+    member x.Var_TEST0_2_1_TppCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoNorm), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoNorm), TppCh0) value
+
+    member x.Var_TEST0_2_1_CCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoNorm), CCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoNorm), CCh1) value
+
+    member x.Var_TEST0_2_1_TppCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoNorm), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoNorm), TppCh1) value
+
+    member x.Var_TEST0_2_2_CCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoHigh), CCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoHigh), CCh0) value
+
+    member x.Var_TEST0_2_2_TppCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoHigh), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoHigh), TppCh0) value
+
+    member x.Var_TEST0_2_2_CCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoHigh), CCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoHigh), CCh1) value
+
+    member x.Var_TEST0_2_2_TppCh1
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoHigh), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoHigh), TppCh1) value
+
+    member x.Var_TEST1_0_0_CCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoLow), CCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoLow), CCh0) value
+
+    member x.Var_TEST1_0_0_TppCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoLow), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoLow), TppCh0) value
+
+    member x.Var_TEST1_0_0_CCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoLow), CCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoLow), CCh1) value
+
+    member x.Var_TEST1_0_0_TppCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoLow), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoLow), TppCh1) value
+
+    member x.Var_TEST1_0_1_CCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoNorm), CCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoNorm), CCh0) value
+
+    member x.Var_TEST1_0_1_TppCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoNorm), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoNorm), TppCh0) value
+
+    member x.Var_TEST1_0_1_CCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoNorm), CCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoNorm), CCh1) value
+
+    member x.Var_TEST1_0_1_TppCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoNorm), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoNorm), TppCh1) value
+
+    member x.Var_TEST1_0_2_CCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoHigh), CCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoHigh), CCh0) value
+
+    member x.Var_TEST1_0_2_TppCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoHigh), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoHigh), TppCh0) value
+
+    member x.Var_TEST1_0_2_CCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoHigh), CCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoHigh), CCh1) value
+
+    member x.Var_TEST1_0_2_TppCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoHigh), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoHigh), TppCh1) value
 
-    member x.Var_TestConcErrors_Sens1_TppCh0_ScaleMid2_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoNorm, PressPt.PressNorm) value
+    member x.Var_TEST1_1_0_CCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoLow), CCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoLow), CCh0) value
 
-    member x.Var_TestConcErrors_Sens1_TppCh0_ScaleMid2_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoLow, PressPt.PressNorm) value
+    member x.Var_TEST1_1_0_TppCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoLow), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoLow), TppCh0) value
 
-    member x.Var_TestConcErrors_Sens1_TppCh0_ScaleMid2_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleMid2, TermoPt.TermoHigh, PressPt.PressNorm) value
+    member x.Var_TEST1_1_0_CCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoLow), CCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoLow), CCh1) value
 
-    member x.Var_TestConcErrors_Sens1_TppCh0_ScaleEnd_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm) value
+    member x.Var_TEST1_1_0_TppCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoLow), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoLow), TppCh1) value
 
-    member x.Var_TestConcErrors_Sens1_TppCh0_ScaleEnd_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoLow, PressPt.PressNorm) value
+    member x.Var_TEST1_1_1_CCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoNorm), CCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoNorm), CCh0) value
 
-    member x.Var_TestConcErrors_Sens1_TppCh0_ScaleEnd_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens1), PhysVar.TppCh0, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressPt.PressNorm) value
+    member x.Var_TEST1_1_1_TppCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoNorm), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoNorm), TppCh0) value
 
-    member x.Var_TestConcErrors_Sens2_CCh1_ScaleBeg_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm) value
+    member x.Var_TEST1_1_1_CCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoNorm), CCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoNorm), CCh1) value
 
-    member x.Var_TestConcErrors_Sens2_CCh1_ScaleBeg_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm) value
+    member x.Var_TEST1_1_1_TppCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoNorm), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoNorm), TppCh1) value
 
-    member x.Var_TestConcErrors_Sens2_CCh1_ScaleBeg_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm) value
+    member x.Var_TEST1_1_2_CCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoHigh), CCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoHigh), CCh0) value
 
-    member x.Var_TestConcErrors_Sens2_CCh1_ScaleMid1_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressPt.PressNorm) value
+    member x.Var_TEST1_1_2_TppCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoHigh), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoHigh), TppCh0) value
 
-    member x.Var_TestConcErrors_Sens2_CCh1_ScaleMid1_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoLow, PressPt.PressNorm) value
+    member x.Var_TEST1_1_2_CCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoHigh), CCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoHigh), CCh1) value
 
-    member x.Var_TestConcErrors_Sens2_CCh1_ScaleMid1_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressPt.PressNorm) value
+    member x.Var_TEST1_1_2_TppCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoHigh), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoHigh), TppCh1) value
 
-    member x.Var_TestConcErrors_Sens2_CCh1_ScaleEnd_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm) value
+    member x.Var_TEST1_2_0_CCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoLow), CCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoLow), CCh0) value
 
-    member x.Var_TestConcErrors_Sens2_CCh1_ScaleEnd_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressPt.PressNorm) value
+    member x.Var_TEST1_2_0_TppCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoLow), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoLow), TppCh0) value
 
-    member x.Var_TestConcErrors_Sens2_CCh1_ScaleEnd_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.CCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressPt.PressNorm) value
+    member x.Var_TEST1_2_0_CCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoLow), CCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoLow), CCh1) value
 
-    member x.Var_TestConcErrors_Sens2_TppCh1_ScaleBeg_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoNorm, PressPt.PressNorm) value
+    member x.Var_TEST1_2_0_TppCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoLow), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoLow), TppCh1) value
 
-    member x.Var_TestConcErrors_Sens2_TppCh1_ScaleBeg_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoLow, PressPt.PressNorm) value
+    member x.Var_TEST1_2_1_CCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoNorm), CCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoNorm), CCh0) value
 
-    member x.Var_TestConcErrors_Sens2_TppCh1_ScaleBeg_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleBeg, TermoPt.TermoHigh, PressPt.PressNorm) value
+    member x.Var_TEST1_2_1_TppCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoNorm), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoNorm), TppCh0) value
 
-    member x.Var_TestConcErrors_Sens2_TppCh1_ScaleMid1_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoNorm, PressPt.PressNorm) value
+    member x.Var_TEST1_2_1_CCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoNorm), CCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoNorm), CCh1) value
 
-    member x.Var_TestConcErrors_Sens2_TppCh1_ScaleMid1_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoLow, PressPt.PressNorm) value
+    member x.Var_TEST1_2_1_TppCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoNorm), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoNorm), TppCh1) value
 
-    member x.Var_TestConcErrors_Sens2_TppCh1_ScaleMid1_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleMid1, TermoPt.TermoHigh, PressPt.PressNorm) value
+    member x.Var_TEST1_2_2_CCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoHigh), CCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoHigh), CCh0) value
 
-    member x.Var_TestConcErrors_Sens2_TppCh1_ScaleEnd_TermoNorm_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoNorm, PressPt.PressNorm) value
+    member x.Var_TEST1_2_2_TppCh0
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoHigh), TppCh0)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoHigh), TppCh0) value
 
-    member x.Var_TestConcErrors_Sens2_TppCh1_ScaleEnd_TermoLow_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoLow, PressPt.PressNorm) value
+    member x.Var_TEST1_2_2_CCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoHigh), CCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoHigh), CCh1) value
 
-    member x.Var_TestConcErrors_Sens2_TppCh1_ScaleEnd_TermoHigh_PressNorm
-        with get () = x.getVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressPt.PressNorm)
-        and set value = x.setVarUi (ProductionPoint.TestConcErrors(SensorIndex.Sens2), PhysVar.TppCh1, ScalePt.ScaleEnd, TermoPt.TermoHigh, PressPt.PressNorm) value
+    member x.Var_TEST1_2_2_TppCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoHigh), TppCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoHigh), TppCh1) value
 
-    member x.ConcError_Sens1_ScaleBeg = x.GetConcError {SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg} 
+    member x.ConcError0_0_L = x.GetConcError (Sens1, ScaleEdge(ScaleBeg), TermoLow)
 
-    member x.ConcError_Sens1_ScaleMid1 = x.GetConcError {SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleMid1} 
+    member x.ConcError0_0_N = x.GetConcError (Sens1, ScaleEdge(ScaleBeg), TermoNorm)
 
-    member x.ConcError_Sens1_ScaleMid2 = x.GetConcError {SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleMid2} 
+    member x.ConcError0_0_H = x.GetConcError (Sens1, ScaleEdge(ScaleBeg), TermoHigh)
 
-    member x.ConcError_Sens1_ScaleEnd = x.GetConcError {SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd} 
+    member x.ConcError0_M_L = x.GetConcError (Sens1, ScaleMid, TermoLow)
 
-    member x.ConcError_Sens2_ScaleBeg = x.GetConcError {SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg} 
+    member x.ConcError0_M_N = x.GetConcError (Sens1, ScaleMid, TermoNorm)
 
-    member x.ConcError_Sens2_ScaleMid1 = x.GetConcError {SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleMid1} 
+    member x.ConcError0_M_H = x.GetConcError (Sens1, ScaleMid, TermoHigh)
 
-    member x.ConcError_Sens2_ScaleEnd = x.GetConcError {SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd} 
+    member x.ConcError0_E_L = x.GetConcError (Sens1, ScaleEdge(ScaleEnd), TermoLow)
 
-    member x.TermoError_Sens1_ScaleBeg_TermoNorm = x.GetTermoError ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg}, TermoPt.TermoNorm) 
+    member x.ConcError0_E_N = x.GetConcError (Sens1, ScaleEdge(ScaleEnd), TermoNorm)
 
-    member x.TermoError_Sens1_ScaleBeg_TermoLow = x.GetTermoError ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg}, TermoPt.TermoLow) 
+    member x.ConcError0_E_H = x.GetConcError (Sens1, ScaleEdge(ScaleEnd), TermoHigh)
 
-    member x.TermoError_Sens1_ScaleBeg_TermoHigh = x.GetTermoError ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleBeg}, TermoPt.TermoHigh) 
+    member x.ConcError1_0_L = x.GetConcError (Sens2, ScaleEdge(ScaleBeg), TermoLow)
 
-    member x.TermoError_Sens1_ScaleMid1_TermoNorm = x.GetTermoError ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleMid1}, TermoPt.TermoNorm) 
+    member x.ConcError1_0_N = x.GetConcError (Sens2, ScaleEdge(ScaleBeg), TermoNorm)
 
-    member x.TermoError_Sens1_ScaleMid1_TermoLow = x.GetTermoError ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleMid1}, TermoPt.TermoLow) 
+    member x.ConcError1_0_H = x.GetConcError (Sens2, ScaleEdge(ScaleBeg), TermoHigh)
 
-    member x.TermoError_Sens1_ScaleMid1_TermoHigh = x.GetTermoError ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleMid1}, TermoPt.TermoHigh) 
+    member x.ConcError1_M_L = x.GetConcError (Sens2, ScaleMid, TermoLow)
 
-    member x.TermoError_Sens1_ScaleMid2_TermoNorm = x.GetTermoError ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleMid2}, TermoPt.TermoNorm) 
+    member x.ConcError1_M_N = x.GetConcError (Sens2, ScaleMid, TermoNorm)
 
-    member x.TermoError_Sens1_ScaleMid2_TermoLow = x.GetTermoError ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleMid2}, TermoPt.TermoLow) 
+    member x.ConcError1_M_H = x.GetConcError (Sens2, ScaleMid, TermoHigh)
 
-    member x.TermoError_Sens1_ScaleMid2_TermoHigh = x.GetTermoError ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleMid2}, TermoPt.TermoHigh) 
+    member x.ConcError1_E_L = x.GetConcError (Sens2, ScaleEdge(ScaleEnd), TermoLow)
 
-    member x.TermoError_Sens1_ScaleEnd_TermoNorm = x.GetTermoError ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd}, TermoPt.TermoNorm) 
+    member x.ConcError1_E_N = x.GetConcError (Sens2, ScaleEdge(ScaleEnd), TermoNorm)
 
-    member x.TermoError_Sens1_ScaleEnd_TermoLow = x.GetTermoError ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd}, TermoPt.TermoLow) 
+    member x.ConcError1_E_H = x.GetConcError (Sens2, ScaleEdge(ScaleEnd), TermoHigh)
 
-    member x.TermoError_Sens1_ScaleEnd_TermoHigh = x.GetTermoError ({SensorIndex = SensorIndex.Sens1; ScalePt = ScalePt.ScaleEnd}, TermoPt.TermoHigh) 
+    member x.CCh0 = x.getPhysVarValueUi(CCh0)
 
-    member x.TermoError_Sens2_ScaleBeg_TermoNorm = x.GetTermoError ({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg}, TermoPt.TermoNorm) 
+    member x.CCh1 = x.getPhysVarValueUi(CCh1)
 
-    member x.TermoError_Sens2_ScaleBeg_TermoLow = x.GetTermoError ({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg}, TermoPt.TermoLow) 
+    member x.CCh2 = x.getPhysVarValueUi(CCh2)
 
-    member x.TermoError_Sens2_ScaleBeg_TermoHigh = x.GetTermoError ({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleBeg}, TermoPt.TermoHigh) 
+    member x.PkPa = x.getPhysVarValueUi(PkPa)
 
-    member x.TermoError_Sens2_ScaleMid1_TermoNorm = x.GetTermoError ({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleMid1}, TermoPt.TermoNorm) 
+    member x.Pmm = x.getPhysVarValueUi(Pmm)
 
-    member x.TermoError_Sens2_ScaleMid1_TermoLow = x.GetTermoError ({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleMid1}, TermoPt.TermoLow) 
+    member x.Tmcu = x.getPhysVarValueUi(Tmcu)
 
-    member x.TermoError_Sens2_ScaleMid1_TermoHigh = x.GetTermoError ({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleMid1}, TermoPt.TermoHigh) 
+    member x.Vbat = x.getPhysVarValueUi(Vbat)
 
-    member x.TermoError_Sens2_ScaleEnd_TermoNorm = x.GetTermoError ({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd}, TermoPt.TermoNorm) 
+    member x.Vref = x.getPhysVarValueUi(Vref)
 
-    member x.TermoError_Sens2_ScaleEnd_TermoLow = x.GetTermoError ({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd}, TermoPt.TermoLow) 
+    member x.Vmcu = x.getPhysVarValueUi(Vmcu)
 
-    member x.TermoError_Sens2_ScaleEnd_TermoHigh = x.GetTermoError ({SensorIndex = SensorIndex.Sens2; ScalePt = ScalePt.ScaleEnd}, TermoPt.TermoHigh) 
+    member x.VdatP = x.getPhysVarValueUi(VdatP)
 
-    member x.CCh0 = x.getPhysVarValueUi PhysVar.CCh0 
+    member x.CoutCh0 = x.getPhysVarValueUi(CoutCh0)
 
-    member x.CCh1 = x.getPhysVarValueUi PhysVar.CCh1 
+    member x.TppCh0 = x.getPhysVarValueUi(TppCh0)
 
-    member x.CCh2 = x.getPhysVarValueUi PhysVar.CCh2 
+    member x.ILOn0 = x.getPhysVarValueUi(ILOn0)
 
-    member x.PkPa = x.getPhysVarValueUi PhysVar.PkPa 
+    member x.ILOff0 = x.getPhysVarValueUi(ILOff0)
 
-    member x.Pmm = x.getPhysVarValueUi PhysVar.Pmm 
+    member x.Uw_Ch0 = x.getPhysVarValueUi(Uw_Ch0)
 
-    member x.Tmcu = x.getPhysVarValueUi PhysVar.Tmcu 
+    member x.Ur_Ch0 = x.getPhysVarValueUi(Ur_Ch0)
 
-    member x.Vbat = x.getPhysVarValueUi PhysVar.Vbat 
+    member x.WORK0 = x.getPhysVarValueUi(WORK0)
 
-    member x.Vref = x.getPhysVarValueUi PhysVar.Vref 
+    member x.REF0 = x.getPhysVarValueUi(REF0)
 
-    member x.Vmcu = x.getPhysVarValueUi PhysVar.Vmcu 
+    member x.Var1Ch0 = x.getPhysVarValueUi(Var1Ch0)
 
-    member x.VdatP = x.getPhysVarValueUi PhysVar.VdatP 
+    member x.Var2Ch0 = x.getPhysVarValueUi(Var2Ch0)
 
-    member x.CoutCh0 = x.getPhysVarValueUi PhysVar.CoutCh0 
+    member x.Var3Ch0 = x.getPhysVarValueUi(Var3Ch0)
 
-    member x.TppCh0 = x.getPhysVarValueUi PhysVar.TppCh0 
+    member x.FppCh0 = x.getPhysVarValueUi(FppCh0)
 
-    member x.ILOn0 = x.getPhysVarValueUi PhysVar.ILOn0 
+    member x.CoutCh1 = x.getPhysVarValueUi(CoutCh1)
 
-    member x.ILOff0 = x.getPhysVarValueUi PhysVar.ILOff0 
+    member x.TppCh1 = x.getPhysVarValueUi(TppCh1)
 
-    member x.Uw_Ch0 = x.getPhysVarValueUi PhysVar.Uw_Ch0 
+    member x.ILOn1 = x.getPhysVarValueUi(ILOn1)
 
-    member x.Ur_Ch0 = x.getPhysVarValueUi PhysVar.Ur_Ch0 
+    member x.ILOff1 = x.getPhysVarValueUi(ILOff1)
 
-    member x.WORK0 = x.getPhysVarValueUi PhysVar.WORK0 
+    member x.Uw_Ch1 = x.getPhysVarValueUi(Uw_Ch1)
 
-    member x.REF0 = x.getPhysVarValueUi PhysVar.REF0 
+    member x.Ur_Ch1 = x.getPhysVarValueUi(Ur_Ch1)
 
-    member x.Var1Ch0 = x.getPhysVarValueUi PhysVar.Var1Ch0 
+    member x.WORK1 = x.getPhysVarValueUi(WORK1)
 
-    member x.Var2Ch0 = x.getPhysVarValueUi PhysVar.Var2Ch0 
+    member x.REF1 = x.getPhysVarValueUi(REF1)
 
-    member x.Var3Ch0 = x.getPhysVarValueUi PhysVar.Var3Ch0 
+    member x.Var1Ch1 = x.getPhysVarValueUi(Var1Ch1)
 
-    member x.FppCh0 = x.getPhysVarValueUi PhysVar.FppCh0 
+    member x.Var2Ch1 = x.getPhysVarValueUi(Var2Ch1)
 
-    member x.CoutCh1 = x.getPhysVarValueUi PhysVar.CoutCh1 
+    member x.Var3Ch1 = x.getPhysVarValueUi(Var3Ch1)
 
-    member x.TppCh1 = x.getPhysVarValueUi PhysVar.TppCh1 
-
-    member x.ILOn1 = x.getPhysVarValueUi PhysVar.ILOn1 
-
-    member x.ILOff1 = x.getPhysVarValueUi PhysVar.ILOff1 
-
-    member x.Uw_Ch1 = x.getPhysVarValueUi PhysVar.Uw_Ch1 
-
-    member x.Ur_Ch1 = x.getPhysVarValueUi PhysVar.Ur_Ch1 
-
-    member x.WORK1 = x.getPhysVarValueUi PhysVar.WORK1 
-
-    member x.REF1 = x.getPhysVarValueUi PhysVar.REF1 
-
-    member x.Var1Ch1 = x.getPhysVarValueUi PhysVar.Var1Ch1 
-
-    member x.Var2Ch1 = x.getPhysVarValueUi PhysVar.Var2Ch1 
-
-    member x.Var3Ch1 = x.getPhysVarValueUi PhysVar.Var3Ch1 
-
-    member x.FppCh1 = x.getPhysVarValueUi PhysVar.FppCh1 
+    member x.FppCh1 = x.getPhysVarValueUi(FppCh1)

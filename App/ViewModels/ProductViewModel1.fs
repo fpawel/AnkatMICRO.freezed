@@ -12,7 +12,6 @@ module private ViewModelProductHelpers =
     let appCfg = AppConfig.config
     type PSr = Chart.ProductSeriesInfo
 
-    let uu<'a> = FSharpType.unionCasesList<'a>
     //let nCase<'a when 'a : equality> = FSharpType.caseOrder<'a>
 
 
@@ -25,36 +24,22 @@ type Product1(p : P, getProductType, getPgsConc, partyId) =
 
     let mutable connection : Result<string,string> option = None
     
-    let getTermoError ((n, _, _) as pt) = 
-        SensorIndex.sensorOfProdTypeByIndex (getProductType()) n
+    let getConcError ((n, gas, t) as pt) = 
+        let sensor = SensorIndex.sensorOfProdTypeByIndex (getProductType()) n
+        
+        sensor 
         |> Option.bind( fun sensor ->
-            P.termoError 
-                sensor
-                (apply2 getPgsConc n)
-                pt p )
-
-    let getConcError ((n, _) as pt) = 
-        SensorIndex.sensorOfProdTypeByIndex (getProductType()) n
-        |> Option.bind( fun sensor ->
-            P.concError 
-                sensor
-                (apply2 getPgsConc n)
-                pt p )
+            match t with 
+            | TermoNorm -> P.concError sensor (apply2 getPgsConc n) (n, gas) p 
+            | _ -> P.termoError sensor getPgsConc pt p )
 
     let getConcErrors () = 
-        let xs1 =
-            List.zip uu<SensorIndex> ScalePt.values
-            |> List.map (fun (n,gas) -> (n,gas,TermoNorm), getConcError (n,gas) )
-
-        let xs2 = 
-            List.zip3 uu<SensorIndex> ScalePt.values [TermoLow; TermoHigh]
-            |> List.map (fun k -> k, getTermoError k )
-
-        Map.ofList (xs1 @ xs2)
-            
+        List.zip3 SensorIndex.valuesList ScalePt.valuesList TermoPt.valuesList
+        |> List.map (fun k -> k, getConcError k )
+        |> Map.ofList
                
     let getVarsValues() = 
-        dataPoints
+        Points.prod
         |> List.map (fun pt -> pt, Product.getVar pt p)
         |> Map.ofList
 
@@ -83,8 +68,8 @@ type Product1(p : P, getProductType, getPgsConc, partyId) =
 
         listOf {
             let! n = [ Sens1; Sens2 ]
-            let! scale = ScalePt.values
-            let! t = TermoPt.values
+            let! scale = ScalePt.valuesList
+            let! t = TermoPt.valuesList
             return n,scale,t }
         |> List.filter(fun k -> prevConcErrors.[k] <> concErrors.[k] )
         |> List.iter (Prop.concError >> x.RaisePropertyChanged)
@@ -118,8 +103,6 @@ type Product1(p : P, getProductType, getPgsConc, partyId) =
 
     member x.GetConcError = getConcError        
     
-    member x.GetTermoError = getTermoError
-
     member x.Connection
         with get () = connection
         and set v = 
@@ -153,8 +136,8 @@ type Product1(p : P, getProductType, getPgsConc, partyId) =
     member x.ForceCalculateErrors() =        
         listOf {
             let! n = [ Sens1; Sens2 ]
-            let! scale = ScalePt.values
-            let! t = TermoPt.values
+            let! scale = ScalePt.valuesList
+            let! t = TermoPt.valuesList
             return n,scale,t }
         |> List.iter (Prop.concError >> x.RaisePropertyChanged ) 
 
@@ -178,7 +161,7 @@ type Product1(p : P, getProductType, getPgsConc, partyId) =
             let varsValues = getVarsValues()
             let kefsValues = getKefsValues()
 
-            dataPoints
+            Points.prod
             |> List.filter(fun var -> prevVarsValues.[var] <> varsValues.[var] )
             |> List.iter (Prop.dataPoint >> x.RaisePropertyChanged) 
 

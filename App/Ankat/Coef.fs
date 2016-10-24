@@ -134,7 +134,12 @@ module private Helpers2 =
                 FSharpValue.MakeUnion(case,[||]) :?> Coef |> Some 
             else None)
 
-    let attr1 = FSharpValue.tryGetUnionCaseAttribute<CoefAttribute,Coef> >> Option.get
+    let attr1 (x:Coef) = 
+        let case,_ = FSharpValue.GetUnionFields(x, typeof<Coef> )
+        case.GetCustomAttributes() 
+        |> Seq.tryFind( fun e -> e.GetType()=typeof< CoefAttribute > ) 
+        |> Option.map( fun atr -> atr :?> CoefAttribute )
+        |> Option.get
 
     let order1 = function
         | CoefCustom (n,_,_) -> n

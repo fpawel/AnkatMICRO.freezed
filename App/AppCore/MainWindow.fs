@@ -88,7 +88,13 @@ type Tabsheet =
     | TabsheetVars
     | TabsheetErrors
     member x.Title = Tabsheet.title x
-    static member values = FSharpType.unionCasesList<Tabsheet>
+    static member valuesList = 
+        [   TabsheetParty
+            TabsheetChart
+            TabsheetKefs
+            TabsheetScenary
+            TabsheetVars
+            TabsheetErrors ]
     static member title = function
         | TabsheetParty ->   "Партия"
         | TabsheetChart ->   "График"
@@ -107,7 +113,7 @@ type Tabsheet =
 
 module private TabPagesHelp =
     let content = 
-        Tabsheet.values 
+        Tabsheet.valuesList 
         |> List.map(fun x -> 
             let p1 = new Panel( Dock = DockStyle.Fill, Parent = rightTabContentPlaceholder, Visible = false, AutoScroll = true)
             let p2 = new Panel( Dock = DockStyle.Fill, Parent = leftBottomTabContentPlaceHolder, Visible = false, AutoScroll = true)
@@ -122,7 +128,7 @@ type Tabsheet with
     member x.ShowContent() =
         Tabsheet.showContent x
     static member showContent tabPage =        
-        Tabsheet.values 
+        Tabsheet.valuesList
         |> List.iter ( fun x -> 
             let v = x=tabPage
             x.BottomTab.Visible <- v

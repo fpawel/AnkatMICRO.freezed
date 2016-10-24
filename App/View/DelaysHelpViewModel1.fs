@@ -33,5 +33,5 @@ type DelaysHelperViewModel1() =
         if x.GetDelay ctx <> value then            
             DelayContext.getWorks ctx
             |> List.iter( fun (i,_) -> i.GetRunInfo().SetDelayTime value )
-            x.RaisePropertyChanged ctx.Prop
+            x.RaisePropertyChanged <| Prop.delayContext ctx
             

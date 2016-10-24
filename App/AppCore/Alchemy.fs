@@ -80,7 +80,7 @@ module private PivateComputeProduct =
             |> sprintf "точках %s"
 
     let getValuesTermo p n gas var  =
-        TermoPt.values
+        valuesListOf<TermoPt>
         |> List.map( fun t -> TermoScalePt ( n,gas,t) , var  ) 
         |> getVarsValues p
 
@@ -116,7 +116,7 @@ module private PivateComputeProduct =
         | CorTermoPress ->
             // [ Termo1, ch1.Tpp, Air; Termo1, ch1.Var1, Air ]
             let xs var =
-                getVarsValues p (List.map( fun t -> TermoPressPt t, var) TermoPt.values)                
+                getVarsValues p (List.map( fun t -> TermoPressPt t, var) valuesListOf<TermoPt>)                
             result {
                 let! temps = xs TppCh0
                 let! vars = xs VdatP
@@ -132,7 +132,7 @@ module private PivateComputeProduct =
             let xs2 = List.map( fun pt -> LinPt (n,pt), n.Conc ) xs1                
             getVarsValues p xs2
             |> Result.map ( fun xs -> List.zip xs ys )
-            |> fmtCorrErr ( fun (LinPt (_,lin) ) -> FSharpType.caseOrder lin |> string) 
+            |> fmtCorrErr ( fun (LinPt (_,lin) ) -> valueOrderOf lin |> string) 
         
         | CorTermoScale ( n, ScaleBeg ) -> 
             let (~%%) = getValuesTermo p n ScaleBeg 
@@ -155,7 +155,7 @@ module private PivateComputeProduct =
             |> fmtCorrErr ( fun (TermoScalePt (_,_,t) ) -> t.What)
             |> Result.bind( fun xs ->
                 let errs =
-                    xs |> List.zip TermoPt.values 
+                    xs |> List.zip valuesListOf<TermoPt>
                     |> List.map(fun (ptT,(_,var0,var)) ->  if var0 = var then Some ptT else None )
                     |> List.filter Option.isSome
                 if List.isEmpty errs then 
@@ -218,8 +218,10 @@ let getProductTermoErrorlimit sensor getPgsConc (n,gas,t)  product =
     | _ ->
         (Product.getVar (f, n.Conc) product, Product.getVar (f, n.Termo) product) 
         |> Option.map2(fun(c,t) -> 
-            let dt = t - 20m             
-            let maxc = sensor.ConcErrorlimit (ScalePt.mapLin getPgsConc gas)
+            let dt = t - 20m
+            let linPt = ScalePt.toLinPt gas
+            let pgsConc = getPgsConc (n,linPt)
+            let maxc = sensor.ConcErrorlimit pgsConc
             0.5m * abs( maxc*dt ) / 10.0m )
     
 

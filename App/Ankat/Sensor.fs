@@ -33,7 +33,11 @@ type Scale =
     static member value = Scale.context >> snd
     static member what = Scale.context >> snd >> sprintf "0-%M"
 
-    static member values = FSharpType.unionCasesList<Scale>    
+    static member valuesList = [
+        Sc2
+        Sc5 
+        Sc10 
+        Sc100  ]
 
 
 type Sensor =
@@ -44,7 +48,7 @@ type Sensor =
     | C3H8 
     | SumCH
     
-    member x.What = Sensor.what
+    member x.What = Sensor.what x
     
     member x.SensorCode = Sensor.sensorCode x 
 
@@ -73,8 +77,13 @@ type Sensor =
         | CH4       -> "CH₄"
         
     
-    static member values = 
-        FSharpType.unionCasesList<Sensor>
+    static member values = [
+        CO2_2  
+        CO2_5
+        CO2_10
+        C3H8
+        SumCH
+        CH4 ]
 
     static member isCH = function
         | CH4 | C3H8 | SumCH -> true

@@ -25,6 +25,48 @@ let fkef (k:Coef) =
 let kefss() = 
     List.iter fkef Coef.coefs
 
+module Name = 
+    let private nn<'a> (x:'a) = sprintf "%A" x
+
+    let (|PhysVar1|) = nn<PhysVar>
+    let (|Sens|) = nn<SensorIndex>
+    let (|T|) = nn<TermoPt>
+    let (|P|) = nn<PressPt>
+    let (|ScaleEdge1|) = nn<ScaleEdgePt>
+    let (|Gas|) = function
+        | ScaleMid -> "ScaleMid"
+        | ScaleEdge (ScaleEdge1 x) -> sprintf "ScaleEdge(%s)" x
+
+    let (|LinN|) = nn<LinPt>        
+
+    let sens_gas_t (Sens n, Gas gas, T t) = sprintf "%s, %s, %s" n gas t
+
+    let physVar (PhysVar1 x) = x
+
+    let t (T x) = x
+
+    let dataPoint (x, PhysVar1 y) = 
+        let str1 =
+            match x with            
+            | LinPt (Sens n, LinN m) -> 
+                sprintf "LinPt(%s,%s)" n m
+            
+            | TermoScalePt (Sens n, ScaleEdge1 gas, T t) -> 
+                sprintf "TermoScalePt(%s, %s, %s)" n gas t  
+
+            | TermoPressPt (T t) -> sprintf "TermoPressPt(%s)" t
+
+            | PressSensPt (P p) -> sprintf "PressSensPt(%s)" p
+
+            | TestPt (Sens n, Gas gas, T t) -> sprintf "TestPt(%s, %s, %s)" n gas t 
+        
+        sprintf "%s, %s" str1 y
+
+    let clapan (Sens n, LinN  gas)= 
+        sprintf "%s, %s" n gas
+
+    let pgs  = clapan
+
 let createSourceFile_ProductViewModel() = 
   [|  
     yield """namespace Ankat.ViewModel
@@ -37,22 +79,20 @@ type Product(p, getProdType, getPgs, partyId) =
     override x.RaisePropertyChanged propertyName = 
         ViewModelBase.raisePropertyChanged x propertyName"""
 
-    for ((prodData,var) as k) in dataPoints do
-        let k1 = 
-            sprintf "(%s)" (Name.dataPoint k) 
+    for ((prodData,var) as k) in Points.prod do
         yield sprintf """
     member x.%s
-        with get () = x.getVarUi %s
-        and set value = x.setVarUi %s value"""  (Prop.dataPoint k) k1 k1 
+        with get () = x.getVarUi (%s)
+        and set value = x.setVarUi (%s) value"""  (Prop.dataPoint k) (Name.dataPoint k) (Name.dataPoint k)
         
-    for n in sens_gas_t_points do
+    for n in Points.sens_gas_t do
         yield sprintf """
-    member x.%s = x.GetConcError %s """  (Prop.concError n) (Name.sens_gas_t n)
+    member x.%s = x.GetConcError (%s)"""  (Prop.concError n) (Name.sens_gas_t n)
        
     
-    for x in PhysVar.values do        
+    for x in FSharpType.valuesListOf<PhysVar> do        
         yield sprintf """
-    member x.%s = x.getPhysVarValueUi %s """ (Prop.physVar x)  (Name.physVar x) |]
+    member x.%s = x.getPhysVarValueUi(%s)""" (Prop.physVar x)  (Name.physVar x) |]
 
     |> createSourcefile "ViewModels/ProductViewModel.fs" 
 
@@ -69,19 +109,24 @@ type Party(partyHeader, partyData) =
     override x.RaisePropertyChanged propertyName = 
         ViewModelBase.raisePropertyChanged x propertyName"""
 
-    for n,gas in sens_gas_points do
-        let whatPgs = gas.What
-        let whatScale = ScalePt.whatScale n.ScalePt
+    for n,gas as pt in Points.sens_lin do
         
         yield sprintf """
     [<Category("Концентрация ПГС")>] 
-    [<DisplayName("%s")>]    
-    [<Description("Концентрация %s, канал %d, %s")>]
+    [<DisplayName("Канал %d, ПГС%d")>]    
+    [<Description("Концентрация ПГС%d, канал %d")>]
     member x.%s
-        with get() = x.GetPgs %s
-        and set v = x.SetPgs (%s, v) """  whatPgs whatPgs n.SensorIndex.N whatScale n.Property n.Name n.Name
+        with get() = x.GetPgs(%s)
+        and set v = x.SetPgs ( (%s), v) """  
+             
+            (valueOrderOf n + 1) 
+            (valueOrderOf gas + 1) 
+            (valueOrderOf gas + 1) 
+            (valueOrderOf n + 1) 
+            (Prop.pgs pt)
+            (Name.pgs pt) (Name.pgs pt)
         
-    for t in TermoPt.values  do
+    for t in TermoPt.valuesList  do
         let what = TermoPt.what t
         let descr = TermoPt.dscr t
         
@@ -93,7 +138,7 @@ type Party(partyHeader, partyData) =
     member x.%s 
         with get() = x.GetTermoTemperature %s
         and set v = x.SetTermoTemperature (%s,v) """  
-                what descr t.Property t.Name t.Name |]
+                what descr (Prop.t t) (Name.t t) (Name.t t) |]
     |> createSourcefile "ViewModels/PartyViewModel.fs" 
 
 createSourceFile_ProductViewModel()
@@ -122,7 +167,7 @@ type DelaysHelperViewModel() =
     [<TypeConverter(typeof<TimeSpanConverter>)>]
     member x.%s 
         with get() = x.GetDelay (%A)
-        and set value = x.SetDelay (%A) value  """ ctx.What ctx.What ctx.Prop ctx ctx
+        and set value = x.SetDelay (%A) value  """ ctx.What ctx.What (Prop.delayContext ctx) ctx ctx
   |]
 |> createSourcefile "View/DelaysHelpViewModel.fs" 
 

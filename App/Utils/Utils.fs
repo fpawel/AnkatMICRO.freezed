@@ -183,6 +183,10 @@ type Double with
 
 let fun0() = ()
 
+let inline valuesListOf< ^a when ^a : (static member valuesList : 'a list)> =
+    ( ^a : (static member valuesList : 'a list) () )
 
-
-        
+let inline valueOrderOf< ^a when ^a : (static member valuesList : 'a list)
+                            and ^a : equality> (value : 'a) =
+    valuesListOf<'a>
+    |> List.findIndex ((=) value) 

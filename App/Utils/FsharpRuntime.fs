@@ -9,31 +9,32 @@ type Type with
         typeof<System.Collections.IEnumerable>.IsAssignableFrom tx 
         || typeof<System.Collections.Generic.IEnumerable<_>>.IsAssignableFrom tx
 
-module FSharpValue =
-    let inline unionCaseName<'a> (x:'a) = 
-        try
-            match FSharpValue.GetUnionFields(x, typeof<'a>) with
-            | case, _ -> 
-                case.Name
-        with e ->
-            failwithf "Utils unif %A" e
-
-    
-
-    let inline tryGetUnionCaseAttribute<'T,'a> (x:'a) = 
-        let case,_ = FSharpValue.GetUnionFields(x, x.GetType() )
-        case.GetCustomAttributes() |> 
-        Seq.tryFind( fun e -> e.GetType()=typeof< 'T > ) |> 
-        Option.map( fun atr -> atr :?> 'T )
+//module FSharpValue =
+//    let inline unionCaseName<'a> (x:'a) = 
+//        try
+//            match FSharpValue.GetUnionFields(x, typeof<'a>) with
+//            | case, _ -> 
+//                case.Name
+//        with e ->
+//            failwithf "Utils unif %A" e
+//
+//    
+//
+//    let inline tryGetUnionCaseAttribute<'T,'a> (x:'a) = 
+//        let case,_ = FSharpValue.GetUnionFields(x, x.GetType() )
+//        case.GetCustomAttributes() |> 
+//        Seq.tryFind( fun e -> e.GetType()=typeof< 'T > ) |> 
+//        Option.map( fun atr -> atr :?> 'T )
+//
 
 module FSharpType =
     
-    let inline unionCasesList<'T> =
+    let inline valuesListOf<'T> =
         FSharpType.GetUnionCases typeof<'T> 
         |> Array.toList 
         |> List.map( fun case -> FSharpValue.MakeUnion(case,[||]) :?> 'T )
 
-    let inline caseOrder<'T when 'T: equality> (case:  'T)=
+    let inline valueOrderOf<'T when 'T: equality> (case:  'T)=
         FSharpType.GetUnionCases typeof<'T> 
         |> Array.map( fun x -> FSharpValue.MakeUnion(x,[||]) :?> 'T )
         |> Array.findIndex ( (=) case )
