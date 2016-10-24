@@ -349,31 +349,29 @@ module private Helpers1 =
         sprintf "%s, %s" strGas strFeats
 
     let formatProdpointsClapansList prodsClapansList =        
-        let clapans', prodpoints = List.unzip prodsClapansList
-        let clapans = List.concat clapans'
+        let clapans, prodpoints' = List.unzip prodsClapansList
+        let prodpoints = List.concat prodpoints'
         let strClapans = clapans |> Set.ofSeq |> Seq.toStr ", " ClapanHelp.what
         let strProdpoints = prodpoints |> Set.ofSeq |> Seq.toStr ", " ProdDataPt.what
         sprintf "%s, %s" strClapans strProdpoints
 
 
     let blowAndRead prodsClapansList  =
-
         sprintf "Снятие %s" (formatProdpointsClapansList prodsClapansList) <||>
             [   for clapan, prodpoints in prodsClapansList do
-                    yield blow 3 clapan ("Продувка " + gas.What)                    
-                    for feat in feats do                        
-                        yield readVars (feat, gas.ScalePt, temp, press) 
+                    yield blow1 3 clapan ("Продувка " + ClapanHelp.what clapan)                    
+                    yield! List.map ProdDataPt.read prodpoints                    
                 yield blowAir() ]
 
-    let warmAndRead featsGasesList temp  =
-
-        sprintf "Снятие %s, %s" (TermoPt.what temp) (formatFeatsGasesList featsGasesList) <||> 
-            [   yield sprintf "Установка %s" (TermoPt.what temp) <||> [
-                    yield "Установка"  <|> fun () -> warm temp
-                    yield ("Выдержка", TimeSpan.FromHours 1., WarmDelay temp) <-|-> fun gettime -> maybeErr{    
+    let warmAndRead prodsClapansList temperature  =
+        let strTemperature = TermoPt.what temperature
+        sprintf "Снятие %s, %s" (TermoPt.what temperature) (formatProdpointsClapansList prodsClapansList) <||> 
+            [   yield sprintf "Установка %s" strTemperature <||> [
+                    yield "Установка"  <|> fun () -> warm temperature
+                    yield ("Выдержка", TimeSpan.FromHours 1., WarmDelay temperature) <-|-> fun gettime -> maybeErr{    
                         do! switchPneumo None    
-                        do! Delay.perform ( sprintf "Выдержка термокамеры %A" (TermoPt.what temp) ) gettime true } ]        
-                yield blowAndRead featsGasesList (temp,PressNorm)  ]
+                        do! Delay.perform ( "Выдержка термокамеры " + strTemperature ) gettime true } ]        
+                yield blowAndRead prodsClapansList  ]
     
     let featGases1 s f = 
         SensorIndex.scalePts s 
