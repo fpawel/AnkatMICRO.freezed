@@ -10,6 +10,7 @@ open WinFormsControlUtils
 
 open MainWindow
 open Ankat
+open Pneumo
 open Ankat.View.Products
 
 type private P = Ankat.ViewModel.Product
@@ -20,16 +21,44 @@ module TabsheetVars =
 
     [<AutoOpen>]
     module private Helpers =
-
-        type Page = 
-            {   PhysVar : PhysVar
-                ProductionPoint : ProductionPoint
-                TermoPt : TermoPt } 
         
-        let mutable page = { 
-            PhysVar = Sens1.Conc
-            ProductionPoint = Correction <| CorrectionLinScale Sens1
-            TermoPt = TermoNorm }
+        type Page = 
+            | Lin of SensorIndex
+            | T of SensorIndex * ScaleEdgePt
+            | PT 
+            | PS
+            | Test of SensorIndex * TermoPt * PhysVar
+
+            static member what = function
+                | Lin n ->      Correction.what <| CorLin n                
+                | T (n,gas) ->  Correction.what <| CorTermoScale (n,gas)                
+                | PT ->         Correction.what <| CorTermoPress                
+                | PS ->         Correction.what <| CorPressSens                
+                | Test (n,t,var) -> sprintf "%d %s %s" n.N t.What var.What
+
+            static member descr = function
+                | Lin n ->      Correction.descr <| CorLin n                
+                | T (n,gas) ->  Correction.descr <| CorTermoScale (n,gas)                
+                | PT ->         Correction.descr <| CorTermoPress                
+                | PS ->         Correction.descr <| CorPressSens                
+                | Test (n,t,var) -> sprintf "Проерка погрешности %d %s %s" n.N t.What var.What
+
+        let pages = [
+            yield! List.map Lin SensorIndex.valuesList
+            yield! listOf{
+                let! n = SensorIndex.valuesList
+                let! gas = ScaleEdgePt.valuesList
+                return T(n,gas) }
+            yield PT
+            yield PS
+            yield! listOf{
+                let! n = SensorIndex.valuesList
+                let! t = TermoPt.valuesList
+                let! var = [n.Conc; n.Termo]
+                return Test(n,t,var) } ]
+                
+
+        let mutable page = Lin Sens1
 
         let addcol dataPropertyName headerText = 
             new DataGridViewTextBoxColumn( DataPropertyName = dataPropertyName, HeaderText = headerText)
@@ -52,79 +81,49 @@ module TabsheetVars =
     let update () = 
         
         gridProducts.Columns.``remove all columns but`` Columns.main
-        let f = page.ProductionPoint
+        match page  with
+        | Lin n ->
+            for pt in [ yield Lin1; yield Lin2                
+                        match n, AppContent.party.getProductType().Sensor with
+                        | Sens1, IsCO2Sensor true -> yield Lin3
+                        | _ -> ()
+                        yield Lin4 ] do
+                let linPt = LinPt (n,pt)
+                let prop = Prop.dataPoint(linPt,n.Conc)
+                addcol prop (LinPt.clapan (n,pt) |> Clapan.what ) 
+
+        | T (n,gas) -> 
+            for t in TermoPt.valuesList do
+                for var in [n.Var1; n.Termo] do
+                    let pt = TermoScalePt(n,gas,t),var
+                    addcol (Prop.dataPoint pt) (var.What + termoLeter t)           
+        | PT ->
+            for t in TermoPt.valuesList do
+                for var in Correction.physVars CorTermoPress do
+                    let pt = TermoPressPt t,var
+                    addcol (Prop.dataPoint pt) (var.What + termoLeter t)
+
+        | PS ->             
+            for p in PressPt.valuesList do
+                for var in Correction.physVars CorPressSens do
+                    let pt = PressSensPt p, var
+                    addcol (Prop.dataPoint pt) (var.What + pressLeter p)
+            
+        | Test (n,t,var)  ->
+            for gas in ScalePt.valuesList do
+                let pt = TestPt(n,gas,t), var
+                addcol (Prop.dataPoint pt) gas.What
+
+        setActivePageTitle <| Page.what page
+                
         
-        match f with
-        | Correction (CorrectionLinScale sens ) ->
-            for gas in f.Gases do
-                let var = f, sens.Conc, gas, TermoNorm, PressNorm
-                addcol (Vars.property var) gas.What
-                setActivePageTitle f.What1
-        | TestConcErrors _ ->
-            for gas in f.Gases do
-                let var = page.ProductionPoint, page.PhysVar, gas, page.TermoPt, PressNorm
-                addcol (Vars.property var) gas.What
-                setActivePageTitle <| sprintf "%s, %s, %s" page.ProductionPoint.What2 page.PhysVar.What page.TermoPt.What
-        | Correction (CorrectionTermoScale _ | CorrectionTermoPress) -> 
-            for t in [TermoNorm; TermoLow; TermoHigh] do
-                for physvar in f.PhysVars do
-                    let var = page.ProductionPoint, physvar, f.Gases.Head, t, PressNorm
-                    addcol (Vars.property var) (physvar.What + termoLeter t)
-            setActivePageTitle page.ProductionPoint.What1
-        | Correction CorrectionPressSens  -> 
-            for p in f.Pressures do
-                for physvar in f.PhysVars do                
-                    let var = page.ProductionPoint, physvar, ScaleBeg, TermoNorm, p
-                    addcol (Vars.property var) (physvar.What + pressLeter p)
-            setActivePageTitle page.ProductionPoint.What1
-
-    module Termo =
-        let get,set, setVisibility = 
-            radioButtons (addp ()) TermoPt.values TermoPt.what TermoPt.dscr <| fun x -> 
-                page <- {page with TermoPt = x }
-                update()
     
-    module PhysVar =
-        let get,set, setVisibility = 
-            let vars =
-                Vars.vars |> List.map(fun (_,x,_,_,_) -> x)
-                |> Set.ofList
-                |> Set.toList
-
-            radioButtons (addp ()) vars PhysVar.what PhysVar.dscr <| fun x -> 
-                page <- {page with PhysVar = x }
-                update()
 
     module ProductionPoint =
-        let get, set, setVisibility = 
-            let f x y =
-                PhysVar.setVisibility x
-                Termo.setVisibility y
-                    
-            radioButtons (addp ()) ProductionPoint.values ProductionPoint.what2 ProductionPoint.what1 <| fun x ->
-                page <- { page with ProductionPoint = x }
-                match x with
-                | TestConcErrors _ -> 
-                    PhysVar.set x.PhysVars.Head 
-                    Termo.set x.Temperatures.Head
-                    PhysVar.setVisibility x.PhysVars
-                    Termo.setVisibility x.Temperatures
-                | _ -> 
-                    PhysVar.setVisibility []
-                    Termo.setVisibility []
-                page <- { page with ProductionPoint = x}
-                
+        let get, set, _ = 
+            radioButtons (addp ()) pages Page.what Page.descr <| fun x ->
+                page <- x                
                 update()
-                
-
-        let private vis x = 
-            AppContent.party.getProductType().Sensor2.IsSome ||
-                ProductionPoint.isSens1 x
-
-        let updateVisibility() =             
-            let xs = List.filter vis ProductionPoint.values 
-            setVisibility xs
-            set xs.Head
 
 module TabsheetChart = 
     
@@ -142,45 +141,25 @@ module TabsheetChart =
             let panelSelectVar = new Panel(Parent = TabsheetChart.BottomTab, Dock = DockStyle.Top)
             let _ = new Panel(Parent = TabsheetChart.BottomTab, Dock = DockStyle.Top, Height = 10)
         
-            radioButtons panelSelectVar PhysVar.values PhysVar.what PhysVar.dscr <| fun x -> 
+            radioButtons panelSelectVar PhysVar.valuesList PhysVar.what PhysVar.dscr <| fun x -> 
                 Chart.physVar <- x
                 update()
 
 module TabsheetErrors =
-    let private pts = 
-        [   SScalePt.Beg1
-            SScalePt.Mid11
-            SScalePt.End1
-            SScalePt.Beg2
-            SScalePt.Mid2
-            SScalePt.End2 ]
-
     
-
     [<AutoOpen>]
     module private Helpers =
 
         type Page = 
-            {   SensorIndex  : SensorIndex
-                TermoPt : TermoPt } 
-
+            {   N  : SensorIndex
+                T : TermoPt } 
             
-            static member ctx x = 
-                match x.TermoPt with
-                | TermoNorm ->
-                    x.SensorIndex.ScalePts
-                    |> List.map (fun gas -> 
-                        let n = SScalePt.new' x.SensorIndex gas
-                        n.What, Property.concError n )
-                | t ->
-                    x.SensorIndex.ScalePts
-                    |> List.map (fun gas -> 
-                        let n = SScalePt.new' x.SensorIndex gas
-                        n.What, Property.termoError (n, t) )
+            static member ctx {N = n; T = t} = 
+                ScalePt.valuesList |> List.map(fun gas ->  
+                    let clapan = ScalePt.clapan(n, gas)
+                    clapan.What, Prop.concError(n,gas,t) )
                 
-        let mutable page = { 
-            TermoPt = TermoNorm 
-            SensorIndex = Sens1 }
+        let mutable page = { T = TermoNorm ; N = Sens1 }
 
         let addp () = 
             let p = new Panel(Parent = TabsheetErrors.BottomTab, Dock = DockStyle.Top)

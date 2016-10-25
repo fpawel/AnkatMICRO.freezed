@@ -14,15 +14,13 @@ let initKefsValues getPgsConc  prodType =
         | Some ch -> yield Sens2, ch 
         | _ -> () ]  
 
-    let scalePt = ScaleEdge >> ScalePt.toLinPt 
-
     [   for n, sensor in chans do
 
             
             
             let pgs0, pgsK, shk0, shkK, shk, units, gastype = SensorIndex.prodTypeCoefs n
-            yield pgs0, getPgsConc (n, scalePt ScaleBeg)
-            yield pgsK, getPgsConc (n, scalePt ScaleEnd)
+            yield pgs0, getPgsConc (ScaleEdgePt.clapan (n,ScaleBeg) )
+            yield pgsK, getPgsConc (ScaleEdgePt.clapan (n,ScaleEnd) )
             yield shk0, 0m
             yield shkK, sensor.Scale.Value
             yield shk, sensor.Scale.Code  
@@ -128,7 +126,7 @@ module private PivateComputeProduct =
                 match prodType.Sensor with
                 | IsCO2Sensor true -> [Lin1; Lin2; Lin3; Lin4]
                 | _ -> [Lin1; Lin2; Lin4]
-            let ys = List.map (getPgsConc n) xs1 
+            let ys = xs1 |> List.map ( fun linPt -> linPt.Clapan n |> getPgsConc )  
             let xs2 = List.map( fun pt -> LinPt (n,pt), n.Conc ) xs1                
             getVarsValues p xs2
             |> Result.map ( fun xs -> List.zip xs ys )
@@ -198,7 +196,7 @@ let compute group getPgsConc prodType = state {
         match group with
         | CorPressSens -> calculatePressureSensCoefs product
         | _ ->
-            getGaussXY product (apply2 getPgsConc) prodType group
+            getGaussXY product  getPgsConc prodType group
             |> Result.map (doValuesGaussXY group)
     match result with
     | Err e -> 
@@ -218,9 +216,8 @@ let getProductTermoErrorlimit sensor getPgsConc (n,gas,t)  product =
     | _ ->
         (Product.getVar (f, n.Conc) product, Product.getVar (f, n.Termo) product) 
         |> Option.map2(fun(c,t) -> 
-            let dt = t - 20m
-            let linPt = ScalePt.toLinPt gas
-            let pgsConc = getPgsConc (n,linPt)
+            let dt = t - 20m            
+            let pgsConc = getPgsConc (gas.Clapan n)
             let maxc = sensor.ConcErrorlimit pgsConc
             0.5m * abs( maxc*dt ) / 10.0m )
     
@@ -240,7 +237,7 @@ type Product with
     static member concError sensor getPgsConc (n,gas) product = 
         Product.getVar (TestPt(n,gas,TermoNorm), n.Conc) product 
         |> Option.map(fun conc ->                 
-            let pgs = ScalePt.mapLin getPgsConc gas
+            let pgs = getPgsConc(gas.Clapan n)
             {   Value = conc
                 Nominal = pgs
                 Limit = Sensor.concErrorlimit sensor pgs  }  ) 

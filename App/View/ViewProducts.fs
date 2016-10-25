@@ -73,9 +73,9 @@ module Columns =
         serialPortColumn
 
     
-    let physVars = PhysVar.values|> List.map(fun physvar -> 
+    let physVars = PhysVar.valuesList |> List.map(fun physvar -> 
         %% new TextColumn
-                (   DataPropertyName = PhysVar.property physvar, 
+                (   DataPropertyName = Prop.physVar physvar, 
                     HeaderText = PhysVar.what physvar,
                     ReadOnly = true) )
 
@@ -98,7 +98,7 @@ let updateCoefsGridRowsVisibility _ =
         row.Visible <- visCoefs.Contains (MainWindow.getCoefOfRow row).Order )
 
 let updatePhysVarsGridColsVisibility() =
-    List.zip PhysVar.values Columns.physVars
+    List.zip PhysVar.valuesList Columns.physVars
     |> List.iter(fun (var,col) -> 
         col.Visible <- Set.contains var AppConfig.config.View.VisiblePhysVars )
 

@@ -132,7 +132,7 @@ type Party1
             |> List.iter x.DeleteProduct
             setProducts otherPartyData.Products
 
-            Points.sens_lin
+            Pneumo.Clapan.valuesList
             |> List.iter (Prop.pgs >> x.RaisePropertyChanged)
 
             TermoPt.valuesList

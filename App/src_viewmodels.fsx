@@ -6,7 +6,7 @@
 #load "Utils/Assembly.fs"
 #load "Utils/PathUtils.fs"
 #load "Utils/Logging.fs"
-
+#load "Pneumo.fs"
 #load "Ankat/Coef.fs"
 #load "Ankat/Sensor.fs"
 #load "Ankat/Ankat.fs"
@@ -14,6 +14,7 @@
 open System
 
 open Ankat
+open Pneumo
 
 let createSourcefile path (source : string []) = 
     System.IO.File.WriteAllLines (__SOURCE_DIRECTORY__ + "/" + path, source)
@@ -62,8 +63,8 @@ module Name =
         
         sprintf "%s, %s" str1 y
 
-    let clapan (Sens n, LinN  gas)= 
-        sprintf "%s, %s" n gas
+    let clapan (x:Clapan)= 
+        sprintf "%A" x
 
     let pgs  = clapan
 
@@ -72,6 +73,7 @@ let createSourceFile_ProductViewModel() =
     yield """namespace Ankat.ViewModel
 
 open Ankat
+open Pneumo
 
 type Product(p, getProdType, getPgs, partyId) =
 
@@ -90,11 +92,14 @@ type Product(p, getProdType, getPgs, partyId) =
     member x.%s = x.GetConcError (%s)"""  (Prop.concError n) (Name.sens_gas_t n)
        
     
-    for x in FSharpType.valuesListOf<PhysVar> do        
+    for x in PhysVar.valuesList do        
         yield sprintf """
     member x.%s = x.getPhysVarValueUi(%s)""" (Prop.physVar x)  (Name.physVar x) |]
 
     |> createSourcefile "ViewModels/ProductViewModel.fs" 
+
+
+
 
 let createSourceFile_PartyViewModel() = 
   [|  
@@ -102,6 +107,7 @@ let createSourceFile_PartyViewModel() =
 open System
 open System.ComponentModel
 open Ankat
+open Pneumo
 
 type Party(partyHeader, partyData) =
 
@@ -109,22 +115,20 @@ type Party(partyHeader, partyData) =
     override x.RaisePropertyChanged propertyName = 
         ViewModelBase.raisePropertyChanged x propertyName"""
 
-    for n,gas as pt in Points.sens_lin do
+    for clapan as pt in Clapan.valuesList do
         
         yield sprintf """
     [<Category("Концентрация ПГС")>] 
-    [<DisplayName("Канал %d, ПГС%d")>]    
-    [<Description("Концентрация ПГС%d, канал %d")>]
+    [<DisplayName("%s")>]    
+    [<Description("%s, концентрация ")>]
     member x.%s
         with get() = x.GetPgs(%s)
         and set v = x.SetPgs ( (%s), v) """  
              
-            (valueOrderOf n + 1) 
-            (valueOrderOf gas + 1) 
-            (valueOrderOf gas + 1) 
-            (valueOrderOf n + 1) 
-            (Prop.pgs pt)
-            (Name.pgs pt) (Name.pgs pt)
+            (Clapan.what clapan) 
+            (Clapan.descr clapan) 
+            (Prop.pgs clapan) 
+            (Name.pgs clapan) (Name.pgs clapan)
         
     for t in TermoPt.valuesList  do
         let what = TermoPt.what t
@@ -150,6 +154,7 @@ createSourceFile_PartyViewModel()
 open System
 open System.ComponentModel
 open Ankat
+open Pneumo
 open Operations
 open PartyWorks
 

@@ -189,5 +189,3 @@ type ProductType with
         Helper.prodTypes.Head
     static member values = 
         Helper.prodTypes
-
-    

@@ -2,6 +2,7 @@ namespace Ankat.ViewModel
 open System
 open System.ComponentModel
 open Ankat
+open Pneumo
 
 type Party(partyHeader, partyData) =
 
@@ -10,53 +11,46 @@ type Party(partyHeader, partyData) =
         ViewModelBase.raisePropertyChanged x propertyName
 
     [<Category("Концентрация ПГС")>] 
-    [<DisplayName("Канал 1, ПГС1")>]    
-    [<Description("Концентрация ПГС1, канал 1")>]
-    member x.PGS0_0
-        with get() = x.GetPgs(Sens1, Lin1)
-        and set v = x.SetPgs ( (Sens1, Lin1), v) 
+    [<DisplayName("ПГС1")>]    
+    [<Description("ПГС1, начало шкалы, концентрация ")>]
+    member x.PgsGas0
+        with get() = x.GetPgs(Gas1)
+        and set v = x.SetPgs ( (Gas1), v) 
 
     [<Category("Концентрация ПГС")>] 
-    [<DisplayName("Канал 1, ПГС2")>]    
-    [<Description("Концентрация ПГС2, канал 1")>]
-    member x.PGS0_1
-        with get() = x.GetPgs(Sens1, Lin2)
-        and set v = x.SetPgs ( (Sens1, Lin2), v) 
+    [<DisplayName("1-ПГС2")>]    
+    [<Description("ПГС2, середина шкалы канала 1, концентрация ")>]
+    member x.PgsGas1
+        with get() = x.GetPgs(S1Gas2)
+        and set v = x.SetPgs ( (S1Gas2), v) 
 
     [<Category("Концентрация ПГС")>] 
-    [<DisplayName("Канал 1, ПГС3")>]    
-    [<Description("Концентрация ПГС3, канал 1")>]
-    member x.PGS0_2
-        with get() = x.GetPgs(Sens1, Lin3)
-        and set v = x.SetPgs ( (Sens1, Lin3), v) 
+    [<DisplayName("CO₂-ПГС2")>]    
+    [<Description("ПГС2, доп.середина шкалы канала 1 CO₂, концентрация ")>]
+    member x.PgsGas2
+        with get() = x.GetPgs(S1Gas2CO2)
+        and set v = x.SetPgs ( (S1Gas2CO2), v) 
 
     [<Category("Концентрация ПГС")>] 
-    [<DisplayName("Канал 1, ПГС4")>]    
-    [<Description("Концентрация ПГС4, канал 1")>]
-    member x.PGS0_3
-        with get() = x.GetPgs(Sens1, Lin4)
-        and set v = x.SetPgs ( (Sens1, Lin4), v) 
+    [<DisplayName("1-ПГС3")>]    
+    [<Description("ПГС3, конец шкалы канала 1, концентрация ")>]
+    member x.PgsGas3
+        with get() = x.GetPgs(S1Gas3)
+        and set v = x.SetPgs ( (S1Gas3), v) 
 
     [<Category("Концентрация ПГС")>] 
-    [<DisplayName("Канал 2, ПГС1")>]    
-    [<Description("Концентрация ПГС1, канал 2")>]
-    member x.PGS1_0
-        with get() = x.GetPgs(Sens2, Lin1)
-        and set v = x.SetPgs ( (Sens2, Lin1), v) 
+    [<DisplayName("2-ПГС2")>]    
+    [<Description("ПГС2, середина шкалы канала 2, концентрация ")>]
+    member x.PgsGas4
+        with get() = x.GetPgs(S2Gas2)
+        and set v = x.SetPgs ( (S2Gas2), v) 
 
     [<Category("Концентрация ПГС")>] 
-    [<DisplayName("Канал 2, ПГС2")>]    
-    [<Description("Концентрация ПГС2, канал 2")>]
-    member x.PGS1_1
-        with get() = x.GetPgs(Sens2, Lin2)
-        and set v = x.SetPgs ( (Sens2, Lin2), v) 
-
-    [<Category("Концентрация ПГС")>] 
-    [<DisplayName("Канал 2, ПГС4")>]    
-    [<Description("Концентрация ПГС4, канал 2")>]
-    member x.PGS1_3
-        with get() = x.GetPgs(Sens2, Lin4)
-        and set v = x.SetPgs ( (Sens2, Lin4), v) 
+    [<DisplayName("2-ПГС3")>]    
+    [<Description("ПГС3, конец шкалы канала 1, концентрация ")>]
+    member x.PgsGas5
+        with get() = x.GetPgs(S2Gas3)
+        and set v = x.SetPgs ( (S2Gas3), v) 
 
     [<Category("Температура")>] 
     [<DisplayName("T-")>]    

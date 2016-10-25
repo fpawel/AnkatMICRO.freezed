@@ -4,6 +4,7 @@ open System
 
 open Thread2
 open Ankat.Alchemy
+open Pneumo
 
 open ViewModel.Operations
 
@@ -88,7 +89,7 @@ type Ankat.ViewModel.Product1 with
             | TermoNorm -> Some <| Sensor.concErrorlimit sensor conc        
             | _ -> Alchemy.getProductTermoErrorlimit sensor party.GetPgs pt p.Product with
         | Some concErrorlimit -> 
-            let pgs = party.GetPgs (n, ScalePt.toLinPt gas)
+            let pgs = party.GetPgs (gas.Clapan n)
             let d = abs(conc - pgs)
             Logging.write 
                 (if d < concErrorlimit then Logging.Info else Logging.Error)
@@ -215,12 +216,12 @@ module private Helpers1 =
     
     type Op = Operation
 
-    let switchPneumo1 pt = maybeErr{
+    let switchPneumo clapan = maybeErr{
         let code, title, text = 
-            match pt with
-            | Some ( n,gas as pt ) -> 
-                let code = ClapanHelp.code pt
-                let what = ClapanHelp.what pt
+            match clapan with
+            | Some clapan -> 
+                let code = Clapan.code clapan
+                let what = Clapan.what clapan
                 byte code, "Продувка " + what, "Подайте " + what
             | _ -> 0uy, "Выключить пневмоблок", "Отключите газ"
 
@@ -229,25 +230,17 @@ module private Helpers1 =
         else            
             ModalMessage.show Logging.Info  title text 
             if isKeepRunning() then
-                match pt with
-                | Some pt -> Logging.info "газ %s подан вручную" (ClapanHelp.what pt)
+                match clapan with
+                | Some clapan -> Logging.info "газ %s подан вручную" (Clapan.what clapan)
                 | _ -> Logging.info "пневмоблок закрыт вручную" }
 
-    
-
-    let switchPneumo  = 
-        Option.map ClapanHelp.ofScalePt
-        >> switchPneumo1 
-
-    let blow1 minutes pt what = 
-        let s = ClapanHelp.what pt
+    let blow minutes pt what = 
+        let s = Clapan.what pt
         let title, text = "Продувка " + s, "Подайте " + s
 
         (what, TimeSpan.FromMinutes (float minutes), BlowDelay pt ) <-|-> fun gettime -> maybeErr{        
-            do! switchPneumo1 <| Some pt
+            do! switchPneumo <| Some pt
             do! Delay.perform title gettime true }
-
-    let blow minutes pt what = blow1 minutes (ClapanHelp.ofScalePt pt) what
 
     let warm t = maybeErr{    
         if appCfg.UsePneumoblock && Hardware.Pneumo.isOpened()  then
@@ -272,11 +265,11 @@ module private Helpers1 =
     let isSens2() = party.getProductType().Sensor2.IsSome
     
     let adjustNull = 
-        let clapan = Sens1, Lin1
+        
         ("Калибровка нуля шкалы", TimeSpan.FromMinutes 3., AdjustDelay ScaleBeg)  <-|-> fun gettime -> maybeErr{
-            let pgsConc = party.GetPgs clapan
+            let pgsConc = party.GetPgs Gas1
             Logging.info  "Калибровка нуля шкалы, %M"  pgsConc
-            do! switchPneumo1 <| Some clapan
+            do! switchPneumo <| Some Gas1
             do! Delay.perform "Продувка перед калибровка нуля шкалы" gettime true
            
             do! party.WriteModbus( cmdAdjust (Sens1,ScaleBeg), pgsConc ) 
@@ -290,13 +283,13 @@ module private Helpers1 =
 
     let adjustSens n = 
         let cmd = cmdAdjust (n,ScaleEnd)   
-        let clapan = n,Lin4
+        let clapan = ScaleEnd.Clapan n
         let what1 = sprintf "чувствительности канала %d" n.N
         ("Калибровка " + what1, 
             TimeSpan.FromMinutes 3., AdjustDelay ScaleEnd)  <-|-> fun gettime -> maybeErr{
             let pgs = party.GetPgs clapan
             Logging.info  "%s, %M" n.What pgs
-            do! switchPneumo1 <| Some clapan
+            do! switchPneumo <| Some clapan
             do! Delay.perform ("Продувка перед калибровкой " + what1)  gettime true
             do! party.WriteModbus( cmdAdjust (n,ScaleEnd) , pgs ) 
             do! Delay.perform ("Выдержка после калибровки " + what1) (fun () -> TimeSpan.FromSeconds 10.) true
@@ -304,9 +297,9 @@ module private Helpers1 =
         
     
 
-    let blowAir() = 
+    let blowAir = 
         "Продувка воздухом" <||> [   
-            blow 1 (Sens1, ScaleEdge ScaleBeg) "Продуть воздух"
+            blow 1 Gas1 "Продуть воздух"
             "Закрыть пневмоблок" <|> fun () -> switchPneumo None
         ]
 
@@ -319,14 +312,19 @@ module private Helpers1 =
             yield adjustSens Sens1
             if isSens2() then
                 yield adjustSens Sens2
-            yield blowAir()]
+            yield blowAir]
 
     let goNku = "Установка НКУ" <|> fun () -> warm TermoNorm
 
+    let norming() = 
+        "Нормировка" <|> fun () -> maybeErr{
+            do! party.WriteModbus( Sens1.CmdNorm, 100m ) 
+            if isSens2() then
+                do! party.WriteModbus( Sens2.CmdNorm, 100m )  }
+
     type ProdDataPt with
         static member read prodPt = 
-            let what1 = ProdDataPt.what prodPt
-            let what = "Снятие " + what1
+            let what = ProdDataPt.what prodPt
             what <|> fun () -> maybeErr{
                 do! party.DoForEachProduct(fun p -> 
                     maybeErr{
@@ -337,110 +335,132 @@ module private Helpers1 =
                                 "%s : %s = %s, %s" 
                                 p.What (PhysVar.what physVar) 
                                 (Decimal.toStr6 readedValue) 
-                                what1 } 
+                                what } 
                     |> function 
                         | Some error -> Logging.error "%s" error
                         | _ -> () ) }
 
 
-    let formatClapanProdpointsList (clapan, prodpoints) =
-        let strFeats = prodpoints |> Set.ofSeq |> Seq.toStr ", " ProdDataPt.what
-        let strGas = ClapanHelp.what clapan
-        sprintf "%s, %s" strGas strFeats
+//    let formatClapanProdpointsList (clapan, prodpoints) =
+//        let strFeats = prodpoints |> Set.ofSeq |> Seq.toStr ", " ProdDataPt.what
+//        let strGas = ClapanHelp.what clapan
+//        sprintf "%s, %s" strGas strFeats
+//
+//    let formatClapansProdpointsList clapans prodpoints =        
+//        let strClapans = clapans |> Set.ofSeq |> Seq.toStr ", " ClapanHelp.what
+//        let strProdpoints = prodpoints |> Set.ofSeq |> Seq.toStr ", " ProdDataPt.what
+//        sprintf "%s, %s" strClapans strProdpoints
+//
+//
 
-    let formatProdpointsClapansList prodsClapansList =        
-        let clapans, prodpoints' = List.unzip prodsClapansList
-        let prodpoints = List.concat prodpoints'
-        let strClapans = clapans |> Set.ofSeq |> Seq.toStr ", " ClapanHelp.what
-        let strProdpoints = prodpoints |> Set.ofSeq |> Seq.toStr ", " ProdDataPt.what
-        sprintf "%s, %s" strClapans strProdpoints
 
+    let setupTermo temperature =
+        let strT = TermoPt.what temperature        
+        "Установка " + strT <||> [
+            "Уставка термокамеры " + strT  <|> fun () -> warm temperature
+            ("Выдержка термокамеры " + strT, 
+                TimeSpan.FromHours 1., WarmDelay temperature) <-|-> fun gettime -> maybeErr{    
+                do! switchPneumo None   
+                do! Delay.perform ( "Выдержка термокамеры " + strT ) gettime true } ]
 
-    let blowAndRead prodsClapansList  =
-        sprintf "Снятие %s" (formatProdpointsClapansList prodsClapansList) <||>
-            [   for clapan, prodpoints in prodsClapansList do
-                    yield blow1 3 clapan ("Продувка " + ClapanHelp.what clapan)                    
-                    yield! List.map ProdDataPt.read prodpoints                    
-                yield blowAir() ]
+    let blowAndRead<'a> (clapan_points : (Clapan * ('a list)) list ) (f : 'a -> ProdDataPt) =
+        [   for clapan,points in clapan_points do
+                yield Clapan.what clapan <||> [   
+                    yield blow 3 clapan "Продувка"
+                    for pt in points do
+                        yield ProdDataPt.read (f pt) ] ]
 
-    let warmAndRead prodsClapansList temperature  =
-        let strTemperature = TermoPt.what temperature
-        sprintf "Снятие %s, %s" (TermoPt.what temperature) (formatProdpointsClapansList prodsClapansList) <||> 
-            [   yield sprintf "Установка %s" strTemperature <||> [
-                    yield "Установка"  <|> fun () -> warm temperature
-                    yield ("Выдержка", TimeSpan.FromHours 1., WarmDelay temperature) <-|-> fun gettime -> maybeErr{    
-                        do! switchPneumo None    
-                        do! Delay.perform ( "Выдержка термокамеры " + strTemperature ) gettime true } ]        
-                yield blowAndRead prodsClapansList  ]
-    
-    let featGases1 s f = 
-        SensorIndex.scalePts s 
-        |> List.map( fun gas -> SScalePt.new' s gas, [f s] )
+    let test() =         
+        let points = [   
+            yield Gas1, [   yield Sens1, ScalePt.Beg; 
+                            if isSens2() then 
+                                yield Sens2, ScalePt.Beg] 
+            yield S1Gas2, [Sens1, ScaleMid] 
+            yield S1Gas3, [Sens1, ScalePt.End] 
+            if isSens2() then 
+                yield S2Gas2, [Sens2, ScaleMid] 
+                yield S2Gas3, [Sens2, ScalePt.End] ]
 
-    let test() = 
-        let xs =
-            [   yield! featGases1 Sens1 TestConcErrors
-                if isSens2() then
-                    yield! featGases1 Sens2 TestConcErrors ]
-        "Проверка" <||> [   
-            adjust()        
-            blowAndRead xs (TermoNorm,PressNorm )
-            warmAndRead xs TermoLow 
-            warmAndRead xs TermoHigh  ]
-    let lin() =        
-        let xs =
-            [   yield! featGases1 Sens1 (CorrectionLinScale >> Correction)
-                if isSens2() then
-                    yield! featGases1 Sens2 (CorrectionLinScale >> Correction) ]
+        "Снятие основной погрешности" <||> [   
+            yield adjust() 
+            for t in TermoPt.valuesList do
+                yield t.What <||> [
+                    yield setupTermo t
+                    yield! blowAndRead points <| fun (n,scalePt) ->
+                        let prodPt = n,scalePt,t
+                        TestPt prodPt  ] 
+            yield blowAir ]
+
+    let lin() = 
+        let points = [   
+            yield Gas1, [   yield Sens1, Lin1; 
+                            if isSens2() then 
+                                yield Sens2, Lin1] 
+            yield S1Gas2, [Sens1, Lin2] 
+            if party.getProductType().Sensor.IsCH |> not then
+                yield S1Gas2CO2, [Sens1, Lin2] 
+
+            yield S1Gas3, [Sens1, Lin3] 
+            if isSens2() then 
+                yield S2Gas2, [Sens2, Lin2] 
+                yield S2Gas3, [Sens2, Lin4] ]
 
         "Линеаризация" <||> [
-                yield blowAndRead xs (TermoNorm, PressNorm)
-                yield computeAndWriteGroup <| CorrectionLinScale Sens1
-                if isSens2() then
-                    yield computeAndWriteGroup <| CorrectionLinScale Sens2 ]
-
-    let norming() = 
-        "Нормировка" <|> fun () -> maybeErr{
-            do! party.WriteModbus( Sens1.CmdNorm, 100m ) 
+            yield! blowAndRead points LinPt
+            yield blowAir
+            yield computeAndWriteGroup <| CorLin Sens1
             if isSens2() then
-                do! party.WriteModbus( Sens2.CmdNorm, 100m )  }
+                yield computeAndWriteGroup <| CorLin Sens2 ]
 
-    
-let production() = 
-    
-    let termoFeatsGases =
-        let mk gas n = 
-            let x = SScalePt.new' n gas
-            x, [Correction <| CorrectionTermoScale x]
-        [   for gas in [ScaleBeg; ScaleEnd] do
-                yield mk gas Sens1 
-                if isSens2() then
-                    yield mk gas Sens2 ]
+    let termo() =
+        let points = [   
+            yield Gas1, [   yield Sens1, ScaleBeg; 
+                            if isSens2() then 
+                                yield Sens2, ScaleBeg]
+                                 
+            yield S1Gas3, [Sens1, ScaleEnd] 
+            if isSens2() then 
+                yield S2Gas3, [Sens2, ScaleEnd] ] 
 
-    let gases = 
-        [   yield SScalePt.Beg1
-            yield SScalePt.End1
+        "Термокомпенсация"  <||> [
+                    
+            for t in [TermoLow; TermoHigh; TermoNorm] do
+                yield t.What <||> [
+                    yield setupTermo t
+                    yield! blowAndRead points <| fun (n,scalePt) ->
+                        let prodPt = n,scalePt,t                                
+                        TermoScalePt prodPt ]            
+            yield computeAndWriteGroup <| CorTermoScale (Sens1,ScaleBeg)
+            yield computeAndWriteGroup <| CorTermoScale (Sens1,ScaleEnd)
             if isSens2() then
-                yield SScalePt.Beg2
-                yield SScalePt.End2 ]
-    "ИКД" + (if isSens2() then "2" else "1") <||> [
+                yield computeAndWriteGroup <| CorTermoScale (Sens2,ScaleBeg)
+                yield computeAndWriteGroup <| CorTermoScale (Sens2,ScaleEnd)
+            yield blowAir   ]
+
+    let initCoefs() =         
         "Установка к-тов исплнения" <|> fun () -> 
             party.DoForEachProduct (fun p -> 
                 p.WriteKefsInitValues()
                 |> ignore ) 
             |> Result.someErr
-                
-                
+
+    
+
+    
+let production() = 
+   
+    (if isSens2() then "2K" else "1K") <||> [
+        "Установка к-тов исплнения" <|> fun () -> 
+            party.DoForEachProduct (fun p -> 
+                p.WriteKefsInitValues()
+                |> ignore ) 
+            |> Result.someErr
         goNku
-        blowAir()
+        blowAir
         norming()
         adjust()
         lin()
-        "Термокомпенсация"  <||> [
-            warmAndRead termoFeatsGases TermoLow 
-            warmAndRead termoFeatsGases TermoHigh 
-            warmAndRead termoFeatsGases TermoNorm  
-            "Ввод" <||> ( gases |> List.map (CorrectionTermoScale >> computeAndWriteGroup) )  ]
+        termo()
         test() ]
 
 
@@ -481,18 +501,12 @@ let sendCommand (cmd,value as x) =
 
 
 module Pneumoblock =
-    let clapans = [   
-        SScalePt.Beg1
-        SScalePt.Mid11
-        SScalePt.Mid21
-        SScalePt.End1
-        SScalePt.Mid2
-        SScalePt.End2 ]
-
-    let switch gas = 
+    
+    let switch clapan = 
         
-        SScalePt.what gas -->> fun () -> 
-            Hardware.Pneumo.switch gas.PneumoBlockCode |> Result.someErr
+        Clapan.what clapan -->> fun () -> 
+            Hardware.Pneumo.switch (Clapan.code clapan)
+            |> Result.someErr
     let close() = 
         "Выкл." -->> fun () ->
             Hardware.Pneumo.switch 0uy |> Result.someErr

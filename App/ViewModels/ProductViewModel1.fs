@@ -25,12 +25,11 @@ type Product1(p : P, getProductType, getPgsConc, partyId) =
     let mutable connection : Result<string,string> option = None
     
     let getConcError ((n, gas, t) as pt) = 
-        let sensor = SensorIndex.sensorOfProdTypeByIndex (getProductType()) n
-        
+        let sensor = SensorIndex.sensorOfProdTypeByIndex (getProductType()) n        
         sensor 
         |> Option.bind( fun sensor ->
             match t with 
-            | TermoNorm -> P.concError sensor (apply2 getPgsConc n) (n, gas) p 
+            | TermoNorm -> P.concError sensor getPgsConc (n, gas) p 
             | _ -> P.termoError sensor getPgsConc pt p )
 
     let getConcErrors () = 

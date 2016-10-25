@@ -2,6 +2,7 @@ namespace Ankat.ViewModel
 open System
 open System.ComponentModel
 open Ankat
+open Pneumo
 open Operations
 open PartyWorks
 
@@ -15,51 +16,44 @@ type DelaysHelperViewModel() =
     [<DisplayName("Продувка ПГС1")>]    
     [<Description("Продувка ПГС1, длительность час:мин:сек")>]
     [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.BlowDelay_0_0 
-        with get() = x.GetDelay (BlowDelay (Sens1, Lin1))
-        and set value = x.SetDelay (BlowDelay (Sens1, Lin1)) value  
+    member x.BlowDelay_Gas0 
+        with get() = x.GetDelay (BlowDelay Gas1)
+        and set value = x.SetDelay (BlowDelay Gas1) value  
 
-    [<DisplayName("Продувка ПГС2, канал 1")>]    
-    [<Description("Продувка ПГС2, канал 1, длительность час:мин:сек")>]
+    [<DisplayName("Продувка 1-ПГС2")>]    
+    [<Description("Продувка 1-ПГС2, длительность час:мин:сек")>]
     [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.BlowDelay_0_1 
-        with get() = x.GetDelay (BlowDelay (Sens1, Lin2))
-        and set value = x.SetDelay (BlowDelay (Sens1, Lin2)) value  
+    member x.BlowDelay_Gas1 
+        with get() = x.GetDelay (BlowDelay S1Gas2)
+        and set value = x.SetDelay (BlowDelay S1Gas2) value  
 
-    [<DisplayName("Продувка ПГС2, CO₂")>]    
-    [<Description("Продувка ПГС2, CO₂, длительность час:мин:сек")>]
+    [<DisplayName("Продувка CO₂-ПГС2")>]    
+    [<Description("Продувка CO₂-ПГС2, длительность час:мин:сек")>]
     [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.BlowDelay_0_2 
-        with get() = x.GetDelay (BlowDelay (Sens1, Lin3))
-        and set value = x.SetDelay (BlowDelay (Sens1, Lin3)) value  
+    member x.BlowDelay_Gas2 
+        with get() = x.GetDelay (BlowDelay S1Gas2CO2)
+        and set value = x.SetDelay (BlowDelay S1Gas2CO2) value  
 
-    [<DisplayName("Продувка ПГС3, канал 1")>]    
-    [<Description("Продувка ПГС3, канал 1, длительность час:мин:сек")>]
+    [<DisplayName("Продувка 1-ПГС3")>]    
+    [<Description("Продувка 1-ПГС3, длительность час:мин:сек")>]
     [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.BlowDelay_0_3 
-        with get() = x.GetDelay (BlowDelay (Sens1, Lin4))
-        and set value = x.SetDelay (BlowDelay (Sens1, Lin4)) value  
+    member x.BlowDelay_Gas3 
+        with get() = x.GetDelay (BlowDelay S1Gas3)
+        and set value = x.SetDelay (BlowDelay S1Gas3) value  
 
-    [<DisplayName("Продувка ПГС1")>]    
-    [<Description("Продувка ПГС1, длительность час:мин:сек")>]
+    [<DisplayName("Продувка 2-ПГС2")>]    
+    [<Description("Продувка 2-ПГС2, длительность час:мин:сек")>]
     [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.BlowDelay_1_0 
-        with get() = x.GetDelay (BlowDelay (Sens2, Lin1))
-        and set value = x.SetDelay (BlowDelay (Sens2, Lin1)) value  
+    member x.BlowDelay_Gas4 
+        with get() = x.GetDelay (BlowDelay S2Gas2)
+        and set value = x.SetDelay (BlowDelay S2Gas2) value  
 
-    [<DisplayName("Продувка ПГС2, канал 2")>]    
-    [<Description("Продувка ПГС2, канал 2, длительность час:мин:сек")>]
+    [<DisplayName("Продувка 2-ПГС3")>]    
+    [<Description("Продувка 2-ПГС3, длительность час:мин:сек")>]
     [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.BlowDelay_1_1 
-        with get() = x.GetDelay (BlowDelay (Sens2, Lin2))
-        and set value = x.SetDelay (BlowDelay (Sens2, Lin2)) value  
-
-    [<DisplayName("Продувка ПГС3, канал 2")>]    
-    [<Description("Продувка ПГС3, канал 2, длительность час:мин:сек")>]
-    [<TypeConverter(typeof<TimeSpanConverter>)>]
-    member x.BlowDelay_1_3 
-        with get() = x.GetDelay (BlowDelay (Sens2, Lin4))
-        and set value = x.SetDelay (BlowDelay (Sens2, Lin4)) value  
+    member x.BlowDelay_Gas5 
+        with get() = x.GetDelay (BlowDelay S2Gas3)
+        and set value = x.SetDelay (BlowDelay S2Gas3) value  
 
     [<DisplayName("Прогрев T-")>]    
     [<Description("Прогрев T-, длительность час:мин:сек")>]

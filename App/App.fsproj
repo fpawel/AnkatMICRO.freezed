@@ -84,6 +84,7 @@
     <Compile Include="Json\Json.fs" />
     <Compile Include="Json\JsonSerialization.fs" />
     <Compile Include="Json\JsonConfig.fs" />
+    <Compile Include="Pneumo.fs" />
     <Compile Include="Ankat\Coef.fs" />
     <Compile Include="Ankat\Sensor.fs" />
     <Compile Include="Ankat\Ankat.fs" />

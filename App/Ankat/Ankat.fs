@@ -1,7 +1,7 @@
 ﻿namespace Ankat
 
 open System
-
+open Pneumo
 
 type PressPt =
     | PressNorm
@@ -43,6 +43,11 @@ type TermoPt =
     member x.Dscr = TermoPt.dscr x
     member x.What = TermoPt.what x
     
+// индекс датчика измерения концентрации
+type SensorIndex = 
+    | Sens1
+    | Sens2
+
 // граница шкалы концентрации
 type ScaleEdgePt = 
     | ScaleBeg
@@ -55,7 +60,15 @@ type ScaleEdgePt =
     static member what = function
         | ScaleBeg -> "ПГС1"
         | ScaleEnd -> "ПГС3"
+
+    static member clapan = function
+        | _, ScaleBeg -> Gas1
+        | Sens1, ScaleEnd -> S1Gas3
+        | Sens2, ScaleEnd -> S2Gas3
+
+    member x.Clapan n = ScaleEdgePt.clapan (n,x)
     
+
 
 // точка шкалы концентрации
 type ScalePt = 
@@ -75,8 +88,12 @@ type ScalePt =
             ScaleMid
             ScaleEdge ScaleEnd  ] 
 
+    static member clapan = function
+        | n, ScaleEdge pt -> ScaleEdgePt.clapan (n,pt)
+        | Sens1, ScaleMid -> S1Gas2
+        | Sens2, ScaleMid -> S2Gas2
 
-    
+    member x.Clapan n = ScalePt.clapan (n,x)
 
 type PhysVar =
     | CCh0 
@@ -151,13 +168,19 @@ type PhysVar =
         | Var3Ch1 ->   692, "Значение дифференциального сигнала с поправкой по чувствительности от температуры - второй канал оптики"
         | FppCh1 ->    694, "Частота преобразования АЦП - второй канал оптики"
 
-
-
     static member code = PhysVar.context >> fst
     static member what (x:PhysVar) = sprintf "%A" x
     static member dscr = PhysVar.context >> snd 
     member x.Dscr = PhysVar.dscr x
     member x.What = PhysVar.what x
+
+
+module private PhysVarHelp = 
+    let valuesList = 
+        FSharpType.valuesListOf<PhysVar>
+
+type PhysVar with 
+    static member valuesList = PhysVarHelp.valuesList
 
 type Id = string
 
@@ -204,9 +227,7 @@ type Command =
 
 
 // индекс датчика измерения концентрации
-type SensorIndex = 
-    | Sens1
-    | Sens2
+type SensorIndex with
 
     member x.Conc = SensorIndex.conc x
     member x.Termo = SensorIndex.termo x
@@ -270,19 +291,16 @@ type LinPt =
             Lin3
             Lin4 ]
 
-type ScaleEdgePt with
-    static member toLinPt = function
-        | ScaleBeg -> Lin1 
-        | ScaleEnd -> Lin4
+    member x.Clapan n = LinPt.clapan (n,x)
 
-type ScalePt with
-    static member toLinPt = function
-        | ScaleEdge n -> ScaleEdgePt.toLinPt n
-        | ScaleMid -> Lin2
-
-    static member mapLin f = 
-        ScalePt.toLinPt >> f
-
+    static member clapan = function
+        | _, Lin1 -> Gas1
+        | Sens1, Lin2 -> S1Gas2
+        | Sens1, Lin3 -> S1Gas2CO2
+        | Sens1, Lin4 -> S1Gas3
+        | Sens2, Lin2 -> S2Gas2
+        | Sens2, Lin3 -> failwith "ClapanHelp.clapanOflinPt, there is no Lin3 for Sens2"
+        | Sens2, Lin4 -> S2Gas3
 
 // точка снятия данных
 type ProdDataPt =
@@ -306,7 +324,6 @@ type ProdDataPt =
         | TermoPressPt t -> sprintf "PT%d" (valueOrderOf t )
         | PressSensPt p -> sprintf "PS%d" (valueOrderOf p )
         | TestPt (n,gas,t) -> sprintf "Test%d/%s/%s" (valueOrderOf n) gas.What t.What
-     
 
 [<AutoOpen>]
 module private Helper = 
@@ -340,7 +357,6 @@ module private Helper =
 
 type ProdDataPt with
     static member valuesList = prodDataPts
-
 
 // вид компенсации показаний
 type Correction = 
@@ -433,9 +449,9 @@ module private Helper1 =
 
     let (|CorrectionOfProdDataPt|_|) = Correction.fromProdDataPt
 
-[<AutoOpen>]
 module Points = 
-    
+
+    open Pneumo
 
     let sens_gas_t = listOf{ 
         let! n = SensorIndex.valuesList
@@ -443,48 +459,44 @@ module Points =
         let! t = TermoPt.valuesList
         return n,gas,t }
 
-    let sens_lin = [
-        Sens1, Lin1
-        Sens1, Lin2
-        Sens1, Lin3
-        Sens1, Lin4
-        Sens2, Lin1
-        Sens2, Lin2
-        Sens2, Lin4 ]
-
-
+    
     let prod = listOf {
         let! prodDataPt = ProdDataPt.valuesList
         let! physVar = ProdDataPt.physVars prodDataPt
         return prodDataPt, physVar }
+
+[<AutoOpen>]
+module ProductTypeHelp = 
 
     type ProductType with
 
         member x.GetPgsConc a  = ProductType.getPgsConc x a
         member x.DefaultPgsConcMap = ProductType.defaultPgsConcMap x 
     
-        static member getPgsConc productType (n,gas:LinPt)  = 
+        static member getPgsConc productType (clapan:Clapan)  = 
             let sensor1 = productType.Sensor
             let sc = sensor1.Scale.Value
-            let k = valueOrderOf gas |> decimal
+            let k = valueOrderOf clapan |> decimal
             let sensor = 
-                match productType.Sensor2, n with 
-                | Some sensor2, Sens2 -> sensor2
+                match productType.Sensor2, clapan with 
+                | Some sensor2, (S2Gas2 | S2Gas3) -> sensor2
                 | _ -> sensor1
             let m = match sensor with IsCO2Sensor true -> 4m | _ -> 3m
             (sensor.Scale.Value / m) * k
 
         static member defaultPgsConcMap productType = 
             let sensor1 = productType.Sensor
-            [   yield Sens1, Lin1
-                yield Sens1, Lin2
-                match sensor1 with IsCO2Sensor true -> yield Sens1, Lin3 | _ -> ()
-                yield Sens1, Lin4
+            [   yield Gas1
+                yield S1Gas2
+                match sensor1 with 
+                | IsCO2Sensor true -> 
+                    yield S1Gas2CO2
+                | _ -> ()
+                yield S1Gas3
                 match productType.Sensor2 with 
                 | Some sensor2 -> 
-                    yield Sens2, Lin1 
-                    yield Sens2, Lin2 
-                    yield Sens2, Lin4 
+                    yield S2Gas2
+                    yield S2Gas3
                 | _ -> () ]
             |> List.map(fun x -> x, productType.GetPgsConc x)
             |> Map.ofList
@@ -519,45 +531,17 @@ type ReadContext =
         | ReadVar var -> PhysVar.code var
 
 
-type Clapan = SensorIndex * LinPt
-
-module ClapanHelp =
-    
-    let private values = 
-        [   (Sens1, Lin1), (1uy, "ПГС1")
-            (Sens1, Lin2), (2uy, "ПГС2, канал 1")
-            (Sens1, Lin3), (3uy, "ПГС2, CO₂")
-            (Sens1, Lin4), (4uy, "ПГС3, канал 1")
-            (Sens2, Lin1), (1uy, "ПГС1")
-            (Sens2, Lin2), (5uy, "ПГС2, канал 2")
-            (Sens2, Lin3), (5uy, "ПГС2, канал 2")
-            (Sens2, Lin4), (6uy, "ПГС3, канал 2") ]
-        |> Map.ofList
-
-    let what x = snd values.[x]
-    let code x = fst values.[x]
-    let valuesList = 
-        [   Sens1, Lin1
-            Sens1, Lin2
-            Sens1, Lin3
-            Sens1, Lin4
-            Sens2, Lin1
-            Sens2, Lin2
-            Sens2, Lin4 ]
-
-    let ofScalePt (n,gas) : Clapan = n, ScalePt.toLinPt gas
-
 type DelayContext = 
     | BlowDelay of Clapan 
     | WarmDelay of TermoPt
     | AdjustDelay of ScaleEdgePt
     static member values = 
-        [   yield! List.map BlowDelay ClapanHelp.valuesList
+        [   yield! List.map BlowDelay Pneumo.Clapan.valuesList
             yield! List.map WarmDelay TermoPt.valuesList
             yield! List.map AdjustDelay ScaleEdgePt.valuesList  ]
 
     static member what = function
-        | BlowDelay n -> sprintf "Продувка %s" (ClapanHelp.what n)
+        | BlowDelay n -> sprintf "Продувка %s" n.What
         | WarmDelay t -> sprintf "Прогрев %s" t.What
         | AdjustDelay n -> sprintf "Калибровка %s" n.What 
     member x.What = DelayContext.what x
@@ -661,9 +645,6 @@ type PerformingOperation =
 type PerformingJournal = Map<int, PerformingOperation >
 
 module Party =
-
-    
-
     type Head = 
         {   Id : Id
             Date : DateTime
@@ -734,11 +715,11 @@ module Prop =
     let dataPoint (x, y  : PhysVar) = 
         sprintf "Var_%s_%s" (prodData x) y.What
 
-    let clapan (n,gas as x : Clapan)= 
-        sprintf "%d_%d" (valueOrderOf n)  (valueOrderOf gas)
+    let clapan (x : Clapan)= 
+        sprintf "Gas%d" (valueOrderOf x)
 
     let pgs x = 
-        sprintf "PGS%s" (clapan x)
+        sprintf "Pgs%s" (clapan x)
 
 
     let delayContext = function
