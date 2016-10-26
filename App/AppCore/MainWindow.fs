@@ -287,6 +287,7 @@ let initialize =
 
     form.Activated.AddHandler h
     aboutForm.Show()
+    aboutForm.Refresh()
     
 
 

@@ -481,15 +481,16 @@ module ProductTypePgsHelp =
                 | Some sensor2, (S2Gas2 | S2Gas3) -> sensor2
                 | _ -> sensor1
 
-            let d x y = function true -> x | _ -> y 
-            let k, m = 
+            let k = 
                 match clapan, sensor with 
-                | Gas1, _ -> 0m, 1m
-                | S1Gas2, IsCO2Sensor x -> d 3m 2m x, d 4m 3m x
-                | S1Gas3, IsCO2Sensor x -> d 4m 3m x, d 5m m x
-                | IsCO2Sensor true -> 4m 
-                | _ -> 3m
-            Math.Round( (sensor.Scale.Value / m) * k, 2)
+                | Gas1, _ -> 0m
+                | S1Gas2, IsCO2Sensor x -> if x then (1m / 3m) else 0.5m
+                | S1Gas2CO2, IsCO2Sensor x -> 2m / 3m 
+                | S1Gas3, _ -> 1m
+                | S2Gas2, _ -> 0.5m
+                | S2Gas3, _ -> 1m
+
+            Math.Round( sensor.Scale.Value * k, 2)
 
         static member defaultPgsConcMap productType = 
             let sensor1 = productType.Sensor
