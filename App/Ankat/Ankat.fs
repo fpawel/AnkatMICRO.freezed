@@ -313,7 +313,7 @@ type ProdDataPt =
     static member physVars = function
         | LinPt (n,_) -> [n.Conc]
         | TermoScalePt (n,_,_) -> [n.Termo; n.Var1]
-        | TermoPressPt _ -> [TppCh0]
+        | TermoPressPt _ -> [TppCh0;VdatP]
         | PressSensPt _ -> [Pmm;VdatP]
         | TestPt (n,_,_) -> [n.Termo; n.Conc]
 
@@ -466,7 +466,7 @@ module Points =
         return prodDataPt, physVar }
 
 [<AutoOpen>]
-module ProductTypeHelp = 
+module ProductTypePgsHelp = 
 
     type ProductType with
 
@@ -476,13 +476,20 @@ module ProductTypeHelp =
         static member getPgsConc productType (clapan:Clapan)  = 
             let sensor1 = productType.Sensor
             let sc = sensor1.Scale.Value
-            let k = valueOrderOf clapan |> decimal
             let sensor = 
                 match productType.Sensor2, clapan with 
                 | Some sensor2, (S2Gas2 | S2Gas3) -> sensor2
                 | _ -> sensor1
-            let m = match sensor with IsCO2Sensor true -> 4m | _ -> 3m
-            (sensor.Scale.Value / m) * k
+
+            let d x y = function true -> x | _ -> y 
+            let k, m = 
+                match clapan, sensor with 
+                | Gas1, _ -> 0m, 1m
+                | S1Gas2, IsCO2Sensor x -> d 3m 2m x, d 4m 3m x
+                | S1Gas3, IsCO2Sensor x -> d 4m 3m x, d 5m m x
+                | IsCO2Sensor true -> 4m 
+                | _ -> 3m
+            Math.Round( (sensor.Scale.Value / m) * k, 2)
 
         static member defaultPgsConcMap productType = 
             let sensor1 = productType.Sensor
@@ -529,7 +536,6 @@ type ReadContext =
     static member code = function
         | ReadKef kef -> Coef.readReg kef
         | ReadVar var -> PhysVar.code var
-
 
 type DelayContext = 
     | BlowDelay of Clapan 
@@ -645,6 +651,7 @@ type PerformingOperation =
 type PerformingJournal = Map<int, PerformingOperation >
 
 module Party =
+
     type Head = 
         {   Id : Id
             Date : DateTime
@@ -652,6 +659,7 @@ module Party =
             Name : string
             ProductsSerials : int list   }
         static member id x = x.Id 
+
     type Data = {
         Products : Product list
         Pgs : Map<Clapan,decimal>
@@ -666,9 +674,6 @@ module Party =
                 if n=127uy then 1uy else loop (n+1uy)
             else n
         loop 1uy
-
-    
-
     
     let createNewEmpty() : Content =         
         {   Id = Product.createNewId()

@@ -149,25 +149,19 @@ type ProductType =
     static member new1 n s1 = 
         {   TypeNumber = n
             Sensor = s1
-            Sensor2 = None   }
-
-    
+            Sensor2 = None   }    
 
 [<AutoOpen>]
-module Helper1 =
+module SensorHelp =
     let (|IsCO2Sensor|) = function
         | CO2_2 | CO2_5 | CO2_10 -> true
         | _ -> false
 
     let (|IsCHSensor|) = function
         | CH4 | C3H8 | SumCH -> true
-        | _ -> false
+        | _ -> false    
 
-
-
-    
-
-module private Helper =
+module private ProductTypeHelp =
     let prodTypes = 
         let co2 = [CO2_2; CO2_5; CO2_10]
         let ch = [CH4; C3H8; SumCH]
@@ -186,6 +180,6 @@ module private Helper =
 
 type ProductType with
     static member first = 
-        Helper.prodTypes.Head
+        ProductTypeHelp.prodTypes.Head
     static member values = 
-        Helper.prodTypes
+        ProductTypeHelp.prodTypes

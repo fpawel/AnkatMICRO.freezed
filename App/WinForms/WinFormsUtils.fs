@@ -22,7 +22,7 @@ let timer interval onTick =
         timer.Stop()    
     start, stop
 
-let buttonsMenu (font:Font) maxWidth xs =
+let buttonsPopupMenu (font:Font) maxWidth xs =
     
     let width =         
         let s =  xs |> List.map fst |> List.maxBy( String.length ) 
@@ -42,16 +42,14 @@ let buttonsMenu (font:Font) maxWidth xs =
         let b = new Button(Parent = p, Width = width, Height = h + 18, Left = 5,
                             FlatStyle = FlatStyle.Flat,
                             Text = text, TextAlign = ContentAlignment.MiddleLeft)        
-        b.Click.Add <| fun _ ->  f b popup
+        b.Click.Add <| fun _ ->  f b popup 
         b )
     |> List.iter( fun b -> 
         b.Top <- p.Height
         p.Height <- p.Height + b.Height + 3 )
     popup <- new MyWinForms.Popup(p)
     popup
-
-
-
+    
 let path  = 
     let rec loop (x:Control) =seq{
         yield x
@@ -122,7 +120,7 @@ let popupConfig title selectedObject propertySort =
                              PropertySort = propertySort)
     let l = new Label(Parent = p,  Dock = DockStyle.Top, Text = title, TextAlign = ContentAlignment.MiddleLeft)
     l.SetInfoStyle()
-    let popup = new MyWinForms.Popup(p, Resizable = true)
+    let popup = new MyWinForms.Popup(p, Resizable = true, Font = Application.OpenForms.[0].Font)
     popup.Closing.Add <| fun e ->
         if isPropGridEditing g then
             e.Cancel <- true

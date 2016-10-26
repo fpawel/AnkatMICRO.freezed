@@ -19,29 +19,31 @@ type private VE = Ankat.Alchemy.ValueError
 
 module TabsheetVars =
 
+    type Page = 
+        | Lin of SensorIndex
+        | T of SensorIndex * ScaleEdgePt
+        | PT 
+        | PS
+        | Test of SensorIndex * TermoPt * PhysVar
+
+        static member what = function
+            | Lin n ->      Correction.what <| CorLin n                
+            | T (n,gas) ->  Correction.what <| CorTermoScale (n,gas)                
+            | PT ->         Correction.what <| CorTermoPress                
+            | PS ->         Correction.what <| CorPressSens                
+            | Test (_,t,var) -> sprintf "%s %s" var.What t.What 
+
+        static member descr = function
+            | Lin n ->      Correction.descr <| CorLin n                
+            | T (n,gas) ->  Correction.descr <| CorTermoScale (n,gas)                
+            | PT ->         Correction.descr <| CorTermoPress                
+            | PS ->         Correction.descr <| CorPressSens                
+            | Test (n,t,var) -> sprintf "Проерка погрешности %d %s %s" n.N t.What var.What
+
     [<AutoOpen>]
     module private Helpers =
         
-        type Page = 
-            | Lin of SensorIndex
-            | T of SensorIndex * ScaleEdgePt
-            | PT 
-            | PS
-            | Test of SensorIndex * TermoPt * PhysVar
-
-            static member what = function
-                | Lin n ->      Correction.what <| CorLin n                
-                | T (n,gas) ->  Correction.what <| CorTermoScale (n,gas)                
-                | PT ->         Correction.what <| CorTermoPress                
-                | PS ->         Correction.what <| CorPressSens                
-                | Test (n,t,var) -> sprintf "%d %s %s" n.N t.What var.What
-
-            static member descr = function
-                | Lin n ->      Correction.descr <| CorLin n                
-                | T (n,gas) ->  Correction.descr <| CorTermoScale (n,gas)                
-                | PT ->         Correction.descr <| CorTermoPress                
-                | PS ->         Correction.descr <| CorPressSens                
-                | Test (n,t,var) -> sprintf "Проерка погрешности %d %s %s" n.N t.What var.What
+        
 
         let pages = [
             yield! List.map Lin SensorIndex.valuesList
@@ -53,7 +55,7 @@ module TabsheetVars =
             yield PS
             yield! listOf{
                 let! n = SensorIndex.valuesList
-                let! t = TermoPt.valuesList
+                let! t = [TermoNorm; TermoLow; TermoHigh]
                 let! var = [n.Conc; n.Termo]
                 return Test(n,t,var) } ]
                 
@@ -203,7 +205,7 @@ module TabsheetErrors =
                 e.FormattingApplied <- true
 
     let update () =
-        setActivePageTitle (sprintf "Погрешность %s, %s"  page.SensorIndex.What page.TermoPt.What)
+        setActivePageTitle (sprintf "Погрешность %s, %s"  page.N.What page.T.What)
         gridProducts.Columns.``remove all columns but`` Columns.main
         for h,p in Page.ctx page do
             let col = new DataGridViewTextBoxColumn( DataPropertyName = p,  HeaderText = h)
@@ -218,8 +220,8 @@ module TabsheetErrors =
 
     module Termo =
         let get,set, _ = 
-            radioButtons (addp ()) TermoPt.values TermoPt.what TermoPt.dscr <| fun x -> 
-                page <- {page with TermoPt = x }
+            radioButtons (addp ()) TermoPt.valuesList TermoPt.what TermoPt.dscr <| fun x -> 
+                page <- {page with T = x }
                 update()
 
     module SensorIndex =
@@ -243,8 +245,8 @@ module TabsheetErrors =
                         let p = getProductOfRow gridProducts e
                         formatCell gridProducts e (f p)
 
-            radioButtons (addp ()) SensorIndex.values SensorIndex.what SensorIndex.what <| fun x -> 
-                page <- {page with SensorIndex = x }
+            radioButtons (addp ()) SensorIndex.valuesList SensorIndex.what SensorIndex.what <| fun x -> 
+                page <- {page with N = x }
                 update()
     
 
@@ -256,7 +258,6 @@ let private onSelect = function
     | TabsheetVars ->
         gridProducts.Columns.``remove all columns but`` Products.Columns.main
         gridProducts.Parent <- TabsheetVars.RightTab
-        TabsheetVars.ProductionPoint.updateVisibility()
         TabsheetVars.update()
     | TabsheetErrors ->
         gridProducts.Columns.``remove all columns but`` Products.Columns.main
@@ -278,7 +279,7 @@ let getSelected, setSelected,_ =
     
     radioButtons 
         tabButtonsPlaceholder 
-        Tabsheet.values
+        Tabsheet.valuesList
         Tabsheet.title
         Tabsheet.descr
         (fun tabPage -> 

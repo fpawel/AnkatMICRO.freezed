@@ -225,7 +225,7 @@ module private Helpers1 =
                 byte code, "Продувка " + what, "Подайте " + what
             | _ -> 0uy, "Выключить пневмоблок", "Отключите газ"
 
-        if appCfg.UsePneumoblock then
+        if appCfg.Hardware.Pneumoblock.UsePneumoblock then
             do! Hardware.Pneumo.switch code
         else            
             ModalMessage.show Logging.Info  title text 
@@ -243,11 +243,11 @@ module private Helpers1 =
             do! Delay.perform title gettime true }
 
     let warm t = maybeErr{    
-        if appCfg.UsePneumoblock && Hardware.Pneumo.isOpened()  then
+        if appCfg.Hardware.Pneumoblock.UsePneumoblock && Hardware.Pneumo.isOpened()  then
             do! switchPneumo None
         let value = party.GetTermoTemperature t
         Logging.info "Установка температуры %A %M\"C" (TermoPt.what t) value
-        if not appCfg.UseTermochamber then             
+        if not appCfg.Hardware.Termochamber.UseTermochamber then             
             ModalMessage.show Logging.Info
                 "Уставка термокамеры" (sprintf "Установите в термокамере температуру %M\"C" value) 
             if isKeepRunning() then
@@ -398,9 +398,10 @@ module private Helpers1 =
                                 yield Sens2, Lin1] 
             yield S1Gas2, [Sens1, Lin2] 
             if party.getProductType().Sensor.IsCH |> not then
-                yield S1Gas2CO2, [Sens1, Lin2] 
+                yield S1Gas2CO2, [Sens1, Lin3] 
 
-            yield S1Gas3, [Sens1, Lin3] 
+            yield S1Gas3, [Sens1, Lin4]
+             
             if isSens2() then 
                 yield S2Gas2, [Sens2, Lin2] 
                 yield S2Gas3, [Sens2, Lin4] ]

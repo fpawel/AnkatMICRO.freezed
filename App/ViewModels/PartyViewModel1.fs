@@ -51,31 +51,29 @@ module private ViewModelPartyHelpers =
         col.Tag <- x
         x
 
-type ProductTypesConverter() = 
-    inherit StringConverter()
-    override this.GetStandardValuesSupported _ = true
-    override this.GetStandardValuesExclusive _ = true
-    override this.GetStandardValues _ =       
-        ProductType.values
-        |> Seq.toArray
-        |> Array.map ProductType.what
-        |> TypeConverter.StandardValuesCollection
+
         
 [<AbstractClass>]
 type Party1
         (   partyHeader:Ankat.Party.Head, 
             partyData : Ankat.Party.Data ) =
-    inherit AppConfigViewModel() 
+
+    inherit ViewModelBase() 
 
     let mutable partyHeader = partyHeader
+    
     let mutable partyData = partyData
+    
     let productType() = partyHeader.ProductType 
+    
     let getPgsConc n = 
         Party.getPgsConc (partyHeader,partyData) n
+    
     let getTermoTemperature t = 
         partyData.Temperature
         |> Map.tryFind t
         |> Option.getWith (TermoPt.defaultTermoTemperature t)
+    
     let products, setProducts = 
         let x = BindingList<P>()
         let setProducts xs = 
@@ -85,7 +83,9 @@ type Party1
             |> List.iter x.Add
         setProducts partyData.Products
         x, setProducts
+    
     let getProducts() = products |> Seq.map(fun x -> x.Product) |> Seq.toList
+    
     let updateProductsTypeAlchemy() = 
         for p in products do
             p.ForceCalculateErrors()
@@ -95,6 +95,7 @@ type Party1
         if xs |> List.forall( fun x -> x.IsChecked ) then Nullable<bool>(true) else
         if xs |> List.forall( fun x -> not x.IsChecked ) then Nullable<bool>(false) else
         Nullable<bool>()
+    
     let mutable productsChecked = Nullable<bool>()
 
     let setMainWindowTitle() = 
@@ -109,16 +110,13 @@ type Party1
 
     let addLoggingEvent = new Event<_>()
 
-    [<Browsable(false)>]
     member private __.AddLoggingEvent = addLoggingEvent
 
     [<CLIEvent>]
     member __.OnAddLogging = addLoggingEvent.Publish
             
-    [<Browsable(false)>]
     member __.Products = products
 
-    [<Browsable(false)>]
     member x.Party 
         with get() = 
             let partyData = { partyData with Products = getProducts() }
@@ -142,7 +140,6 @@ type Party1
             x.RaisePropertyChanged "Name"
             setMainWindowTitle()
             AppConfig.config.View.PartyId <- partyHeader.Id
-
     
     member x.AddNewProduct() = 
         
@@ -193,10 +190,6 @@ type Party1
 
     member __.getProductType() = partyHeader.ProductType
 
-    [<Category("Партия")>]
-    [<DisplayName("Исполнение")>]    
-    [<Description("Исполнение приборов партии")>]
-    [<TypeConverter (typeof<ProductTypesConverter>) >]
     member x.ProductType 
         with get() = partyHeader.ProductType.What
         and set v = 
@@ -210,9 +203,6 @@ type Party1
                 setMainWindowTitle()
                 updateProductsTypeAlchemy()
             
-    [<Category("Партия")>]
-    [<DisplayName("Наименование")>]    
-    [<Description("Наименование партии")>]
     member x.Name 
         with get() = partyHeader.Name
         and set v = 
@@ -221,7 +211,6 @@ type Party1
                 x.RaisePropertyChanged "Name"
                 setMainWindowTitle()
 
-    [<Browsable(false)>]
     member x.Journal 
         with get() = partyData.Journal
         and set value =
@@ -229,7 +218,7 @@ type Party1
                 partyData <- { partyData with Journal =  value }
                 x.RaisePropertyChanged "Journal"
 
-    
+
 [<AutoOpen>]
 module private RunInfoHelpers =
     let private getHash (x:string) = x.GetHashCode()

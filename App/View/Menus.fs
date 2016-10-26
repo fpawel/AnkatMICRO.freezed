@@ -31,7 +31,9 @@ module private Helpers =
         |> Map.toList
         |> List.map( fun (_,x) -> x.DataBoundItem :?> P )
 
-    let simpleMenu = MyWinForms.Utils.buttonsMenu (new Font("Consolas", 12.f)) ( Some 300 ) 
+    let simpleMenu = MyWinForms.Utils.buttonsPopupMenu (new Font("Consolas", 12.f)) ( Some 300 ) 
+
+    let popupConfig = MyWinForms.Utils.popupConfig
 
 
 let popupNumberDialog<'a>     
@@ -69,13 +71,16 @@ let modbusToolsPopup =
                         (fun value -> sendCommand (cmd,value) ) ) ]
     |> simpleMenu
     
-let pneumoToolsPopup =       
-    
-    [   yield! PartyWorks.Pneumoblock.clapans |> List.map ( fun gas -> 
-            gas.What, fun _ _  -> PartyWorks.Pneumoblock.switch gas )
-        yield "Выкл.", fun _ _ -> PartyWorks.Pneumoblock.close()  ]
-    |> simpleMenu
 
+let pneumoToolsPopup = 
+    
+    [   yield! Pneumo.Clapan.valuesList |> List.map ( fun gas -> 
+            gas.What, fun _ _   -> 
+                PartyWorks.Pneumoblock.switch gas )
+        yield "Выкл.", fun _ _ -> 
+            PartyWorks.Pneumoblock.close()  ]
+    |> simpleMenu
+    
 let termoToolsPopup = 
 
     let setpoint = 
@@ -86,7 +91,7 @@ let termoToolsPopup =
             PartyWorks.TermoChamber.setSetpoint
     [   yield "Старт", fun _ _ -> PartyWorks.TermoChamber.start()
         yield "Стоп", fun _ _ -> PartyWorks.TermoChamber.stop()
-        yield "Уставка", setpoint  ]
+        yield "Уставка", setpoint   ]
     |> simpleMenu
     
 open Ankat.View.TopBar
@@ -190,7 +195,6 @@ let private initButtons1 =
                 "Опрашиваемые параметры" 
                 (ViewModel.SelectPhysVars()) 
                 PropertySort.Alphabetical
-        popup.Font <- form.Font        
         popup.Closed.Add( fun _ ->
            View.Products.updatePhysVarsGridColsVisibility()  )
         popup.Show b )    
@@ -226,20 +230,29 @@ let initialize =
             f b    
         MainWindow.setTooltip b tooltip
         TopBar.thread1ButtonsBar.Controls.Add <| new Panel(Dock = DockStyle.Left, Width = 3)
+
+    let imgBtn (key,tooltip) f = 
+        let b = new Button( Parent = TopBar.thread1ButtonsBar, Dock = DockStyle.Left, 
+                            ImageList = Widgets.Icons.instance.imageList1,
+                            FlatStyle = FlatStyle.Flat, ImageKey = key,
+                            Width = 40, Height = 40,
+                            AutoSize = true )
+        b.Click.Add <| fun _ ->  
+            f b    
+        MainWindow.setTooltip b tooltip
+        TopBar.thread1ButtonsBar.Controls.Add <| new Panel(Dock = DockStyle.Left, Width = 3)
         
         
-    do 
-        let s1 = "Опрос","Опрос выбранных параметров приборов партии"    
-        s1 <== fun _ ->
-            runInterrogate()
+    imgBtn ( "loop","Опрос выбранных параметров приборов партии" ) <| fun _ ->
+        runInterrogate()
     
-    ("Modbus", "Ручное управление приборами") <== fun x ->
+    imgBtn ("letter_m", "Управление приборами по Modbus") <| fun x ->
         modbusToolsPopup.Show x
 
-    ("Пневмоблок", "Ручное управление пневмоблоком") <== fun x ->
+    imgBtn ("pneumo", "Управление пневмоблоком") <| fun x ->
         pneumoToolsPopup.Show x   
 
-    ("Термокамера", "Ручное управление термокамерой") <== fun x ->
+    imgBtn  ("termochamber", "Управление термокамерой") <| fun x ->
         termoToolsPopup.Show x   
 
     Thread2.addKeepRunningHandler <| fun (_,isKeepRunning) -> 
@@ -251,7 +264,7 @@ let initialize =
     do
         let x = 
             new Button( Parent = TopBar.thread1ButtonsBar, Dock = DockStyle.Left, AutoSize = true,
-                        ImageKey = "three_lines", Width = 40, Height = 40,
+                        ImageKey = "script", Width = 40, Height = 40,
                         FlatStyle = FlatStyle.Flat,
                         ImageList = Widgets.Icons.instance.imageList1)
         MainWindow.setTooltip x "Выбрать сценарий настройки"
@@ -263,18 +276,6 @@ let initialize =
     initComboBoxProdType()
     initButtons1()
 
-    let buttonStendSettings = 
-        new Button( Parent = right, Height = 40, Width = 40, Visible = true,
-                    ImageList = Widgets.Icons.instance.imageList1,
-                    FlatStyle = FlatStyle.Flat,
-                    Dock = DockStyle.Right, ImageKey = "tools1")
-    right.Controls.Add <| new Panel(Dock = DockStyle.Right, Width = 3)
-    setTooltip buttonStendSettings "Параметры \"железа\""
-    buttonStendSettings.Click.Add <| fun _ ->            
-        let popup = MyWinForms.Utils.popupConfig "Параметры \"железа\"" AppConfig.config PropertySort.CategorizedAlphabetical
-        popup.Font <- form.Font
-        popup.Show(buttonStendSettings)
-
     let buttonSettings = 
         new Button( Parent = right, Height = 40, Width = 40, Visible = true,
                     ImageList = Widgets.Icons.instance.imageList1,
@@ -284,19 +285,12 @@ let initialize =
     setTooltip buttonSettings "Параметры приложения" 
 
     buttonSettings.Click.Add <| fun _ ->            
-        let popup = MyWinForms.Utils.popupConfig "Параметры" Ankat.AppContent.party PropertySort.CategorizedAlphabetical
+        let popup = 
+            MyWinForms.Utils.popupConfig 
+                "Параметры" 
+                (AppConfigView())
+                PropertySort.NoSort
         popup.Font <- form.Font        
-        popup.Closed.Add( fun _ ->
-            Thread2.scenary.Set <| PartyWorks.production() 
-            Scenary.updateGridViewBinding()            
-            match TabPages.getSelected() with
-            | TabsheetChart -> 
-                TabPages.TabChart.update()
-            | TabsheetVars ->
-                TabPages.TabsheetVars.ProductionPoint.updateVisibility()
-            | _ -> ()
-            View.Products.updatePhysVarsGridColsVisibility() 
-            )
         popup.Show(buttonSettings)
 
         

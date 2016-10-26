@@ -33,8 +33,12 @@ type Product1(p : P, getProductType, getPgsConc, partyId) =
             | _ -> P.termoError sensor getPgsConc pt p )
 
     let getConcErrors () = 
-        List.zip3 SensorIndex.valuesList ScalePt.valuesList TermoPt.valuesList
-        |> List.map (fun k -> k, getConcError k )
+        listOf{ 
+             let! n = SensorIndex.valuesList 
+             let! gas = ScalePt.valuesList 
+             let! t = TermoPt.valuesList
+             let k = n,gas,t
+             return k, getConcError k }
         |> Map.ofList
                
     let getVarsValues() = 
@@ -51,7 +55,7 @@ type Product1(p : P, getProductType, getPgsConc, partyId) =
 
     let coefValueChangedEvent = Event<Product1 * Coef * decimal option >()
 
-    let port() = { appCfg.ComportProducts with PortName = p.SerialPortName }
+    let port() = { appCfg.Hardware.ComportProducts with PortName = p.SerialPortName }
     
     [<CLIEvent>]
     member x.CoefValueChanged = coefValueChangedEvent.Publish

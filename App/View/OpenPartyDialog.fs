@@ -189,8 +189,7 @@ module private Helpers =
                 | None -> 
                     Thread2.scenary.Set <| PartyWorks.production() 
                     Scenary.updateGridViewBinding()                    
-                    TabPages.TabChart.update()
-                    TabPages.TabsheetVars.ProductionPoint.updateVisibility()
+                    TabPages.TabChart.update()                    
                 | Some error -> 
                     MessageBox.Show(sprintf "Не удалось открыть данные партии %A, %A. %s" 
                                         b.Date b.ProductType error, 

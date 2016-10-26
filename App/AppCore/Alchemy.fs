@@ -123,8 +123,8 @@ module private PivateComputeProduct =
 
         | CorLin n -> 
             let xs1 = 
-                match prodType.Sensor with
-                | IsCO2Sensor true -> [Lin1; Lin2; Lin3; Lin4]
+                match n, prodType.Sensor with
+                | Sens1, IsCO2Sensor true -> [Lin1; Lin2; Lin3; Lin4]
                 | _ -> [Lin1; Lin2; Lin4]
             let ys = xs1 |> List.map ( fun linPt -> linPt.Clapan n |> getPgsConc )  
             let xs2 = List.map( fun pt -> LinPt (n,pt), n.Conc ) xs1                

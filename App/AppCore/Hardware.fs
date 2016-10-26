@@ -25,7 +25,7 @@ module Pneumo =
     
     let switch (code:byte)  = 
         
-        let port = cfg.ComportPneumo
+        let port = cfg.Hardware.Pneumoblock.Comport
         let req = 
             {   R.addy = 16uy
                 R.cmd = 0x10uy
@@ -83,7 +83,7 @@ module Termo =
         let config = AppConfig.config
         let getResponse1 req = 
             let scmd = Request.requestString req
-            let port = config.ComportTermo
+            let port = cfg.Hardware.Termochamber.Comport
             let result = 
                 [|  yield 2uy
                     yield! sprintf "%s\r\n" scmd |> Text.Encoding.ASCII.GetBytes |]    
@@ -167,11 +167,11 @@ module Warm =
     
         if (not <| isKeepRunning()) then return! Err "прервано" else
         let! (temperature,setPointTemperature) = Termo.read()
-        if abs( s.destT - temperature ) < cfg.TermoWarmError then
+        if abs( s.destT - temperature ) < cfg.Hardware.Termochamber.TermoWarmError then
             return temperature 
         else
-            if DateTime.Now - s.startTime > cfg.TermoWarmTimeOut then
-                return! Err <| sprintf "таймаут %A" cfg.TermoWarmTimeOut
+            if DateTime.Now - s.startTime > cfg.Hardware.Termochamber.TermoWarmTimeOut then
+                return! Err <| sprintf "таймаут %A" cfg.Hardware.Termochamber.TermoWarmTimeOut
             else
                 do! work()
                 return! loopWarm s isKeepRunning work }

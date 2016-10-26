@@ -12,6 +12,16 @@ open MainWindow
 open Ankat
 open Ankat.View
 
+type ProductTypesConverter() = 
+    inherit StringConverter()
+    override this.GetStandardValuesSupported _ = true
+    override this.GetStandardValuesExclusive _ = true
+    override this.GetStandardValues _ =       
+        ProductType.values
+        |> Seq.toArray
+        |> Array.map ProductType.what
+        |> TypeConverter.StandardValuesCollection
+
 [<AutoOpen>]
 module private Helpers =
     type P = Ankat.ViewModel.Product     
@@ -37,7 +47,7 @@ type PartyInfo =
 
         [<DisplayName("Исполнение")>]    
         [<Description("Исполнение приборов партии")>]
-        [<TypeConverter (typeof<Ankat.ViewModel.ProductTypesConverter>) >]
+        [<TypeConverter (typeof<ProductTypesConverter>) >]
         mutable ProductType : string
 
         [<DisplayName("Количество приборов")>]    
@@ -132,9 +142,7 @@ let createNewParty (b:Button) =
                 party.Party <- b
                 AppContent.save()
                 TabPages.TabChart.update()
-                Scenary.updateGridViewBinding() 
-                TabPages.TabsheetVars.ProductionPoint.updateVisibility()
-                )
+                Scenary.updateGridViewBinding() )
     popup1.Closing.Add <| fun e ->
         if MyWinForms.Utils.isPropGridEditing g then
             e.Cancel <- true
