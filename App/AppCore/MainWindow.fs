@@ -279,7 +279,7 @@ let initialize =
     let rec h = EventHandler(fun _ _ -> 
         aboutForm.Hide()
         aboutForm.FormBorderStyle <- FormBorderStyle.FixedDialog
-        aboutForm.ControlBox <- true
+        aboutForm.ControlBox <- false
         aboutForm.ShowInTaskbar <- false
         aboutForm.ShowIcon <- true
         form.Activated.RemoveHandler h

@@ -102,12 +102,28 @@ module private PivateComputeProduct =
             PressSensPt PressNorm, VdatP
             PressSensPt PressHigh, VdatP ]
         |> getVarsValues p
-        |> Result.map (  fun [x0; x1; y0; y1] -> 
+        |> fmtCorrErr ( fun (PressSensPt press) -> press.What) 
+        |> Result.bind (  fun [x0; x1; y0; y1] -> 
+            if x0 = x1 then
+                
+                sprintf "при расчёте коеффициентов компенсации давления  значения Pmm, \
+                        снятые при нормальном и повышенном давлении, не должны быть равными!\
+                        Pmm[0] = %M, Pmm[1] = %M, VdatP[0] = %M, VdatP[1] = %M" 
+                        x0 x1 y0 y1      
+                |> Err              
+            else  Ok (x0, x1, y0, y1) )
+        |> Result.map (  fun (x0, x1, y0, y1) -> 
             let k0 = (y1-y0)/( x1 - x0 )
             let k1 = y0 - x0*k0
-            Logging.info "%s : расчёт коэффициентов %A ==> %M, %M" p.What CorPressSens.Descr k0 k1
+            Logging.info "%s : расчёт коэффициентов %A" p.What CorPressSens.Descr
+            Logging.info "k0 = (y1-y0)/( x1 - x0 )"
+            Logging.info "k1 = y0 - x0*k0"
+            Logging.info "x0 = %M, y0 = %M" x0 y0 
+            Logging.info "x1 = %M, y1 = %M" x1 y1 
+            Logging.info "k0 = %M, k1 = %M" k0 k1
+            
             [ k0; k1 ] )
-        |> fmtCorrErr ( fun (PressSensPt press) -> press.What) 
+        
 
     let getGaussXY p getPgsConc prodType  = function
         | CorPressSens -> failwith "PressureSensCoefs is not for gauss!"
@@ -167,9 +183,6 @@ module private PivateComputeProduct =
                     |> sprintf "при расчёте %s деление на ноль в точке %s" corr.What
                     |> Err )
 
-        
-
-
     let doValuesGaussXY group xy =
         let groupCoefs = Correction.coefs group
         let groupCoefsSet = Set.ofList groupCoefs
@@ -177,10 +190,12 @@ module private PivateComputeProduct =
 
         let x,y = List.toArray xy |> Array.unzip
         let result =  NumericMethod.GaussInterpolation.calculate(x,y) 
-        let ff = Seq.toStr ", " string
-        Logging.info "метод Гаусса X=%s Y=%s ==> %s=%s" (ff x) (ff y) strGroupCoefs (ff result)
-        Array.toList result 
-        
+        let ff = Seq.toStr ", " Decimal.toStr6
+        Logging.info "метод Гаусса"
+        Logging.info "X=%s" (ff x)
+        Logging.info "Y=%s" (ff y) 
+        Logging.info "%s <- %s" strGroupCoefs (ff result)
+        Array.toList result         
 
 let compute group getPgsConc prodType = state {
     let! product = getState
@@ -275,9 +290,6 @@ let createNewParty1( name, productType, count) : Party.Content =
     let products = 
         [1..count] 
         |> List.map( fun n ->  createNewProduct n productType.GetPgsConc productType )
-
-    
-        
     {   Id = Product.createNewId()
         ProductsSerials = List.map Product.productSerial products
         Date=DateTime.Now 

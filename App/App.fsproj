@@ -102,7 +102,6 @@
     <Compile Include="ViewModels\ProductViewModel1.fs" />
     <Compile Include="ViewModels\ProductViewModel.fs" />
     <Compile Include="ViewModels\SelectPhysVarsViewModel.fs" />
-    <Compile Include="ViewModels\PartyViewModel1.fs" />
     <Compile Include="ViewModels\PartyViewModel.fs" />
     <Compile Include="Work\AppContent.fs" />
     <Compile Include="Work\Operation.fs" />

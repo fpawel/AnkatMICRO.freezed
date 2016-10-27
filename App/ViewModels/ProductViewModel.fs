@@ -141,13 +141,25 @@ type Product(p, getProdType, getPgs, partyId) =
         with get () = x.getVarUi (TermoPressPt(TermoLow), TppCh0)
         and set value = x.setVarUi (TermoPressPt(TermoLow), TppCh0) value
 
+    member x.Var_PT0_VdatP
+        with get () = x.getVarUi (TermoPressPt(TermoLow), VdatP)
+        and set value = x.setVarUi (TermoPressPt(TermoLow), VdatP) value
+
     member x.Var_PT1_TppCh0
         with get () = x.getVarUi (TermoPressPt(TermoNorm), TppCh0)
         and set value = x.setVarUi (TermoPressPt(TermoNorm), TppCh0) value
 
+    member x.Var_PT1_VdatP
+        with get () = x.getVarUi (TermoPressPt(TermoNorm), VdatP)
+        and set value = x.setVarUi (TermoPressPt(TermoNorm), VdatP) value
+
     member x.Var_PT2_TppCh0
         with get () = x.getVarUi (TermoPressPt(TermoHigh), TppCh0)
         and set value = x.setVarUi (TermoPressPt(TermoHigh), TppCh0) value
+
+    member x.Var_PT2_VdatP
+        with get () = x.getVarUi (TermoPressPt(TermoHigh), VdatP)
+        and set value = x.setVarUi (TermoPressPt(TermoHigh), VdatP) value
 
     member x.Var_PS0_Pmm
         with get () = x.getVarUi (PressSensPt(PressNorm), Pmm)

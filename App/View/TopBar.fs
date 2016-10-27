@@ -54,9 +54,12 @@ let initialize =
     buttonSave.Click.Add <| fun _ -> 
         Ankat.AppContent.save()
     
+    MainWindow.aboutForm.Deactivate.Add(fun _ -> 
+        MainWindow.aboutForm.Hide()
+        )
     
     buttonAbout.Click.Add <| fun _ ->
-        MainWindow.aboutForm.ShowDialog()  
+        MainWindow.aboutForm.Show()  
         |> ignore  
     
     

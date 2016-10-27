@@ -105,7 +105,27 @@ type Ankat.ViewModel.Product1 with
         p.setVar (TestPt pt, concVar) (Some conc)
         p.calculateTestConc sensor pt conc }
 
+    member p.FixProdData prods = maybeErr{  
+        let physVars = 
+            prods 
+            |> List.map  ProdDataPt.physVars 
+            |> List.concat
+            |> Set.ofList
+
+        for physVar in physVars do
+            if notKeepRunning() then () else
+            let! readedValue = p.ReadModbus( ReadVar physVar)
+            let strValue = Decimal.toStr6 readedValue
+            Logging.info  "%s : %s -> %s"  p.What physVar.What strValue                           
+            let f = ProdDataPt.physVars  >> List.exists ( (=) physVar )
+            for prodPt in List.filter f prods do
+                p.setVar (prodPt,physVar) (Some readedValue)
+                Logging.info 
+                    "%s : %s, %s <- %s" 
+                    p.What (ProdDataPt.what prodPt) physVar.What strValue } 
+
 type Ankat.ViewModel.Party with
+    
     member x.DoForEachProduct f = 
         let xs = x.Products |> Seq.filter(fun p -> p.IsChecked)
         if Seq.isEmpty xs then
@@ -113,7 +133,21 @@ type Ankat.ViewModel.Party with
         else
             for p in xs do 
                 if isKeepRunning() && p.IsChecked then 
-                    f p
+                    match f p with
+                    | Some error -> Logging.error "%s : %s" p.What error
+                    | _ -> ()
+            Ok ()
+
+    member x.DoForEachProduct f = 
+        let xs = x.Products |> Seq.filter(fun p -> p.IsChecked)
+        if Seq.isEmpty xs then
+            Err "приборы не отмечены"
+        else
+            for p in xs do 
+                if isKeepRunning() && p.IsChecked then 
+                    match f p with
+                    | Err error -> Logging.error "%s : %s" p.What error
+                    | _ -> ()
             Ok ()
 
     member x.Interrogate() = Option.toResult <| maybeErr {
@@ -128,26 +162,29 @@ type Ankat.ViewModel.Party with
 
     member x.WriteModbus(cmd,value) = maybeErr{
         
-        do! x.DoForEachProduct (fun p -> p.WriteModbus(SendCommand cmd,value) |> ignore  ) }
+        do! x.DoForEachProduct (fun p -> p.WriteModbus(SendCommand cmd,value)   ) }
 
     member x.SetModbusAddrs() = maybeErr{
-        do! x.DoForEachProduct (fun p -> p.SetModbusAddr() |> ignore  ) }
+        do! x.DoForEachProduct (fun p -> p.SetModbusAddr()   ) }
 
     member x.WriteKefs(kefs) = maybeErr{
         do! x.DoForEachProduct (fun p -> 
-            p.WriteKefs kefs |> ignore ) }
+            p.WriteKefs kefs  ) }
 
     member x.ReadKefs(kefs) = maybeErr{
         do! x.DoForEachProduct (fun p -> 
-            p.ReadKefs kefs |> ignore ) }
+            p.ReadKefs kefs  ) }
 
     member x.ComputeAndWriteKefGroup (kefGroup) = 
         x.DoForEachProduct(fun p -> 
             p.ComputeKefGroup kefGroup
             (Correction.coefs kefGroup)
             |> List.map (fun x -> x, None)
-            |> p.WriteKefs  
-            |> ignore )
+            |> p.WriteKefs  )
+
+    member x.FixProdData prods =
+        x.DoForEachProduct ( fun p -> p.FixProdData prods ) 
+        |> Result.someErr
    
 module Delay = 
     let onStart = Ref.Initializable<_>(sprintf "Delay.start %s:%s" __LINE__ __SOURCE_FILE__ )
@@ -322,23 +359,21 @@ module private Helpers1 =
             if isSens2() then
                 do! party.WriteModbus( Sens2.CmdNorm, 100m )  }
 
-    type ProdDataPt with
-        static member read prodPt = 
-            let what = ProdDataPt.what prodPt
-            what <|> fun () -> maybeErr{
-                do! party.DoForEachProduct(fun p -> 
-                    maybeErr{
-                        for physVar in ProdDataPt.physVars prodPt do
-                            let! readedValue = p.ReadModbus( ReadVar physVar)
-                            p.setVar (prodPt,physVar) (Some readedValue)
-                            Logging.info 
-                                "%s : %s = %s, %s" 
-                                p.What (PhysVar.what physVar) 
-                                (Decimal.toStr6 readedValue) 
-                                what } 
-                    |> function 
-                        | Some error -> Logging.error "%s" error
-                        | _ -> () ) }
+//    type ProdDataPt with
+//        static member read prodPt = 
+//            let what = ProdDataPt.what prodPt
+//            what <|> fun () -> maybeErr{
+//                do! party.DoForEachProduct(fun p -> 
+//                    maybeErr{
+//                        let physVars = ProdDataPt.physVars prodPt
+//                        for physVar in physVars do
+//                            let! readedValue = p.ReadModbus( ReadVar physVar)
+//                            p.setVar (prodPt,physVar) (Some readedValue)
+//                            Logging.info 
+//                                "%s : %s = %s, %s" 
+//                                p.What (PhysVar.what physVar) 
+//                                (Decimal.toStr6 readedValue) 
+//                                what }  ) }
 
 
 //    let formatClapanProdpointsList (clapan, prodpoints) =
@@ -350,8 +385,6 @@ module private Helpers1 =
 //        let strClapans = clapans |> Set.ofSeq |> Seq.toStr ", " ClapanHelp.what
 //        let strProdpoints = prodpoints |> Set.ofSeq |> Seq.toStr ", " ProdDataPt.what
 //        sprintf "%s, %s" strClapans strProdpoints
-//
-//
 
 
     let setupTermo temperature =
@@ -363,12 +396,27 @@ module private Helpers1 =
                 do! switchPneumo None   
                 do! Delay.perform ( "Выдержка термокамеры " + strT ) gettime true } ]
 
+    
+    let fixProdData prods =
+        let physVars = 
+            prods 
+            |> List.map  ProdDataPt.physVars 
+            |> List.concat
+            |> Set.ofList
+
+        let strPhysVars = Seq.toStr ", " PhysVar.what physVars
+        let strProds = Seq.toStr ", " ProdDataPt.what prods
+
+        sprintf "Снятие %s <- %s" strProds strPhysVars <|> fun () ->
+            party.FixProdData prods
+
     let blowAndRead<'a> (clapan_points : (Clapan * ('a list)) list ) (f : 'a -> ProdDataPt) =
         [   for clapan,points in clapan_points do
                 yield Clapan.what clapan <||> [   
-                    yield blow 3 clapan "Продувка"
-                    for pt in points do
-                        yield ProdDataPt.read (f pt) ] ]
+                    blow 3 clapan "Продувка"                    
+                    points  
+                        |> List.map f  
+                        |> fixProdData    ] ]
 
     let test() =         
         let points = [   
@@ -414,35 +462,48 @@ module private Helpers1 =
                 yield computeAndWriteGroup <| CorLin Sens2 ]
 
     let termo() =
-        let points = [   
-            yield Gas1, [   yield Sens1, ScaleBeg; 
+        let points t = [   
+            yield Gas1, [   yield TermoScalePt(Sens1, ScaleBeg, t) 
+                            yield TermoPressPt t
                             if isSens2() then 
-                                yield Sens2, ScaleBeg]
+                                yield TermoScalePt(Sens2, ScaleBeg,t) ]
                                  
-            yield S1Gas3, [Sens1, ScaleEnd] 
+            yield S1Gas3, [ TermoScalePt(Sens1, ScaleEnd,t)] 
             if isSens2() then 
-                yield S2Gas3, [Sens2, ScaleEnd] ] 
+                yield S2Gas3, [TermoScalePt(Sens2, ScaleEnd,t)] ] 
 
         "Термокомпенсация"  <||> [
                     
             for t in [TermoLow; TermoHigh; TermoNorm] do
                 yield t.What <||> [
                     yield setupTermo t
-                    yield! blowAndRead points <| fun (n,scalePt) ->
-                        let prodPt = n,scalePt,t                                
-                        TermoScalePt prodPt ]            
+                    yield! blowAndRead (points t) id ]            
             yield computeAndWriteGroup <| CorTermoScale (Sens1,ScaleBeg)
             yield computeAndWriteGroup <| CorTermoScale (Sens1,ScaleEnd)
             if isSens2() then
                 yield computeAndWriteGroup <| CorTermoScale (Sens2,ScaleBeg)
                 yield computeAndWriteGroup <| CorTermoScale (Sens2,ScaleEnd)
+            yield computeAndWriteGroup <| CorTermoPress
             yield blowAir   ]
+
+
+    let press() = 
+        "Компенсация давления"  <||>  [
+            blowAir
+            "Нормальное" <|> fun () -> 
+                ModalMessage.show Logging.Info "Компенсация давления" "Установите нормальное давление"
+                party.FixProdData [PressSensPt PressNorm] 
+            "Повышенное" <|> fun () -> 
+                ModalMessage.show Logging.Info "Компенсация давления" "Установите повышенное давление"
+                party.FixProdData [PressSensPt PressHigh] 
+            computeAndWriteGroup <| CorPressSens ]
+
+
 
     let initCoefs() =         
         "Установка к-тов исплнения" <|> fun () -> 
             party.DoForEachProduct (fun p -> 
-                p.WriteKefsInitValues()
-                |> ignore ) 
+                p.WriteKefsInitValues() ) 
             |> Result.someErr
 
     
@@ -451,17 +512,14 @@ module private Helpers1 =
 let production() = 
    
     (if isSens2() then "2K" else "1K") <||> [
-        "Установка к-тов исплнения" <|> fun () -> 
-            party.DoForEachProduct (fun p -> 
-                p.WriteKefsInitValues()
-                |> ignore ) 
-            |> Result.someErr
+        initCoefs()
         goNku
         blowAir
         norming()
         adjust()
         lin()
         termo()
+        press()
         test() ]
 
 

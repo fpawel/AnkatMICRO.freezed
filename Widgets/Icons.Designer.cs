@@ -63,10 +63,10 @@
             this.imageList1.Images.SetKeyName(23, "todo");
             this.imageList1.Images.SetKeyName(24, "termochamber");
             this.imageList1.Images.SetKeyName(25, "pneumo");
-            this.imageList1.Images.SetKeyName(26, "letter_m");
-            this.imageList1.Images.SetKeyName(27, "loop");
-            this.imageList1.Images.SetKeyName(28, "run");
-            this.imageList1.Images.SetKeyName(29, "script");
+            this.imageList1.Images.SetKeyName(26, "loop");
+            this.imageList1.Images.SetKeyName(27, "run");
+            this.imageList1.Images.SetKeyName(28, "script");
+            this.imageList1.Images.SetKeyName(29, "network");
             // 
             // Icons
             // 

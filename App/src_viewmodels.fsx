@@ -101,52 +101,52 @@ type Product(p, getProdType, getPgs, partyId) =
 
 
 
-let createSourceFile_PartyViewModel() = 
-  [|  
-    yield """namespace Ankat.ViewModel
-open System
-open System.ComponentModel
-open Ankat
-open Pneumo
-
-type Party(partyHeader, partyData) =
-
-    inherit ViewModel.Party1(partyHeader, partyData) 
-    override x.RaisePropertyChanged propertyName = 
-        ViewModelBase.raisePropertyChanged x propertyName"""
-
-    for clapan as pt in Clapan.valuesList do
-        
-        yield sprintf """
-    [<Category("Концентрация ПГС")>] 
-    [<DisplayName("%s")>]    
-    [<Description("%s, концентрация ")>]
-    member x.%s
-        with get() = x.GetPgs(%s)
-        and set v = x.SetPgs ( (%s), v) """  
-             
-            (Clapan.what clapan) 
-            (Clapan.descr clapan) 
-            (Prop.pgs clapan) 
-            (Name.pgs clapan) (Name.pgs clapan)
-        
-    for t in TermoPt.valuesList  do
-        let what = TermoPt.what t
-        let descr = TermoPt.dscr t
-        
-
-        yield sprintf """
-    [<Category("Температура")>] 
-    [<DisplayName("%s")>]    
-    [<Description("%s")>]
-    member x.%s 
-        with get() = x.GetTermoTemperature %s
-        and set v = x.SetTermoTemperature (%s,v) """  
-                what descr (Prop.t t) (Name.t t) (Name.t t) |]
-    |> createSourcefile "ViewModels/PartyViewModel.fs" 
+//let createSourceFile_PartyViewModel() = 
+//  [|  
+//    yield """namespace Ankat.ViewModel
+//open System
+//open System.ComponentModel
+//open Ankat
+//open Pneumo
+//
+//type Party(partyHeader, partyData) =
+//
+//    inherit ViewModel.Party1(partyHeader, partyData) 
+//    override x.RaisePropertyChanged propertyName = 
+//        ViewModelBase.raisePropertyChanged x propertyName"""
+//
+//    for clapan as pt in Clapan.valuesList do
+//        
+//        yield sprintf """
+//    [<Category("Концентрация ПГС")>] 
+//    [<DisplayName("%s")>]    
+//    [<Description("%s, концентрация ")>]
+//    member x.%s
+//        with get() = x.GetPgs(%s)
+//        and set v = x.SetPgs ( (%s), v) """  
+//             
+//            (Clapan.what clapan) 
+//            (Clapan.descr clapan) 
+//            (Prop.pgs clapan) 
+//            (Name.pgs clapan) (Name.pgs clapan)
+//        
+//    for t in TermoPt.valuesList  do
+//        let what = TermoPt.what t
+//        let descr = TermoPt.dscr t
+//        
+//
+//        yield sprintf """
+//    [<Category("Температура")>] 
+//    [<DisplayName("%s")>]    
+//    [<Description("%s")>]
+//    member x.%s 
+//        with get() = x.GetTermoTemperature %s
+//        and set v = x.SetTermoTemperature (%s,v) """  
+//                what descr (Prop.t t) (Name.t t) (Name.t t) |]
+//    |> createSourcefile "ViewModels/PartyViewModel.fs" 
 
 createSourceFile_ProductViewModel()
-createSourceFile_PartyViewModel()
+//createSourceFile_PartyViewModel()
 
 
 

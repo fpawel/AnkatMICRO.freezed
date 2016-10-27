@@ -12,12 +12,13 @@ let main () =
     try 
         Application.EnableVisualStyles() 
         Application.SetCompatibleTextRenderingDefault true 
-        
+        MainWindow.initialize()
+
         let config = AppConfig.config
         let party = Ankat.AppContent.party
         let form = MainWindow.form
 
-        MainWindow.initialize()
+        
         TabPages.setSelected MainWindow.TabsheetParty
         TopBar.initialize()
         Products.initialize()        

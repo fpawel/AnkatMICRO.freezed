@@ -96,6 +96,119 @@ let termoToolsPopup =
     |> simpleMenu
     
 
+let private initPgsEdit  =
+    let updPanelHeight(p:Panel) =
+        p.Height <-
+            List.fold (+) 0 [ for c in p.Controls do if c.Visible then yield c.Height ]
+
+    let visClapans() = 
+        let t = party.getProductType()                
+        [   yield Gas1
+            yield S1Gas2
+            match t.Sensor with
+            | IsCO2Sensor true -> yield S1Gas2CO2
+            | _ -> ()
+            yield S1Gas3
+            match t.Sensor2 with
+            | Some _ -> 
+                yield S2Gas2
+                yield S2Gas3 
+            | _ -> () ]
+        |> Set.ofList
+
+    let addClapan p clapan =
+        let x = new TextBox( Parent = p, Dock = DockStyle.Top )
+        //let p1 = new Panel(Parent = p, Dock = DockStyle.Top, Height = 1 )
+
+        let p3 = new Label(Parent = p, Dock = DockStyle.Top, AutoSize = true,
+                            Text = Pneumo.Clapan.what clapan )
+        //let p2 = new Panel(Parent = p, Dock = DockStyle.Top, Height = 1 )
+        let upd() = 
+            x.Text <- party.GetPgs clapan |> string
+
+        let rec textChangedHandler = EventHandler( fun _ _ ->
+            Runtime.PropertyChanged.removeAction party pgsPropertyChangedHandler        
+            let t = party.getProductType()
+            let pgs = 
+                String.tryParseDecimal x.Text
+                |> Option.getWith( ProductType.getPgsConc t clapan )
+            Runtime.PropertyChanged.addHandler party pgsPropertyChangedHandler 
+            )
+        and pgsPropertyChangedHandler = PropertyChangedEventHandler(fun _ evt -> 
+            if evt.PropertyName = Prop.pgs clapan then
+                x.TextChanged.RemoveHandler textChangedHandler
+                upd()
+                x.TextChanged.AddHandler textChangedHandler
+            )
+
+        upd()
+        Runtime.PropertyChanged.addHandler party pgsPropertyChangedHandler
+        x.TextChanged.AddHandler textChangedHandler        
+        Runtime.PropertyChanged.add party <| fun evt -> 
+            if evt.PropertyName = "ProductType" then
+                let vis = Set.contains clapan (visClapans())
+                x.Visible <- vis
+                //p1.Visible <- vis
+                //p2.Visible <- vis
+                p3.Visible <- vis
+                updPanelHeight p
+
+    let pgsPlaceholder = new Panel(Parent = TabsheetParty.BottomTab, Dock = DockStyle.Top)
+    Clapan.valuesList |> List.rev |> List.iter (addClapan pgsPlaceholder)
+
+    let rec h = EventHandler(fun _ _ -> 
+        updPanelHeight pgsPlaceholder
+        form.Activated.RemoveHandler h
+        )
+    form.Shown.AddHandler h
+    fun () -> ()
+  
+let private initComboBoxProdType = 
+    let x = myCombobox()
+    x.Dock <- DockStyle.Top 
+    x.Parent <- TabsheetParty.BottomTab
+    let types = ProductType.values
+
+    types |> List.iter(ProductType.what >> x.Items.Add >> ignore )
+
+    let upd() = 
+        let h,_ = party.Party
+        
+        x.SelectedIndex <- 
+            ProductType.values 
+            |> List.tryFindIndex ( (=) h.ProductType ) 
+            |> Option.getWith (-1)
+        
+    let rec selectedIndexChangedHandler = EventHandler( fun _ _ ->
+        Runtime.PropertyChanged.removeAction party productTypePropertyChangedHandler        
+        let n = x.SelectedIndex
+        let t = if n < 0 || n > types.Length - 1 then ProductType.first else types.[n]
+        let h,xs = party.Party
+        party.Party <- {h with ProductType = t}, xs
+        Runtime.PropertyChanged.addHandler party productTypePropertyChangedHandler 
+        )
+
+    and productTypePropertyChangedHandler = PropertyChangedEventHandler(fun _ evt -> 
+        if evt.PropertyName = "ProductType" then
+            x.SelectedIndexChanged.RemoveHandler selectedIndexChangedHandler
+            upd()
+            x.SelectedIndexChanged.AddHandler selectedIndexChangedHandler
+        )
+    upd()
+    Runtime.PropertyChanged.addHandler party productTypePropertyChangedHandler
+    x.SelectedIndexChanged.AddHandler selectedIndexChangedHandler
+
+    let _ = new Panel(Parent = TabsheetParty.BottomTab, Dock = DockStyle.Top, Height = 1 )
+    
+    let _ = new Label(Parent = TabsheetParty.BottomTab, Dock = DockStyle.Top, AutoSize = true,
+                      Text = "Исполнение")
+    let _ = new Panel(Parent = TabsheetParty.BottomTab, Dock = DockStyle.Top, Height = 1 )
+
+    Thread2.IsRunningChangedEvent.addHandler <| fun (_,isRunning) ->
+        x.Enabled <- not isRunning 
+
+    fun () -> ()
+
 let private initButtons1 = 
     let buttons1placeholder = 
         new Panel
@@ -213,8 +326,12 @@ let initialize =
             SelectScenaryDialog.showSelectScenaryDialog x
         TopBar.thread1ButtonsBar.Controls.Add <| new Panel(Dock = DockStyle.Left, Width = 3)
 
+    initPgsEdit()
+    initComboBoxProdType()
     initButtons1()
     
+    
+
     let buttonSettings = 
         new Button( Parent = right, Height = 40, Width = 40, Visible = true,
                     ImageList = Widgets.Icons.instance.imageList1,
