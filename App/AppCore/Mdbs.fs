@@ -115,7 +115,7 @@ module private Helper =
         if needLog then             
             Logging.write level "%s %s адр.%d, %s, ком.%d%s" 
                 port.PortName "MODBUS" req.addy req.what req.cmd 
-                (if result = "" then "" else " ==> " + result )                 
+                (if result = "" then "" else " ==> " + result )
         
 
     
