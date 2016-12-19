@@ -42,6 +42,8 @@ type Clapan with
 
     static member code x = 
         Clapan.valuesList 
-        |> List.findIndex ( (=) x) |> byte 
+        |> List.findIndex ( (=) x) 
+        |> ((+) 1)
+        |> byte 
 
     
