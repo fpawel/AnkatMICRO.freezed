@@ -69,11 +69,19 @@ let bottomLayer =
     let _ = new Panel(Parent = mainLayer, Dock = DockStyle.Bottom, Height = 3)    
     x
 
+let labelPerformingInfo = 
+    new Label(Parent = bottomLayer, Dock = DockStyle.Fill, Text = "",
+                TextAlign = ContentAlignment.MiddleLeft )
+
 module HardwareInfo = 
     type private C = MyWinForms.Components.LeftInfoBlock
     let private (~%%) x = C(bottomLayer, x)
+    
+                
     let termo = %% "Термокамера"
     let peumo = %% "Пневмоблок"
+    let products = %% "Приборы"
+    
 
     let initialize = 
         List.iter C.hide [ termo; peumo ]

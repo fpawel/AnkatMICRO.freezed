@@ -9,7 +9,7 @@ open MainWindow
 
 let operations = BindingList<RunOperationInfo>()
 let showScenaryReport = Ref.Initializable<_>(sprintf "show'performing'report %s:%s" __LINE__ __SOURCE_FILE__ )
-let show'performing'message = Ref.Initializable<_>(sprintf "show'performing'message %s:%s" __LINE__ __SOURCE_FILE__ )
+let showPerformingMessage = Ref.Initializable<_>(sprintf "show'performing'message %s:%s" __LINE__ __SOURCE_FILE__ )
 
 [<AutoOpen>]
 module private Helpers1 =
@@ -109,7 +109,7 @@ module private Helpers2 =
             match  x.Value with
             | Some (op:Operation) -> 
                 op.RunInfo.AddLogging l s                 
-                show'performing'message.Value l s
+                showPerformingMessage.Value l s
             | _ -> ()
             
         |> ignore
@@ -242,7 +242,7 @@ let private stopHardwareWork() =
 let private do'beg op = 
     let prev'op = operation.Get()
     operation.Set (Some op)
-    show'performing'message.Value Logging.Info ""
+    showPerformingMessage.Value Logging.Info ""
     perfomOperationEvent.Trigger(op,true)
     fun () -> 
         operation.Set prev'op
@@ -298,4 +298,5 @@ let run needStopHardwareOrNot  (x : Operation) =
         is'running.Set false
         for p in party.Products do
             p.Connection <- None 
+        MainWindow.HardwareInfo.products.Hide()
         AppContent.save()   }

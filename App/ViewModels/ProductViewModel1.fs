@@ -215,6 +215,8 @@ type Product1(p : P, getProductType, getPgsConc, partyId) =
 
     
     member x.ReadModbus(ctx) = 
+        
+        
         let r = Mdbs.read3decimal (port()) 1uy (ReadContext.code ctx) (ReadContext.what ctx)
         match r, ctx with
         | Ok value, ReadVar var -> 
@@ -226,6 +228,15 @@ type Product1(p : P, getProductType, getPgsConc, partyId) =
             r 
             |> Result.map(fun v -> sprintf "%s = %s" (ReadContext.what ctx) (Decimal.toStr6 v))
             |> Some 
+
+        let strResult,lev = 
+            match r with
+            | Ok v -> sprintf "%s = %s" (ReadContext.what ctx) (Decimal.toStr6 v), Logging.Info
+            | Err err -> sprintf "%s : %s" (ReadContext.what ctx) err, Logging.Error
+
+        (sprintf "%s %s" x.What x.Port, Some strResult)
+        |> MainWindow.HardwareInfo.products.setTextSafe lev
+
         r
 
     member x.WriteModbus (ctx,value) = 
@@ -238,6 +249,15 @@ type Product1(p : P, getProductType, getPgsConc, partyId) =
             r 
             |> Result.map(fun v -> sprintf "%s <-- %s" (WriteContext.what ctx) (Decimal.toStr6 value))
             |> Some 
+
+        let strResult,lev = 
+            match r with
+            | Ok v -> sprintf "%s <-- %s" (WriteContext.what ctx) (Decimal.toStr6 value), Logging.Info
+            | Err err -> sprintf "%s <-- %s : %s" (WriteContext.what ctx) (Decimal.toStr6 value) err, Logging.Error
+
+        (sprintf "%s %s" x.What x.Port, Some strResult)
+        |> MainWindow.HardwareInfo.products.setTextSafe lev
+
         r
 
     member x.SetModbusAddr () = 

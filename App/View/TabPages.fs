@@ -249,28 +249,37 @@ module TabsheetErrors =
                 page <- {page with N = x }
                 update()
     
+[<AutoOpen>]
+module private Helpers1 =
+    
+    let onSelect = function
+        | TabsheetParty -> 
+            gridProducts.Columns.``remove all columns but`` Products.Columns.main
+            gridProducts.Columns.AddColumns Products.Columns.interrogate 
+            gridProducts.Parent <- TabsheetParty.RightTab
+        | TabsheetVars ->
+            gridProducts.Columns.``remove all columns but`` Products.Columns.main
+            gridProducts.Parent <- TabsheetVars.RightTab
+            TabsheetVars.update()
+        | TabsheetErrors ->
+            gridProducts.Columns.``remove all columns but`` Products.Columns.main
+            gridProducts.Parent <- TabsheetErrors.RightTab
+            TabsheetErrors.Termo.set TermoNorm
+            TabsheetErrors.SensorIndex.set Sens1
+            TabsheetErrors.update()
+        
+        | TabsheetChart ->
+            gridProducts.Parent <- null
+            TabsheetChart.update()
+        | _ -> ()
+        
+//    let selectedPage = Ref.Observable(None)
+//
+//let addSelectedPageCahngedHandler f = 
+//    selectedPage.AddChanged <| function
+//        | (_,Some page) -> f page
+//        | _ -> ()
 
-let private onSelect = function
-    | TabsheetParty -> 
-        gridProducts.Columns.``remove all columns but`` Products.Columns.main
-        gridProducts.Columns.AddColumns Products.Columns.interrogate 
-        gridProducts.Parent <- TabsheetParty.RightTab
-    | TabsheetVars ->
-        gridProducts.Columns.``remove all columns but`` Products.Columns.main
-        gridProducts.Parent <- TabsheetVars.RightTab
-        TabsheetVars.update()
-    | TabsheetErrors ->
-        gridProducts.Columns.``remove all columns but`` Products.Columns.main
-        gridProducts.Parent <- TabsheetErrors.RightTab
-        TabsheetErrors.Termo.set TermoNorm
-        TabsheetErrors.SensorIndex.set Sens1
-        TabsheetErrors.update()
-        
-    | TabsheetChart ->
-        gridProducts.Parent <- null
-        TabsheetChart.update()
-    | _ -> ()
-        
 let getSelected, setSelected,_ =
     gridProducts.Columns.CollectionChanged.Add(fun _ ->
         gridProducts.Columns.SetDisplayIndexByOrder()
@@ -282,9 +291,10 @@ let getSelected, setSelected,_ =
         Tabsheet.valuesList
         Tabsheet.title
         Tabsheet.descr
-        (fun tabPage -> 
+        (fun tabPage ->             
             setActivePageTitle tabPage.Title
             onSelect tabPage
+            //selectedPage.Set <| Some tabPage
             tabPage.ShowContent() ) 
 
 module TabChart =

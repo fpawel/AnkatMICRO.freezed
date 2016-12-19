@@ -33,7 +33,8 @@ type LeftInfoBlock(par, caption) =
             p.Visible <- true
 
     member __.Hide() =
-        p.Visible <- false
+        par.PerformThreadSafeAction <| fun () ->
+            p.Visible <- false
 
     member x.setTextSafe level text =
         par.PerformThreadSafeAction <| fun () ->

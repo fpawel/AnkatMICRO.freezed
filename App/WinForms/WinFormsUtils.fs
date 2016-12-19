@@ -142,8 +142,8 @@ let radioButtons<'a when 'a : comparison>
         b.CheckedChanged.Add <| fun _ ->                
             if b.Checked then 
                 handler item
+            activeItem <- item
         b.FlatStyle <- FlatStyle.Flat
-        activeItem <- item
         b,bPanel )
     let b = fst buttons.Head 
     parent.Height <- b.Top + b.Height + 3
@@ -156,6 +156,7 @@ let radioButtons<'a when 'a : comparison>
 
     let set x =
         (fst <| %% x).Checked <- true
+        activeItem <- x
 
     let setVisibility visibleItems =
         let visibleItemsSet = Set.ofList visibleItems

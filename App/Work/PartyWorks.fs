@@ -126,7 +126,7 @@ type Ankat.ViewModel.Product1 with
 
 type Ankat.ViewModel.Party with
     
-    member x.DoForEachProduct f = 
+    member x.DoForEachProduct<'a> (f : Ankat.ViewModel.Product -> Result<'a,string>) = 
         let xs = x.Products |> Seq.filter(fun p -> p.IsChecked)
         if Seq.isEmpty xs then
             Err "приборы не отмечены"
@@ -134,31 +134,26 @@ type Ankat.ViewModel.Party with
             for p in xs do 
                 if isKeepRunning() && p.IsChecked then 
                     match f p with
-                    | Some error -> Logging.error "%s : %s" p.What error
+                    | Err error -> 
+                        Logging.error "%s : %s" p.What error
                     | _ -> ()
             Ok ()
 
-    member x.DoForEachProduct f = 
-        let xs = x.Products |> Seq.filter(fun p -> p.IsChecked)
-        if Seq.isEmpty xs then
-            Err "приборы не отмечены"
-        else
-            for p in xs do 
-                if isKeepRunning() && p.IsChecked then 
-                    match f p with
-                    | Err error -> Logging.error "%s : %s" p.What error
-                    | _ -> ()
-            Ok ()
+    member x.DoForEachProduct (f : Ankat.ViewModel.Product -> string option) = 
+        x.DoForEachProduct ( f >> Option.toResult )
 
     member x.Interrogate() = Option.toResult <| maybeErr {
         let xs = x.Products |> Seq.filter(fun p -> p.IsChecked)
         if Seq.isEmpty xs then
             return "приборы не отмечены"
         else
-            
+            let nfop = MainWindow.HardwareInfo.products
             for p in xs do 
                 if isKeepRunning() && p.IsChecked then                         
-                    do! p.Interrogate() }
+                    do! p.Interrogate() 
+
+                    
+                    }
 
     member x.WriteModbus(cmd,value) = maybeErr{
         
