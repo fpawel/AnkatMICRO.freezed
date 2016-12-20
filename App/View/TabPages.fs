@@ -42,9 +42,6 @@ module TabsheetVars =
 
     [<AutoOpen>]
     module private Helpers =
-        
-        
-
         let pages = [
             yield! List.map Lin SensorIndex.valuesList
             yield! listOf{
@@ -118,9 +115,7 @@ module TabsheetVars =
 
         setActivePageTitle <| Page.what page
                 
-        
-    
-
+     
     module ProductionPoint =
         let get, set, _ = 
             radioButtons (addp ()) pages Page.what Page.descr <| fun x ->
@@ -192,9 +187,10 @@ module TabsheetErrors =
                     [|  yield "Снятое значение", decToStr ve.Value                     
                         yield "Номинал", decToStr ve.Nominal
                         yield "Предел погрешности", decToStr ve.Limit  |]
-                    |> Array.map( fun (p,v) -> sprintf "%s = %s" p v)
-                    |> fun v -> String.Join("\n", v)                
-                ve.Value, foreColor, backColor, toolTip  )
+                    |> Array.map( fun (p,v) -> sprintf "%s : %s" p v)
+                    |> fun v -> String.Join("\n", v)
+                let value = 100m * ( ve.Nominal - ve.Value ) / ve.Limit                 
+                value, foreColor, backColor, toolTip  )
             |> function
             | None -> cell.ToolTipText <- sprintf "%s - нет данных" p.What
             | Some (value, foreColor, backColor, text) ->
@@ -273,12 +269,6 @@ module private Helpers1 =
             TabsheetChart.update()
         | _ -> ()
         
-//    let selectedPage = Ref.Observable(None)
-//
-//let addSelectedPageCahngedHandler f = 
-//    selectedPage.AddChanged <| function
-//        | (_,Some page) -> f page
-//        | _ -> ()
 
 let getSelected, setSelected,_ =
     gridProducts.Columns.CollectionChanged.Add(fun _ ->

@@ -241,8 +241,8 @@ type SensorIndex with
     member x.CmdNorm = SensorIndex.cmdNorm x
 
     static member conc = function
-        | Sens1 -> CCh0
-        | Sens2 -> CCh1
+        | Sens1 -> CoutCh0
+        | Sens2 -> CoutCh1
 
     static member termo = function
         | Sens1 -> TppCh0
@@ -257,8 +257,8 @@ type SensorIndex with
         | Sens2 -> 2
 
     static member prodTypeCoefs = function
-        | Sens1 -> Pgs1_1, Pgs3_1, PREDEL_LO_1, PREDEL_HI_1, SHKALA_1, ED_IZMER_1, Gas_Type_1
-        | Sens2  -> Pgs1_2, Pgs3_2, PREDEL_LO_2, PREDEL_HI_2, SHKALA_2, ED_IZMER_2, Gas_Type_2
+        | Sens1 -> Pgs1_1, Pgs3_1, Gas_Type_1
+        | Sens2  -> Pgs1_2, Pgs3_2, Gas_Type_2
 
     static member valuesList = [Sens1; Sens2]
 
@@ -403,13 +403,13 @@ type Correction =
             [KNull_T1_0; KNull_T1_1; KNull_T1_2]
         
         | CorTermoScale (Sens1,ScaleEnd) -> 
-            [KSens_T1_0; KSens_T1_1; KSens_T1_1]
+            [KSens_T1_0; KSens_T1_1; KSens_T1_2]
         
         | CorTermoScale (Sens2,ScaleBeg) -> 
             [KNull_T2_0; KNull_T2_1; KNull_T2_2]
         
         | CorTermoScale (Sens2,ScaleEnd) -> 
-            [KSens_T2_0; KSens_T2_1; KSens_T2_1]
+            [KSens_T2_0; KSens_T2_1; KSens_T2_2]
         
         | CorTermoPress  ->
             [KNull_TP_0; KNull_TP_1; KNull_TP_2]
@@ -459,7 +459,6 @@ module Points =
         let! t = TermoPt.valuesList
         return n,gas,t }
 
-    
     let prod = listOf {
         let! prodDataPt = ProdDataPt.valuesList
         let! physVar = ProdDataPt.physVars prodDataPt

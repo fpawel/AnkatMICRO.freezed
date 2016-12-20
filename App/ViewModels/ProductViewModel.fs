@@ -9,37 +9,37 @@ type Product(p, getProdType, getPgs, partyId) =
     override x.RaisePropertyChanged propertyName = 
         ViewModelBase.raisePropertyChanged x propertyName
 
-    member x.Var_LIN0_0_CCh0
-        with get () = x.getVarUi (LinPt(Sens1,Lin1), CCh0)
-        and set value = x.setVarUi (LinPt(Sens1,Lin1), CCh0) value
+    member x.Var_LIN0_0_CoutCh0
+        with get () = x.getVarUi (LinPt(Sens1,Lin1), CoutCh0)
+        and set value = x.setVarUi (LinPt(Sens1,Lin1), CoutCh0) value
 
-    member x.Var_LIN0_1_CCh0
-        with get () = x.getVarUi (LinPt(Sens1,Lin2), CCh0)
-        and set value = x.setVarUi (LinPt(Sens1,Lin2), CCh0) value
+    member x.Var_LIN0_1_CoutCh0
+        with get () = x.getVarUi (LinPt(Sens1,Lin2), CoutCh0)
+        and set value = x.setVarUi (LinPt(Sens1,Lin2), CoutCh0) value
 
-    member x.Var_LIN0_2_CCh0
-        with get () = x.getVarUi (LinPt(Sens1,Lin3), CCh0)
-        and set value = x.setVarUi (LinPt(Sens1,Lin3), CCh0) value
+    member x.Var_LIN0_2_CoutCh0
+        with get () = x.getVarUi (LinPt(Sens1,Lin3), CoutCh0)
+        and set value = x.setVarUi (LinPt(Sens1,Lin3), CoutCh0) value
 
-    member x.Var_LIN0_3_CCh0
-        with get () = x.getVarUi (LinPt(Sens1,Lin4), CCh0)
-        and set value = x.setVarUi (LinPt(Sens1,Lin4), CCh0) value
+    member x.Var_LIN0_3_CoutCh0
+        with get () = x.getVarUi (LinPt(Sens1,Lin4), CoutCh0)
+        and set value = x.setVarUi (LinPt(Sens1,Lin4), CoutCh0) value
 
-    member x.Var_LIN1_0_CCh1
-        with get () = x.getVarUi (LinPt(Sens2,Lin1), CCh1)
-        and set value = x.setVarUi (LinPt(Sens2,Lin1), CCh1) value
+    member x.Var_LIN1_0_CoutCh1
+        with get () = x.getVarUi (LinPt(Sens2,Lin1), CoutCh1)
+        and set value = x.setVarUi (LinPt(Sens2,Lin1), CoutCh1) value
 
-    member x.Var_LIN1_1_CCh1
-        with get () = x.getVarUi (LinPt(Sens2,Lin2), CCh1)
-        and set value = x.setVarUi (LinPt(Sens2,Lin2), CCh1) value
+    member x.Var_LIN1_1_CoutCh1
+        with get () = x.getVarUi (LinPt(Sens2,Lin2), CoutCh1)
+        and set value = x.setVarUi (LinPt(Sens2,Lin2), CoutCh1) value
 
-    member x.Var_LIN1_2_CCh1
-        with get () = x.getVarUi (LinPt(Sens2,Lin3), CCh1)
-        and set value = x.setVarUi (LinPt(Sens2,Lin3), CCh1) value
+    member x.Var_LIN1_2_CoutCh1
+        with get () = x.getVarUi (LinPt(Sens2,Lin3), CoutCh1)
+        and set value = x.setVarUi (LinPt(Sens2,Lin3), CoutCh1) value
 
-    member x.Var_LIN1_3_CCh1
-        with get () = x.getVarUi (LinPt(Sens2,Lin4), CCh1)
-        and set value = x.setVarUi (LinPt(Sens2,Lin4), CCh1) value
+    member x.Var_LIN1_3_CoutCh1
+        with get () = x.getVarUi (LinPt(Sens2,Lin4), CoutCh1)
+        and set value = x.setVarUi (LinPt(Sens2,Lin4), CoutCh1) value
 
     member x.Var_T00_0_TppCh0
         with get () = x.getVarUi (TermoScalePt(Sens1, ScaleBeg, TermoLow), TppCh0)
@@ -181,145 +181,145 @@ type Product(p, getProdType, getPgs, partyId) =
         with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoLow), TppCh0)
         and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoLow), TppCh0) value
 
-    member x.Var_TEST0_0_0_CCh0
-        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoLow), CCh0)
-        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoLow), CCh0) value
+    member x.Var_TEST0_0_0_CoutCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoLow), CoutCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoLow), CoutCh0) value
 
     member x.Var_TEST0_0_1_TppCh0
         with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoNorm), TppCh0)
         and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoNorm), TppCh0) value
 
-    member x.Var_TEST0_0_1_CCh0
-        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoNorm), CCh0)
-        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoNorm), CCh0) value
+    member x.Var_TEST0_0_1_CoutCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoNorm), CoutCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoNorm), CoutCh0) value
 
     member x.Var_TEST0_0_2_TppCh0
         with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoHigh), TppCh0)
         and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoHigh), TppCh0) value
 
-    member x.Var_TEST0_0_2_CCh0
-        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoHigh), CCh0)
-        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoHigh), CCh0) value
+    member x.Var_TEST0_0_2_CoutCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoHigh), CoutCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleBeg), TermoHigh), CoutCh0) value
 
     member x.Var_TEST0_1_0_TppCh0
         with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoLow), TppCh0)
         and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoLow), TppCh0) value
 
-    member x.Var_TEST0_1_0_CCh0
-        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoLow), CCh0)
-        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoLow), CCh0) value
+    member x.Var_TEST0_1_0_CoutCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoLow), CoutCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoLow), CoutCh0) value
 
     member x.Var_TEST0_1_1_TppCh0
         with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoNorm), TppCh0)
         and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoNorm), TppCh0) value
 
-    member x.Var_TEST0_1_1_CCh0
-        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoNorm), CCh0)
-        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoNorm), CCh0) value
+    member x.Var_TEST0_1_1_CoutCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoNorm), CoutCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoNorm), CoutCh0) value
 
     member x.Var_TEST0_1_2_TppCh0
         with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoHigh), TppCh0)
         and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoHigh), TppCh0) value
 
-    member x.Var_TEST0_1_2_CCh0
-        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoHigh), CCh0)
-        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoHigh), CCh0) value
+    member x.Var_TEST0_1_2_CoutCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleMid, TermoHigh), CoutCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleMid, TermoHigh), CoutCh0) value
 
     member x.Var_TEST0_2_0_TppCh0
         with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoLow), TppCh0)
         and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoLow), TppCh0) value
 
-    member x.Var_TEST0_2_0_CCh0
-        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoLow), CCh0)
-        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoLow), CCh0) value
+    member x.Var_TEST0_2_0_CoutCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoLow), CoutCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoLow), CoutCh0) value
 
     member x.Var_TEST0_2_1_TppCh0
         with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoNorm), TppCh0)
         and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoNorm), TppCh0) value
 
-    member x.Var_TEST0_2_1_CCh0
-        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoNorm), CCh0)
-        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoNorm), CCh0) value
+    member x.Var_TEST0_2_1_CoutCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoNorm), CoutCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoNorm), CoutCh0) value
 
     member x.Var_TEST0_2_2_TppCh0
         with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoHigh), TppCh0)
         and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoHigh), TppCh0) value
 
-    member x.Var_TEST0_2_2_CCh0
-        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoHigh), CCh0)
-        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoHigh), CCh0) value
+    member x.Var_TEST0_2_2_CoutCh0
+        with get () = x.getVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoHigh), CoutCh0)
+        and set value = x.setVarUi (TestPt(Sens1, ScaleEdge(ScaleEnd), TermoHigh), CoutCh0) value
 
     member x.Var_TEST1_0_0_TppCh1
         with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoLow), TppCh1)
         and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoLow), TppCh1) value
 
-    member x.Var_TEST1_0_0_CCh1
-        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoLow), CCh1)
-        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoLow), CCh1) value
+    member x.Var_TEST1_0_0_CoutCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoLow), CoutCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoLow), CoutCh1) value
 
     member x.Var_TEST1_0_1_TppCh1
         with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoNorm), TppCh1)
         and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoNorm), TppCh1) value
 
-    member x.Var_TEST1_0_1_CCh1
-        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoNorm), CCh1)
-        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoNorm), CCh1) value
+    member x.Var_TEST1_0_1_CoutCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoNorm), CoutCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoNorm), CoutCh1) value
 
     member x.Var_TEST1_0_2_TppCh1
         with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoHigh), TppCh1)
         and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoHigh), TppCh1) value
 
-    member x.Var_TEST1_0_2_CCh1
-        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoHigh), CCh1)
-        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoHigh), CCh1) value
+    member x.Var_TEST1_0_2_CoutCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoHigh), CoutCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleBeg), TermoHigh), CoutCh1) value
 
     member x.Var_TEST1_1_0_TppCh1
         with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoLow), TppCh1)
         and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoLow), TppCh1) value
 
-    member x.Var_TEST1_1_0_CCh1
-        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoLow), CCh1)
-        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoLow), CCh1) value
+    member x.Var_TEST1_1_0_CoutCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoLow), CoutCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoLow), CoutCh1) value
 
     member x.Var_TEST1_1_1_TppCh1
         with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoNorm), TppCh1)
         and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoNorm), TppCh1) value
 
-    member x.Var_TEST1_1_1_CCh1
-        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoNorm), CCh1)
-        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoNorm), CCh1) value
+    member x.Var_TEST1_1_1_CoutCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoNorm), CoutCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoNorm), CoutCh1) value
 
     member x.Var_TEST1_1_2_TppCh1
         with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoHigh), TppCh1)
         and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoHigh), TppCh1) value
 
-    member x.Var_TEST1_1_2_CCh1
-        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoHigh), CCh1)
-        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoHigh), CCh1) value
+    member x.Var_TEST1_1_2_CoutCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleMid, TermoHigh), CoutCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleMid, TermoHigh), CoutCh1) value
 
     member x.Var_TEST1_2_0_TppCh1
         with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoLow), TppCh1)
         and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoLow), TppCh1) value
 
-    member x.Var_TEST1_2_0_CCh1
-        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoLow), CCh1)
-        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoLow), CCh1) value
+    member x.Var_TEST1_2_0_CoutCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoLow), CoutCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoLow), CoutCh1) value
 
     member x.Var_TEST1_2_1_TppCh1
         with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoNorm), TppCh1)
         and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoNorm), TppCh1) value
 
-    member x.Var_TEST1_2_1_CCh1
-        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoNorm), CCh1)
-        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoNorm), CCh1) value
+    member x.Var_TEST1_2_1_CoutCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoNorm), CoutCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoNorm), CoutCh1) value
 
     member x.Var_TEST1_2_2_TppCh1
         with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoHigh), TppCh1)
         and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoHigh), TppCh1) value
 
-    member x.Var_TEST1_2_2_CCh1
-        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoHigh), CCh1)
-        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoHigh), CCh1) value
+    member x.Var_TEST1_2_2_CoutCh1
+        with get () = x.getVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoHigh), CoutCh1)
+        and set value = x.setVarUi (TestPt(Sens2, ScaleEdge(ScaleEnd), TermoHigh), CoutCh1) value
 
     member x.ConcError0_0_L = x.GetConcError (Sens1, ScaleEdge(ScaleBeg), TermoLow)
 

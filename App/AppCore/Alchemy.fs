@@ -14,24 +14,20 @@ let initKefsValues getPgsConc  prodType =
         | Some ch -> yield Sens2, ch 
         | _ -> () ]  
 
-    [   for n, sensor in chans do
-
-            
-            
-            let pgs0, pgsK, shk0, shkK, shk, units, gastype = SensorIndex.prodTypeCoefs n
+    [   yield Coef_Pmmhg_0, 740m
+        yield Coef_Pmmhg_1, 0m        
+        yield YEAR, decimal DateTime.Now.Year
+        yield KNull_TP_0, 0m
+        yield KNull_TP_1, 1m
+        yield KNull_TP_2, 0m
+        for n, sensor in chans do
+            let pgs0, pgsK, deviceTypeCoef = SensorIndex.prodTypeCoefs n
             yield pgs0, getPgsConc (ScaleEdgePt.clapan (n,ScaleBeg) )
             yield pgsK, getPgsConc (ScaleEdgePt.clapan (n,ScaleEnd) )
-            yield shk0, 0m
-            yield shkK, sensor.Scale.Value
-            yield shk, sensor.Scale.Code  
-            yield units, sensor.Units.Code
-            yield gastype, sensor.SensorCode
+            yield deviceTypeCoef, sensor.SensorCode
             yield! List.zip (SensorIndex.coefsLin n) [0m; 1m; 0m; 0m] 
             yield! List.zip (Correction.coefsTermo n ScaleBeg) [0m; 0m; 0m] 
-            yield! List.zip (Correction.coefsTermo n ScaleEnd) [1m; 0m; 0m]  
-            
-            let now = DateTime.Now
-            yield YEAR, decimal now.Year ]
+            yield! List.zip (Correction.coefsTermo n ScaleEnd) [1m; 0m; 0m] ]
         
 [<AutoOpen>]
 module private PivateComputeProduct = 

@@ -40,24 +40,20 @@ type Ankat.ViewModel.Product1 with
         | None -> 
             Logging.warn "%s, нет значения записываемого к-та %d, %s" x.What kef.Order kef.Description 
             Ok()
-        | Some value -> 
-            let r = x.WriteModbus( WriteKef kef, value )
-            match r with
-            | Ok () -> 
-                Logging.info "%s.коэф.%d <- %M" x.What kef.Order value
-                x.setKef kef (Some value)
-            | Err err -> Logging.error "%s.коэф.%d <- %M : %s" x.What kef.Order value err
-            r
+        | Some value -> x.WriteModbus( WriteKef kef, value )
 
     
-    member x.WriteKefs kefsValues  = maybeErr {
+    member x.WriteKefs kefsValues  = 
         for kef,value in kefsValues do
-            let! _ = x.WriteKef(kef,value)
-            () }
+            let _ = x.WriteKef(kef,value)
+            () 
+        None
             
     member x.WriteKefsInitValues() = 
         let t = party.getProductType()        
-        Alchemy.initKefsValues party.GetPgs t
+        [   yield Coef.SER_NUMBER, decimal x.Product.SerialNumber
+            yield! Alchemy.initKefsValues party.GetPgs t ]
+        |> List.sortBy fst
         |> List.map( fun (coef,value) -> coef, Some value )
         |> x.WriteKefs
 
@@ -70,7 +66,7 @@ type Ankat.ViewModel.Product1 with
                 x.setKef kef (Some value) 
             | Err err ->
                 Logging.error "%s.коэф.%d : %s" x.What kef.Order err 
-            let! _ = r
+            let _ = r
             () }
 
     
@@ -190,18 +186,21 @@ module Delay =
 
     let cancel() = keepRunning <- false
 
-    let perform what gettime interrogate = maybeErr{
+    let perform what gettime interrogate = 
         onStart.Value what gettime
         keepRunning <- true
         let start'time = DateTime.Now
-        while keepRunning && Thread2.isKeepRunning() && (DateTime.Now - start'time < gettime()) do
-            onUpdate.Value start'time gettime
-            if interrogate then
-                do! party.Interrogate()
-            else
-                Threading.Thread.Sleep 10
+        let result = 
+            maybeErr{
+                while keepRunning && Thread2.isKeepRunning() && (DateTime.Now - start'time < gettime()) do
+                    onUpdate.Value start'time gettime
+                    if interrogate then
+                        do! party.Interrogate()
+                    else
+                        Threading.Thread.Sleep 10 }
         keepRunning <- false
-        onStop.Value() }
+        onStop.Value() 
+        result
 
 module ModalMessage = 
     let onShow = Ref.Initializable<_>(sprintf "ModalMessage.onShow %s:%s" __LINE__ __SOURCE_FILE__ )

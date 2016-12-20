@@ -122,9 +122,6 @@ module private Helpers2 =
         MessageBox.Show(s,"СТМ-30М", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         |> ignore
 
-let add'operation'changed f = 
-    operation.AddChanged (snd >> f)
-
 let private is'running = 
     let x = Ref.Observable(false)
     MainWindow.form.Closing.Add <| fun e ->
