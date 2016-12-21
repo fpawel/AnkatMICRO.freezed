@@ -295,7 +295,7 @@ module private Helpers1 =
         
     let isSens2() = party.getProductType().Sensor2.IsSome
     
-    let adjustNull = 
+    let adjustNull() = 
         
         ("Калибровка нуля шкалы", TimeSpan.FromMinutes 3., AdjustDelay ScaleBeg)  <-|-> fun gettime -> maybeErr{
             let pgsConc = party.GetPgs Gas1
@@ -328,7 +328,7 @@ module private Helpers1 =
         
     
 
-    let blowAir = 
+    let blowAir() = 
         "Продувка воздухом" <||> [   
             blow 1 Gas1 "Продуть воздух"
             "Закрыть пневмоблок" <|> fun () -> switchPneumo None
@@ -339,11 +339,11 @@ module private Helpers1 =
 
     let adjust() =
         "Калибровка" <||> [   
-            yield adjustNull
+            yield adjustNull()
             yield adjustSens Sens1
             if isSens2() then
                 yield adjustSens Sens2
-            yield blowAir]
+            yield blowAir()]
 
     let goNku = "Установка НКУ" <|> fun () -> warm TermoNorm
 
@@ -352,34 +352,6 @@ module private Helpers1 =
             do! party.WriteModbus( Sens1.CmdNorm, 100m ) 
             if isSens2() then
                 do! party.WriteModbus( Sens2.CmdNorm, 100m )  }
-
-//    type ProdDataPt with
-//        static member read prodPt = 
-//            let what = ProdDataPt.what prodPt
-//            what <|> fun () -> maybeErr{
-//                do! party.DoForEachProduct(fun p -> 
-//                    maybeErr{
-//                        let physVars = ProdDataPt.physVars prodPt
-//                        for physVar in physVars do
-//                            let! readedValue = p.ReadModbus( ReadVar physVar)
-//                            p.setVar (prodPt,physVar) (Some readedValue)
-//                            Logging.info 
-//                                "%s : %s = %s, %s" 
-//                                p.What (PhysVar.what physVar) 
-//                                (Decimal.toStr6 readedValue) 
-//                                what }  ) }
-
-
-//    let formatClapanProdpointsList (clapan, prodpoints) =
-//        let strFeats = prodpoints |> Set.ofSeq |> Seq.toStr ", " ProdDataPt.what
-//        let strGas = ClapanHelp.what clapan
-//        sprintf "%s, %s" strGas strFeats
-//
-//    let formatClapansProdpointsList clapans prodpoints =        
-//        let strClapans = clapans |> Set.ofSeq |> Seq.toStr ", " ClapanHelp.what
-//        let strProdpoints = prodpoints |> Set.ofSeq |> Seq.toStr ", " ProdDataPt.what
-//        sprintf "%s, %s" strClapans strProdpoints
-
 
     let setupTermo temperature =
         let strT = TermoPt.what temperature        
@@ -431,7 +403,7 @@ module private Helpers1 =
                     yield! blowAndRead points <| fun (n,scalePt) ->
                         let prodPt = n,scalePt,t
                         TestPt prodPt  ] 
-            yield blowAir ]
+            yield blowAir() ]
 
     let lin() = 
         let points = [   
@@ -450,7 +422,7 @@ module private Helpers1 =
 
         "Линеаризация" <||> [
             yield! blowAndRead points LinPt
-            yield blowAir
+            yield blowAir()
             yield computeAndWriteGroup <| CorLin Sens1
             if isSens2() then
                 yield computeAndWriteGroup <| CorLin Sens2 ]
@@ -478,12 +450,12 @@ module private Helpers1 =
                 yield computeAndWriteGroup <| CorTermoScale (Sens2,ScaleBeg)
                 yield computeAndWriteGroup <| CorTermoScale (Sens2,ScaleEnd)
             yield computeAndWriteGroup <| CorTermoPress
-            yield blowAir   ]
+            yield blowAir()   ]
 
 
     let press() = 
         "Компенсация давления"  <||>  [
-            blowAir
+            blowAir()
             "Нормальное" <|> fun () -> 
                 ModalMessage.show Logging.Info "Компенсация давления" "Установите нормальное давление"
                 party.FixProdData [PressSensPt PressNorm] 
@@ -492,23 +464,18 @@ module private Helpers1 =
                 party.FixProdData [PressSensPt PressHigh] 
             computeAndWriteGroup <| CorPressSens ]
 
-
-
     let initCoefs() =         
         "Установка к-тов исплнения" <|> fun () -> 
             party.DoForEachProduct (fun p -> 
                 p.WriteKefsInitValues() ) 
             |> Result.someErr
-
-    
-
     
 let production() = 
    
     (if isSens2() then "2K" else "1K") <||> [
         initCoefs()
         goNku
-        blowAir
+        blowAir()
         norming()
         adjust()
         lin()
