@@ -133,14 +133,14 @@ module TabsheetChart =
         m.MinY <- None
         m.MaxY <- None
     
-    module PhysVar =
-        let get,set,_ = 
-            let panelSelectVar = new Panel(Parent = TabsheetChart.BottomTab, Dock = DockStyle.Top)
-            let _ = new Panel(Parent = TabsheetChart.BottomTab, Dock = DockStyle.Top, Height = 10)
-        
-            radioButtons panelSelectVar PhysVar.valuesList PhysVar.what PhysVar.dscr <| fun x -> 
-                Chart.physVar <- x
-                update()
+//    module PhysVar =
+//        let get,set,_ = 
+//            let panelSelectVar = new Panel(Parent = TabsheetChart.BottomTab, Dock = DockStyle.Top)
+//            let _ = new Panel(Parent = TabsheetChart.BottomTab, Dock = DockStyle.Top, Height = 10)
+//        
+//            radioButtons panelSelectVar PhysVar.valuesList PhysVar.what PhysVar.dscr <| fun x -> 
+//                Chart.physVar <- x
+//                update()
 
 module TabsheetErrors =
     

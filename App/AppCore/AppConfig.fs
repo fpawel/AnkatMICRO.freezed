@@ -34,7 +34,6 @@ module View =
                 VisibleCoefs = "0-150"
                 VisiblePhysVars = Set.ofList [CCh0; CCh1; CCh2] }
 
-
 [<TypeConverter(typeof<ExpandableObjectConverter>)>]
 type Termochamber = 
     {   [<DisplayName("СОМ порт")>]

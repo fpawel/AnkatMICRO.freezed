@@ -62,7 +62,7 @@ module private Helpers =
 
         and onTextChanged = EventHandler(fun _ _ ->  
             
-            textToValue t.Text |> updSubj              
+            updSubj (textToValue t.Text)
             let error, color = 
                 if not <| eq (getSubjValue()) (textToValue t.Text) then "не правильный ввод", Color.Red
                 else "", Color.Black
@@ -296,11 +296,35 @@ module private Helpers1 =
         c.Interval <- 0.001
         c.IsUserSelectionEnabled <- true
 
+    let comboBoxVars = 
+        let x =
+            new MyWinForms.FlatComboBox( DropDownStyle = ComboBoxStyle.DropDownList,
+                                        DisplayMember = "What", FlatStyle = FlatStyle.Flat)
+        x.Items.AddRange ( Ankat.PhysVar.valuesList |> List.map box |> List.toArray)    
+
+        let update _ =            
+            Ankat.Chart.physVar <- x.SelectedItem :?> Ankat.PhysVar
+            MainWindow.setActivePageTitle <| sprintf "График. %s" Ankat.Chart.physVar.Dscr 
+            Ankat.AppContent.updateChartSeriesList ()
+            let m = Ankat.Chart.axisScalingViewModel
+            m.MaxDateTime <- None
+            m.MinDateTime <- None
+            m.MinY <- None
+            m.MaxY <- None
+        x.SelectedIndexChanged.Add update
+
+        x.SelectedItem <- Ankat.CoutCh0
+
+        x
 let initialize =
+    let separator() = addtop TabsheetChart.BottomTab <| new Panel( Height = 3)
+
+    separator()    
+    addtop TabsheetChart.BottomTab comboBoxVars
     
     asvm.InitializeAxisTimer()    
     let p = new Panel( Height = 25)
-    let separator() = addtop TabsheetChart.BottomTab <| new Panel( Height = 3)
+    
     separator()    
     addtop TabsheetChart.BottomTab p 
     separator()
@@ -327,6 +351,8 @@ let initialize =
 
     addtop TabsheetChart.BottomTab OrigZoomStore.button 
     separator()
+
+    
 
     invertChildrenOrder TabsheetChart.BottomTab
 

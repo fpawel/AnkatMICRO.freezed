@@ -25,7 +25,6 @@ module private Helpers =
     let none _ = None
     let form = MainWindow.form
 
-
     let getSelectedProducts() = 
         seq{ for x in gridProducts.SelectedCells -> x.RowIndex, x.OwningRow }
         |> Map.ofSeq
@@ -37,7 +36,7 @@ module private Helpers =
     let popupConfig = MyWinForms.Utils.popupConfig
 
 
-let popupNumberDialog<'a>     
+let popupNumberDialog<'a> 
     prompt title tryParse work 
     (btn : Button) 
     (parentPopup : MyWinForms.Popup) =
@@ -71,7 +70,6 @@ let modbusToolsPopup =
                         String.tryParseDecimal
                         (fun value -> sendCommand (cmd,value) ) ) ]
     |> simpleMenu
-    
 
 let pneumoToolsPopup = 
     
@@ -231,8 +229,7 @@ let initialize =
                 PropertySort.NoSort
         popup.Font <- form.Font        
         popup.Show(buttonSettings)
-
-        
+       
     Thread2.scenary.Set (production())
 
     fun () -> ()
