@@ -312,10 +312,9 @@ module private Helpers1 =
             m.MinY <- None
             m.MaxY <- None
         x.SelectedIndexChanged.Add update
-
         x.SelectedItem <- Ankat.CoutCh0
-
         x
+
 let initialize =
     let separator() = addtop TabsheetChart.BottomTab <| new Panel( Height = 3)
 
