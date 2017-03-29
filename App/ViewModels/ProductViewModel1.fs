@@ -12,6 +12,12 @@ module private ViewModelProductHelpers =
     let appCfg = AppConfig.config
     type PSr = Chart.ProductSeriesInfo
 
+    let concErrPoints = 
+        listOf{ 
+             let! n = SensorIndex.valuesList 
+             let! testPt = TestPt.valuesList 
+             return n,testPt }
+
     //let nCase<'a when 'a : equality> = FSharpType.caseOrder<'a>
 
 
@@ -24,21 +30,15 @@ type Product1(p : P, getProductType, getPgsConc, partyId) =
 
     let mutable connection : Result<string,string> option = None
     
-    let getConcError ((n, gas, t) as pt) = 
+    let getConcError (n, testPt) = 
         let sensor = SensorIndex.sensorOfProdTypeByIndex (getProductType()) n        
         sensor 
         |> Option.bind( fun sensor ->
-            match t with 
-            | TermoNorm -> P.concError sensor getPgsConc (n, gas) p 
-            | _ -> P.termoError sensor getPgsConc pt p )
+            P.concError sensor getPgsConc (n, testPt) p  )
 
     let getConcErrors () = 
-        listOf{ 
-             let! n = SensorIndex.valuesList 
-             let! gas = ScalePt.valuesList 
-             let! t = TermoPt.valuesList
-             let k = n,gas,t
-             return k, getConcError k }
+        concErrPoints
+        |> List.map( fun k -> k, getConcError k )
         |> Map.ofList
                
     let getVarsValues() = 
@@ -69,11 +69,7 @@ type Product1(p : P, getProductType, getPgsConc, partyId) =
         let varsValues = getVarsValues()
         let kefsValues = getKefsValues()
 
-        listOf {
-            let! n = [ Sens1; Sens2 ]
-            let! scale = ScalePt.valuesList
-            let! t = TermoPt.valuesList
-            return n,scale,t }
+        concErrPoints
         |> List.filter(fun k -> prevConcErrors.[k] <> concErrors.[k] )
         |> List.iter (Prop.concError >> x.RaisePropertyChanged)
 
@@ -137,11 +133,7 @@ type Product1(p : P, getProductType, getPgsConc, partyId) =
                 x.setKef SER_NUMBER  (Some <| decimal v)
 
     member x.ForceCalculateErrors() =        
-        listOf {
-            let! n = [ Sens1; Sens2 ]
-            let! scale = ScalePt.valuesList
-            let! t = TermoPt.valuesList
-            return n,scale,t }
+        concErrPoints
         |> List.iter (Prop.concError >> x.RaisePropertyChanged ) 
 
     member x.Port 

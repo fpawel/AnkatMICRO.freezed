@@ -150,10 +150,12 @@ module private PivateComputeProduct =
                 let! t = %% n.Termo
                 let! var = %% n.Var1
                 return List.zip t var }
-            |> Result.map( fun xy ->            
-                match prodType.Sensor with
-                | IsCO2Sensor true -> List.map (fun (x,y) ->  x, -y) xy
-                | _ -> xy )
+            |> Result.map
+//                ( fun xy ->            
+//                    match prodType.Sensor with
+//                    | IsCO2Sensor true -> List.map (fun (x,y) ->  x, -y) xy
+//                    | _ -> xy )
+                ( List.map (fun (x,y) ->  x, -y) )
             |> fmtCorrErr ( fun (TermoScalePt (_,_,t) ) -> t.What)
 
         | CorTermoScale ( n, ScaleEnd ) as corr -> 
@@ -215,24 +217,6 @@ let compute group getPgsConc prodType = state {
     | Ok result ->
         do! result |> List.zipCuty 0m groupCoefs |> Product.setKefs   }
 
-let getProductTermoErrorlimit sensor getPgsConc (n,gas,t)  product =
-    let f = TestPt (n,gas,t) 
-    match sensor with
-    | IsCHSensor true ->
-        match gas with
-        | ScaleEdge ScaleBeg -> Some 5m
-        | _ ->
-            Product.getVar (f, n.Conc) product
-            |> Option.map(fun conc20 -> conc20 * 0.15m |> abs  |> decimal )
-    | _ ->
-        (Product.getVar (f, n.Conc) product, Product.getVar (f, n.Termo) product) 
-        |> Option.map2(fun(c,t) -> 
-            let dt = t - 20m            
-            let pgsConc = getPgsConc (gas.Clapan n)
-            let maxc = sensor.ConcErrorlimit pgsConc
-            0.5m * abs( maxc*dt ) / 10.0m )
-    
-
 type ValueError = 
     {   Value : decimal
         Nominal : decimal
@@ -245,21 +229,13 @@ type ValueError =
 
 type Product with
 
-    static member concError sensor getPgsConc (n,gas) product = 
-        Product.getVar (TestPt(n,gas,TermoNorm), n.Conc) product 
+    static member concError sensor getPgsConc (n,testPt) product = 
+        Product.getVar (TestPt(n,testPt), n.Conc) product 
         |> Option.map(fun conc ->                 
-            let pgs = getPgsConc(gas.Clapan n)
+            let pgs = getPgsConc(testPt.ScalePt.Clapan n)
             {   Value = conc
                 Nominal = pgs
                 Limit = Sensor.concErrorlimit sensor pgs  }  ) 
-
-
-    static member termoError sensor getPgsConc ((n,gas,t) as pt) product = 
-        (   Product.getVar (TestPt pt, n.Conc) product,
-            Product.getVar (TestPt (n,gas,TermoNorm), n.Conc) product,
-            getProductTermoErrorlimit sensor getPgsConc pt product )
-        |> Option.map3( fun (c,c20,limit) -> 
-            { Value = c; Nominal = c20; Limit = limit } )
 
 let createNewProduct serialNumber getPgs productType =
     let prodstate = state {

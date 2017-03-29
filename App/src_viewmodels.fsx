@@ -59,7 +59,8 @@ module Name =
 
             | PressSensPt (P p) -> sprintf "PressSensPt(%s)" p
 
-            | TestPt (Sens n, Gas gas, T t) -> sprintf "TestPt(%s, %s, %s)" n gas t 
+            | TestPt (Sens n, testPt) -> 
+                sprintf "TestPt(%s, %A)" n testPt
         
         sprintf "%s, %s" str1 y
 
@@ -87,9 +88,10 @@ type Product(p, getProdType, getPgs, partyId) =
         with get () = x.getVarUi (%s)
         and set value = x.setVarUi (%s) value"""  (Prop.dataPoint k) (Name.dataPoint k) (Name.dataPoint k)
         
-    for n in Points.sens_gas_t do
-        yield sprintf """
-    member x.%s = x.GetConcError (%s)"""  (Prop.concError n) (Name.sens_gas_t n)
+    for testPt in TestPt.valuesList do
+        for sensN in SensorIndex.valuesList do
+            yield sprintf """
+    member x.%s = x.GetConcError (%A,%A)"""  (Prop.concError (sensN,testPt) ) sensN testPt 
        
     
     for x in PhysVar.valuesList do        
@@ -98,56 +100,7 @@ type Product(p, getProdType, getPgs, partyId) =
 
     |> createSourcefile "ViewModels/ProductViewModel.fs" 
 
-
-
-
-//let createSourceFile_PartyViewModel() = 
-//  [|  
-//    yield """namespace Ankat.ViewModel
-//open System
-//open System.ComponentModel
-//open Ankat
-//open Pneumo
-//
-//type Party(partyHeader, partyData) =
-//
-//    inherit ViewModel.Party1(partyHeader, partyData) 
-//    override x.RaisePropertyChanged propertyName = 
-//        ViewModelBase.raisePropertyChanged x propertyName"""
-//
-//    for clapan as pt in Clapan.valuesList do
-//        
-//        yield sprintf """
-//    [<Category("Концентрация ПГС")>] 
-//    [<DisplayName("%s")>]    
-//    [<Description("%s, концентрация ")>]
-//    member x.%s
-//        with get() = x.GetPgs(%s)
-//        and set v = x.SetPgs ( (%s), v) """  
-//             
-//            (Clapan.what clapan) 
-//            (Clapan.descr clapan) 
-//            (Prop.pgs clapan) 
-//            (Name.pgs clapan) (Name.pgs clapan)
-//        
-//    for t in TermoPt.valuesList  do
-//        let what = TermoPt.what t
-//        let descr = TermoPt.dscr t
-//        
-//
-//        yield sprintf """
-//    [<Category("Температура")>] 
-//    [<DisplayName("%s")>]    
-//    [<Description("%s")>]
-//    member x.%s 
-//        with get() = x.GetTermoTemperature %s
-//        and set v = x.SetTermoTemperature (%s,v) """  
-//                what descr (Prop.t t) (Name.t t) (Name.t t) |]
-//    |> createSourcefile "ViewModels/PartyViewModel.fs" 
-
 createSourceFile_ProductViewModel()
-//createSourceFile_PartyViewModel()
-
 
 
 [|    yield """namespace Ankat.ViewModel

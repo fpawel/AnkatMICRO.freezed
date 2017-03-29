@@ -79,23 +79,17 @@ type Ankat.ViewModel.Product1 with
             let _ = x.ReadModbus( ReadVar var)
             () }
 
-    member private p.calculateTestConc sensor ( n,gas,t as pt) conc = 
-        match 
-            match t with
-            | TermoNorm -> Some <| Sensor.concErrorlimit sensor conc        
-            | _ -> Alchemy.getProductTermoErrorlimit sensor party.GetPgs pt p.Product with
-        | Some concErrorlimit -> 
-            let pgs = party.GetPgs (gas.Clapan n)
-            let d = abs(conc - pgs)
-            Logging.write 
-                (if d < concErrorlimit then Logging.Info else Logging.Error)
-                "%s, проверка погрешности %s=%M - конц.=%M, погр.=%M, макс.погр.=%M" 
-                    p.What n.What pgs conc d concErrorlimit  
-        | _ ->
-            Logging.error "не удалось расчитать предел погрешности %s, канал %d, %s, %s"
-                sensor.What n.N gas.What t.What
+    member private p.calculateTestConc sensor (n, testPt:TestPt) conc = 
+        let concErrorlimit = Sensor.concErrorlimit sensor conc
+        let pgs = party.GetPgs (testPt.ScalePt.Clapan n)
+        let d = abs(conc - pgs)
+        Logging.write 
+            (if d < concErrorlimit then Logging.Info else Logging.Error)
+            "%s, проверка погрешности %s=%M - конц.=%M, погр.=%M, макс.погр.=%M" 
+                p.What n.What pgs conc d concErrorlimit  
+        
             
-    member p.TestConc sensor (n,_,_ as pt) = maybeErr{
+    member p.TestConc sensor (n,_ as pt) = maybeErr{
         let concVar = SensorIndex.conc n
         let! conc = p.ReadModbus( ReadVar concVar )
         p.setVar (TestPt pt, concVar) (Some conc)
@@ -348,10 +342,19 @@ module private Helpers1 =
     let goNku = "Установка НКУ" <|> fun () -> warm TermoNorm
 
     let norming() = 
-        "Нормировка" <|> fun () -> maybeErr{
+        (*
+        (what, TimeSpan.FromMinutes (float minutes), BlowDelay pt ) <-|-> fun gettime -> maybeErr{        
+            do! switchPneumo <| Some pt
+            do! Delay.perform title gettime true }
+        *)
+        ("Нормировка", TimeSpan.FromMinutes 1., BlowDelay Gas1) <-|-> fun gettime -> maybeErr{            
+            do! switchPneumo <| Some Gas1
+            do! Delay.perform "Продуть воздух" gettime true
             do! party.WriteModbus( Sens1.CmdNorm, 100m ) 
             if isSens2() then
-                do! party.WriteModbus( Sens2.CmdNorm, 100m )  }
+                do! party.WriteModbus( Sens2.CmdNorm, 100m )
+            do! Delay.perform "Пауза 5 с для реакции прибора" (fun () -> TimeSpan.FromSeconds 5.) false
+            do! switchPneumo None }
 
     let setupTermo temperature =
         let strT = TermoPt.what temperature        
@@ -379,30 +382,25 @@ module private Helpers1 =
     let blowAndRead<'a> (clapan_points : (Clapan * ('a list)) list ) (f : 'a -> ProdDataPt) =
         [   for clapan,points in clapan_points do
                 yield Clapan.what clapan <||> [   
-                    blow 3 clapan "Продувка"                    
+                    blow 3 clapan "Продувка"
                     points  
                         |> List.map f  
                         |> fixProdData    ] ]
 
-    let test() =         
-        let points = [   
-            yield Gas1, [   yield Sens1, ScalePt.Beg; 
-                            if isSens2() then 
-                                yield Sens2, ScalePt.Beg] 
-            yield S1Gas2, [Sens1, ScaleMid] 
-            yield S1Gas3, [Sens1, ScalePt.End] 
-            if isSens2() then 
-                yield S2Gas2, [Sens2, ScaleMid] 
-                yield S2Gas3, [Sens2, ScalePt.End] ]
+    let test1 (n:SensorIndex)  = 
+        n.What <||> 
+            (   TestPt.valuesList  |> List.map( fun testPt -> 
+                    sprintf "%s" testPt.What <||> [ 
+                        blow 3 (testPt.ScalePt.Clapan n) "Продувка"
+                        fixProdData [ TestPt(n, testPt) ]
+                    ] ) )
 
+    let test() = 
         "Снятие основной погрешности" <||> [   
-            yield adjust() 
-            for t in TermoPt.valuesList do
-                yield t.What <||> [
-                    yield setupTermo t
-                    yield! blowAndRead points <| fun (n,scalePt) ->
-                        let prodPt = n,scalePt,t
-                        TestPt prodPt  ] 
+            yield adjust()             
+            yield test1 Sens1
+            if isSens2() then
+                yield test1 Sens2
             yield blowAir() ]
 
     let lin() = 
@@ -475,7 +473,6 @@ let production() =
     (if isSens2() then "2K" else "1K") <||> [
         initCoefs()
         goNku
-        blowAir()
         norming()
         adjust()
         lin()

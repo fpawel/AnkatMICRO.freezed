@@ -24,21 +24,21 @@ module TabsheetVars =
         | T of SensorIndex * ScaleEdgePt
         | PT 
         | PS
-        | Test of SensorIndex * TermoPt * PhysVar
+        | Test of SensorIndex
 
         static member what = function
             | Lin n ->      Correction.what <| CorLin n                
             | T (n,gas) ->  Correction.what <| CorTermoScale (n,gas)                
             | PT ->         Correction.what <| CorTermoPress                
             | PS ->         Correction.what <| CorPressSens                
-            | Test (_,t,var) -> sprintf "%s %s" var.What t.What 
+            | Test n ->     "Проверка " + n.What
 
         static member descr = function
             | Lin n ->      Correction.descr <| CorLin n                
             | T (n,gas) ->  Correction.descr <| CorTermoScale (n,gas)                
             | PT ->         Correction.descr <| CorTermoPress                
             | PS ->         Correction.descr <| CorPressSens                
-            | Test (n,t,var) -> sprintf "Проерка погрешности %d %s %s" n.N t.What var.What
+            | Test n -> sprintf "Проерка погрешности %s" n.What 
 
     [<AutoOpen>]
     module private Helpers =
@@ -50,11 +50,7 @@ module TabsheetVars =
                 return T(n,gas) }
             yield PT
             yield PS
-            yield! listOf{
-                let! n = SensorIndex.valuesList
-                let! t = [TermoNorm; TermoLow; TermoHigh]
-                let! var = [n.Conc; n.Termo]
-                return Test(n,t,var) } ]
+            yield! List.map Test SensorIndex.valuesList ]
                 
 
         let mutable page = Lin Sens1
@@ -108,10 +104,10 @@ module TabsheetVars =
                     let pt = PressSensPt p, var
                     addcol (Prop.dataPoint pt) (var.What + pressLeter p)
             
-        | Test (n,t,var)  ->
-            for gas in ScalePt.valuesList do
-                let pt = TestPt(n,gas,t), var
-                addcol (Prop.dataPoint pt) gas.What
+        | Test n  ->
+            for testPt in TestPt.valuesList do
+                let pt = TestPt(n,testPt), n.Conc
+                addcol (Prop.dataPoint pt) testPt.What
 
         setActivePageTitle <| Page.what page
                 
@@ -133,30 +129,20 @@ module TabsheetChart =
         m.MinY <- None
         m.MaxY <- None
     
-//    module PhysVar =
-//        let get,set,_ = 
-//            let panelSelectVar = new Panel(Parent = TabsheetChart.BottomTab, Dock = DockStyle.Top)
-//            let _ = new Panel(Parent = TabsheetChart.BottomTab, Dock = DockStyle.Top, Height = 10)
-//        
-//            radioButtons panelSelectVar PhysVar.valuesList PhysVar.what PhysVar.dscr <| fun x -> 
-//                Chart.physVar <- x
-//                update()
-
 module TabsheetErrors =
     
     [<AutoOpen>]
     module private Helpers =
 
         type Page = 
-            {   N  : SensorIndex
-                T : TermoPt } 
+            {   N  : SensorIndex } 
             
-            static member ctx {N = n; T = t} = 
-                ScalePt.valuesList |> List.map(fun gas ->  
-                    let clapan = ScalePt.clapan(n, gas)
-                    clapan.What, Prop.concError(n,gas,t) )
+            static member ctx {N = n } = 
+                TestPt.valuesList |> List.map(fun testPt ->  
+                    //let clapan = ScalePt.clapan(n, testPt.ScalePt)
+                    testPt.What, Prop.concError(n,testPt) )
                 
-        let mutable page = { T = TermoNorm ; N = Sens1 }
+        let mutable page = { N = Sens1 }
 
         let addp () = 
             let p = new Panel(Parent = TabsheetErrors.BottomTab, Dock = DockStyle.Top)
@@ -201,7 +187,7 @@ module TabsheetErrors =
                 e.FormattingApplied <- true
 
     let update () =
-        setActivePageTitle (sprintf "Погрешность %s, %s"  page.N.What page.T.What)
+        setActivePageTitle (sprintf "Погрешность %s"  page.N.What )
         gridProducts.Columns.``remove all columns but`` Columns.main
         for h,p in Page.ctx page do
             let col = new DataGridViewTextBoxColumn( DataPropertyName = p,  HeaderText = h)
@@ -210,15 +196,6 @@ module TabsheetErrors =
                 let prop = t.GetProperty p
                 prop.GetValue(product,null) :?> VE option
             gridProducts.Columns.AddColumn col
-
-    
-    
-
-    module Termo =
-        let get,set, _ = 
-            radioButtons (addp ()) TermoPt.valuesList TermoPt.what TermoPt.dscr <| fun x -> 
-                page <- {page with T = x }
-                update()
 
     module SensorIndex =
         let get,set, _ = 
@@ -260,7 +237,6 @@ module private Helpers1 =
         | TabsheetErrors ->
             gridProducts.Columns.``remove all columns but`` Products.Columns.main
             gridProducts.Parent <- TabsheetErrors.RightTab
-            TabsheetErrors.Termo.set TermoNorm
             TabsheetErrors.SensorIndex.set Sens1
             TabsheetErrors.update()
         
@@ -284,7 +260,6 @@ let getSelected, setSelected,_ =
         (fun tabPage ->             
             setActivePageTitle tabPage.Title
             onSelect tabPage
-            //selectedPage.Set <| Some tabPage
             tabPage.ShowContent() ) 
 
 module TabChart =

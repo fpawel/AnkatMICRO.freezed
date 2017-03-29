@@ -302,20 +302,55 @@ type LinPt =
         | Sens2, Lin3 -> failwith "ClapanHelp.clapanOflinPt, there is no Lin3 for Sens2"
         | Sens2, Lin4 -> S2Gas3
 
+// точка проверки концентрации
+type TestPt =
+    | Test1Gas1
+    | Test2Gas2
+    | Test3Gas3
+    | Test4Gas2
+    | Test5Gas1
+    | Test6Gas3
+    
+    member x.ScalePt = TestPt.GetScalePt x
+
+    static member GetScalePt = function
+        | Test1Gas1 -> ScaleEdge ScaleBeg
+        | Test2Gas2 -> ScaleMid
+        | Test3Gas3 -> ScaleEdge ScaleEnd
+        | Test4Gas2 -> ScaleMid
+        | Test5Gas1 -> ScaleEdge ScaleBeg
+        | Test6Gas3 -> ScaleEdge ScaleEnd
+
+    
+
+module private TestPtHelp = 
+    let valuesList = 
+        FSharpType.valuesListOf<TestPt>
+
+type TestPt with 
+    static member valuesList = TestPtHelp.valuesList
+
+    member x.What = 
+        sprintf "%d:%s" (valueOrderOf x + 1) x.ScalePt.What
+
+    static member what (x:TestPt) = 
+        x.What
+
+
 // точка снятия данных
 type ProdDataPt =
     | LinPt of SensorIndex * LinPt
     | TermoScalePt of SensorIndex * ScaleEdgePt * TermoPt
     | TermoPressPt of TermoPt 
     | PressSensPt of PressPt
-    | TestPt of SensorIndex * ScalePt * TermoPt
+    | TestPt of SensorIndex * TestPt
 
     static member physVars = function
         | LinPt (n,_) -> [n.Conc]
         | TermoScalePt (n,_,_) -> [n.Termo; n.Var1]
         | TermoPressPt _ -> [TppCh0;VdatP]
         | PressSensPt _ -> [Pmm;VdatP]
-        | TestPt (n,_,_) -> [n.Termo; n.Conc]
+        | TestPt (n,_) -> [n.Termo; n.Conc]
 
     static member what = function
         | LinPt (n,m) -> sprintf "LIN%d_%d" (valueOrderOf n) (valueOrderOf m )
@@ -323,7 +358,7 @@ type ProdDataPt =
         | TermoScalePt (n,ScaleEnd,t) -> sprintf "TK%d_%d" (valueOrderOf n) (valueOrderOf t )
         | TermoPressPt t -> sprintf "PT%d" (valueOrderOf t )
         | PressSensPt p -> sprintf "PS%d" (valueOrderOf p )
-        | TestPt (n,gas,t) -> sprintf "Test%d/%s/%s" (valueOrderOf n) gas.What t.What
+        | TestPt (n,pt) -> sprintf "Test%d_%d" (valueOrderOf n) (valueOrderOf pt)
 
 [<AutoOpen>]
 module private Helper = 
@@ -350,10 +385,9 @@ module private Helper =
                 yield PressSensPt(p)
             
             for s in SensorIndex.valuesList do
-                for pgs in scalePts do
-                    for t in TermoPt.valuesList do
-                        yield TestPt(s, pgs, t)
-                         ]
+                for pt in TestPt.valuesList do
+                    yield TestPt(s, pt)
+        ]
 
 type ProdDataPt with
     static member valuesList = prodDataPts
@@ -619,11 +653,12 @@ type Product =
         let sm = if m<10uy then sprintf "0%d" m else m.ToString()
         sprintf "%s.%d" sm (2000 + int y)
 
-    static member termoErrorlimit sensor n pgsConc (gas,t) product =
-        let concVar = SensorIndex.conc n
-        let f = TestPt(n,gas,t)
-        if not <| Sensor.isCH sensor then         
-            let tempVar = SensorIndex.termo n
+    static member concErrorlimit sensor sensorIndex pgsConc testPt product =
+        let concVar = SensorIndex.conc sensorIndex
+        let f = TestPt(sensorIndex,testPt)
+        if not <| Sensor.isCH sensor then      
+               
+            let tempVar = SensorIndex.termo sensorIndex
             ( Product.getVar (f,concVar) product, 
                 Product.getVar (f,tempVar) product) 
             |> Option.map2(fun(c,t) -> 
@@ -631,7 +666,7 @@ type Product =
                 let maxc = sensor.ConcErrorlimit pgsConc
                 0.5m * abs( maxc*dt ) / 10.0m )
         else
-            match gas with
+            match testPt.ScalePt with
             | ScaleEdge ScaleBeg -> Some 5m
             | _ ->
                 Product.getVar (f,concVar) product
@@ -703,8 +738,8 @@ module Prop =
         | TermoHigh -> "H"
         | TermoLow -> "L"
         
-    let concError (n : SensorIndex, gas, termoPt) = 
-        sprintf "ConcError%d_%s_%s" (valueOrderOf n) (scalePt gas) (t termoPt)
+    let concError (n : SensorIndex, testPt:TestPt) = 
+        sprintf "ConcError%d_%d" (valueOrderOf n) (valueOrderOf testPt)
 
     let physVar (x : PhysVar) = 
         x.What
@@ -715,7 +750,7 @@ module Prop =
         | TermoScalePt (n,ScaleEnd,t) -> sprintf "TK%d_%d" (valueOrderOf n) (valueOrderOf t )
         | TermoPressPt t -> sprintf "PT%d" (valueOrderOf t )
         | PressSensPt p -> sprintf "PS%d" (valueOrderOf p )
-        | TestPt (n,gas,t) -> sprintf "TEST%d_%d_%d" (valueOrderOf n) (valueOrderOf gas) (valueOrderOf t)
+        | TestPt (n,testPt) -> sprintf "TEST%d_%d" (valueOrderOf n) (valueOrderOf testPt)
 
     let dataPoint (x, y  : PhysVar) = 
         sprintf "Var_%s_%s" (prodData x) y.What
