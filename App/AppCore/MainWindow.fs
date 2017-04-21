@@ -19,8 +19,15 @@ module private Helpers =
 
 
 let aboutForm = 
-    let x = new Widgets.AboutForm()        
-    x.LabelVersion.Text <-  Assembly.version |> Option.map string |> Option.getWith "-"
+    let x = new Widgets.AboutForm() 
+    x.LabelVersion.Text <-  
+        try
+            Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()
+        with _ -> 
+            ""
+    x.Deactivate.Add(fun _ -> 
+        x.Hide()
+        )
     x
 
 let form =     
