@@ -159,15 +159,23 @@ module private Helpers1 =
                 yield byte len 
                 yield! dt |]
         let request = 
-            {   cmd = 0x10uy
+            {   cmd = 0x16uy
                 addy = addy
                 data  = data
                 what  = what }        
         
-        if addy=0uy then sendBroadcast port request else
+        if addy=0uy then 
+            sendBroadcast port request 
+        else
             getResponse port request (fun x -> "")  <| function
-                |  [ x0; x1; x2; x3 ] as xs when xs = Array.toList dx.[0..3]  -> Ok ()
-                | _ -> Err "Неверный формат ответа %s"
+                |  [ _; _; _; _ ] as xs when xs = Array.toList dx.[0..3]  -> 
+                    Ok ()
+                | _ -> 
+                    getResponse port {request with cmd = 0x10uy} (fun x -> "")  <| function
+                        |  [ _; _; _; _ ] as xs when xs = Array.toList dx.[0..3]  -> 
+                            Ok ()
+                        | _ -> 
+                            Err "Неверный формат ответа %s"
         
 
     let read3<'a> port what addy registerNumber registersCount formatResult parse : Result<'a, string>=

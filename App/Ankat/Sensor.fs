@@ -52,8 +52,6 @@ type Sensor =
     
     member x.SensorCode = Sensor.sensorCode x 
 
-    //member x.GasCode = Sensor.gasGode x 
-
     member x.IsCH = Sensor.isCH x
 
     member x.Scale = Sensor.scale x
