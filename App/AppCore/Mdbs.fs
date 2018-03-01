@@ -226,12 +226,20 @@ let private (|NIn|) xs n =
     let len = List.length xs
     if n>=0 && n<len then Some xs.[n] else None 
 
-let private readOneReg port addy n = 
-    read3 port (sprintf "рег.%d" n) addy n 1 (sprintf "0x%x") <| function
-        | ConvList int [b1; b2] -> 
-            Ok (b1 * 256 + b2)
-        | BytesToStr x -> Err ( sprintf "в ответ на запрос одного регистра МОДБАС ожидалось два байта данных, но получено %A" x )
+let setWorkMode port addy mode = 
+    let request = 
+        {   cmd = 0x16uy
+            addy = addy
+            data  = [ 0xA0uy; 0uy; 0uy; 2uy; 4uy  ] @ (Bin.decimalToAnalitBCD6 (decimal mode))
+            what  = sprintf "Установка режима работы %d" mode } 
 
+
+    getResponse port request (fun x -> "")  <| function
+        |  EqualsTo [0xA0uy; 0uy; 0uy; 0uy;] true  -> 
+            Ok ()
+        | _ -> 
+            Err "Неверный формат ответа %s"
+                            
 let readStatus =
     let reg35s =
             [   "норма"

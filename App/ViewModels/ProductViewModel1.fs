@@ -232,22 +232,26 @@ type Product1(p : P, getProductType, getPgsConc, partyId) =
 
     member x.WriteModbus (ctx,value) = 
         let what = sprintf "%s <-- %s" (WriteContext.what ctx) (Decimal.toStr6 value)
-        let r = Mdbs.write (port()) 1uy (WriteContext.code ctx) (WriteContext.what ctx) value
-        
-//        match r with 
-//        | Err e -> Logging.error "%s, %s : %s" x.What what e
-//        | Ok () -> Logging.info "%s, %s" x.What what
-        
+        let r = Mdbs.write (port()) 1uy (WriteContext.code ctx) (WriteContext.what ctx) value        
         x.Connection <- r  |> Result.map(fun _ -> what) |> Some 
-
         let strResult,lev = 
             match r with
             | Ok _ -> what, Logging.Info
             | Err err -> sprintf "%s : %s" what err, Logging.Error
-
         (sprintf "%s %s" x.What x.Port, Some strResult)
         |> MainWindow.HardwareInfo.products.setTextSafe lev
+        r
 
+    member x.SetWorkMode mode = 
+        let what = sprintf "Установка режима %d" mode
+        let r = Mdbs.setWorkMode (port()) 1uy mode
+        x.Connection <- r  |> Result.map(fun _ -> what) |> Some 
+        let strResult,lev = 
+            match r with
+            | Ok _ -> what, Logging.Info
+            | Err err -> sprintf "%s : %s" what err, Logging.Error
+        (sprintf "%s %s" x.What x.Port, Some strResult)
+        |> MainWindow.HardwareInfo.products.setTextSafe lev
         r
 
     member x.SetModbusAddr () = 

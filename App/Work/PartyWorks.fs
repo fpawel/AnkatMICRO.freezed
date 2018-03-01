@@ -152,6 +152,9 @@ type Ankat.ViewModel.Party with
     member x.SetModbusAddrs() = maybeErr{
         do! x.DoForEachProduct (fun p -> p.SetModbusAddr()   ) }
 
+    member x.SetWorkMode mode = maybeErr{
+        do! x.DoForEachProduct (fun p -> p.SetWorkMode mode ) }
+
     member x.WriteKefs(kefs) = maybeErr{
         do! x.DoForEachProduct (fun p -> 
             p.WriteKefs kefs  ) }
@@ -342,11 +345,6 @@ module private Helpers1 =
     let goNku = "Установка НКУ" <|> fun () -> warm TermoNorm
 
     let norming() = 
-        (*
-        (what, TimeSpan.FromMinutes (float minutes), BlowDelay pt ) <-|-> fun gettime -> maybeErr{        
-            do! switchPneumo <| Some pt
-            do! Delay.perform title gettime true }
-        *)
         ("Нормировка", TimeSpan.FromMinutes 1., BlowDelay Gas1) <-|-> fun gettime -> maybeErr{            
             do! switchPneumo <| Some Gas1
             do! Delay.perform "Продуть воздух" gettime true
@@ -471,6 +469,8 @@ module private Helpers1 =
 let production() = 
    
     (if isSens2() then "2K" else "1K") <||> [
+        "Установка режима работы" <|> fun _ ->
+            party.SetWorkMode 2
         initCoefs()
         goNku
         norming()
@@ -511,6 +511,10 @@ let runInterrogate() = "Опрос" -->> fun () -> maybeErr{
 
 
 let setAddr() = "Установка адреса 1" -->> party.SetModbusAddrs
+
+let setWorkMode mode = 
+    sprintf "Установка режима %d" mode  -->> fun _ ->
+        party.SetWorkMode mode
 
 let sendCommand (cmd,value as x) = 
     sprintf "%s <- %M" (Command.what cmd) value -->> fun () -> 

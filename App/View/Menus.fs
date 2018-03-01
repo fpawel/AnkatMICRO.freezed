@@ -59,6 +59,8 @@ let popupNumberDialog<'a>
 
 let modbusToolsPopup = 
     [   yield "Установка адреса", (fun _ _ -> setAddr())
+        for i = 0 to 2 do 
+            yield sprintf "Установка режима %d" i, (fun _ _ -> setWorkMode i)
         yield!
             Command.valuesList
             |> List.filter( (<>) CmdSetAddr ) 
@@ -221,7 +223,7 @@ let initialize =
     right.Controls.Add <| new Panel(Dock = DockStyle.Right, Width = 3)
     setTooltip buttonSettings "Параметры приложения" 
 
-    buttonSettings.Click.Add <| fun _ ->            
+    buttonSettings.Click.Add <| fun _ -> 
         let popup = 
             MyWinForms.Utils.popupConfig 
                 "Параметры" 

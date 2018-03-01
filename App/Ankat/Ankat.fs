@@ -195,6 +195,7 @@ type Command =
     | CmdSetComponent2
     | CmdCorrectT
     | CmdSetAddr
+    | CmdMode
     static member context = function
         | CmdNorm1         ->  8, "Нормировать каналы 1 ИКД"
         | CmdAdjustNull1   ->  1, "Коррекция нуля 1"

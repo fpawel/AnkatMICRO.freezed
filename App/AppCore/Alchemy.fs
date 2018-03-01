@@ -102,10 +102,8 @@ module private PivateComputeProduct =
         |> Result.bind (  fun [x0; x1; y0; y1] -> 
             if x0 = x1 then
                 
-                sprintf "при расчёте коеффициентов компенсации давления  значения Pmm, \
-                        снятые при нормальном и повышенном давлении, не должны быть равными!\
-                        Pmm[0] = %M, Pmm[1] = %M, VdatP[0] = %M, VdatP[1] = %M" 
-                        x0 x1 y0 y1      
+                sprintf """при расчёте коеффициентов компенсации давления  значения Pmm, снятые при нормальном и повышенном давлении, не должны быть равными! 
+                            Pmm[0] = %M, Pmm[1] = %M, VdatP[0] = %M, VdatP[1] = %M"""  x0 x1 y0 y1      
                 |> Err              
             else  Ok (x0, x1, y0, y1) )
         |> Result.map (  fun (x0, x1, y0, y1) -> 

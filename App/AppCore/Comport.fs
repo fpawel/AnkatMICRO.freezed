@@ -3,6 +3,7 @@
 open System
 open System.IO.Ports
 open ComportConfig
+open Logging
 
 module Ports =
     let mutable serialPorts : Map<string,SerialPort * string > = Map.empty
@@ -157,6 +158,16 @@ module private Helpers3 =
             else 
                 loopRecive req recived
 
+    let rec tryConnect port n = 
+        match tryApplyPort port with
+        | Ok serial -> Ok serial 
+        | Err error when n < port.TryConnectCount -> 
+            Logging.error "%s: попытка %d из %d: %s" port.PortName (n+1) port.TryConnectCount error
+            Logging.info "задержка 1 с..."
+            sleep port.DelayConnectMS
+            tryConnect port (n + 1)
+        | Err error -> Err error
+
     let rec loopTransmit req =  
         writeToPort req.serial req.txd
         let tickStart = tickcount()
@@ -178,14 +189,24 @@ module private Helpers3 =
                 sleep req.config.Delay
                 Ok rxd )
 
-let getResponse port requestBytes : Result<byte[], string>=         
+
+
+let getResponse port requestBytes : Result<byte[], string>=        
+    let returnError error = 
+        Err (formatError port.CanLog port.PortName error requestBytes )    
     try
-        match tryApplyPort port with
-        | Err error -> formatError port.CanLog port.PortName error requestBytes |> Err
+        match tryConnect port 0 with
+        | Err error -> returnError error
         | Ok serial ->
-            loopTransmit { config = port; serial = serial; n =  0; txd =  requestBytes }            
+        
+            loopTransmit { 
+                config = port; 
+                serial = serial; 
+                n =  0; 
+                txd =  requestBytes 
+            }            
     with e ->
-        formatError port.CanLog port.PortName e.Message requestBytes |> Err
+        returnError e.Message
 
 let getProtocolResponse port requestBytes checkResp parseResp =
     match getResponse port requestBytes with

@@ -58,6 +58,14 @@ type Config =
         [<Description("Колличество повторов запроса прибору")>]
         mutable RepeatCount : int
 
+        [<DisplayName("Колличество попыток установки связи")>]
+        [<Description("Колличество попыток установки связи")>]
+        mutable TryConnectCount : int
+
+        [<DisplayName("Задержка установки связи, мс")>]
+        [<Description("Задержка попытки установки связи в милисекундах")>]
+        mutable DelayConnectMS : int
+
         [<DisplayName("Показывать посылки")>]
         [<Description("Разрешить показывать посылки приёмопередачи СОМ порта в консоли данного приложения")>] 
         [<TypeConverter(typeof<YesNoConverter>)>]
@@ -82,7 +90,9 @@ type Config =
         RepeatCount = 0
         CanLog = false 
         BaudRate = 9600
-        Description = "-" }
+        Description = "-" 
+        DelayConnectMS = 1000
+        TryConnectCount = 10}
 
     static member withDescr s = { Config.dummy() with Description = s}
 
