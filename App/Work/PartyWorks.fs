@@ -7,6 +7,7 @@ open Ankat.Alchemy
 open Pneumo
 
 open ViewModel.Operations
+open Logging
 
 [<AutoOpen>]
 module private Helpers = 
@@ -95,7 +96,7 @@ type Ankat.ViewModel.Product1 with
         p.setVar (TestPt pt, concVar) (Some conc)
         p.calculateTestConc sensor pt conc }
 
-    member p.FixProdData prods = maybeErr{  
+    member p.FixProdData prods = 
         let physVars = 
             prods 
             |> List.map  ProdDataPt.physVars 
@@ -103,16 +104,19 @@ type Ankat.ViewModel.Product1 with
             |> Set.ofList
 
         for physVar in physVars do
-            if notKeepRunning() then () else
-            let! readedValue = p.ReadModbus( ReadVar physVar)
-            let strValue = Decimal.toStr6 readedValue
-            Logging.info  "%s : %s -> %s"  p.What physVar.What strValue                           
-            let f = ProdDataPt.physVars  >> List.exists ( (=) physVar )
-            for prodPt in List.filter f prods do
-                p.setVar (prodPt,physVar) (Some readedValue)
-                Logging.info 
-                    "%s : %s, %s <- %s" 
-                    p.What (ProdDataPt.what prodPt) physVar.What strValue } 
+            if notKeepRunning() then () else            
+            match p.ReadModbusLog( ReadVar physVar) with
+            | Err error->
+                Logging.warn  "%s: %s: %s"  p.What physVar.What error
+            | Ok readedValue -> 
+                let strValue = Decimal.toStr6 readedValue
+                Logging.info  "%s : %s -> %s"  p.What physVar.What strValue
+                let f = ProdDataPt.physVars  >> List.exists ( (=) physVar )
+                for prodPt in List.filter f prods do
+                    p.setVar (prodPt,physVar) (Some readedValue)
+                    Logging.info 
+                        "%s : %s, %s <- %s" 
+                        p.What (ProdDataPt.what prodPt) physVar.What strValue 
 
 type Ankat.ViewModel.Party with
     
@@ -171,7 +175,10 @@ type Ankat.ViewModel.Party with
             |> p.WriteKefs  )
 
     member x.FixProdData prods =
-        x.DoForEachProduct ( fun p -> p.FixProdData prods ) 
+        x.DoForEachProduct ( fun p -> 
+            p.FixProdData prods 
+            Ok ()
+            ) 
         |> Result.someErr
    
 module Delay = 
@@ -426,7 +433,6 @@ module private Helpers1 =
     let termo() =
         let points t = [   
             yield Gas1, [   yield TermoScalePt(Sens1, ScaleBeg, t) 
-                            yield TermoPressPt t
                             if isSens2() then 
                                 yield TermoScalePt(Sens2, ScaleBeg,t) ]
                                  
@@ -445,7 +451,6 @@ module private Helpers1 =
             if isSens2() then
                 yield computeAndWriteGroup <| CorTermoScale (Sens2,ScaleBeg)
                 yield computeAndWriteGroup <| CorTermoScale (Sens2,ScaleEnd)
-            yield computeAndWriteGroup <| CorTermoPress
             yield blowAir()   ]
 
 

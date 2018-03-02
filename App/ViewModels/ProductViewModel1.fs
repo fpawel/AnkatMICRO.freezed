@@ -206,9 +206,15 @@ type Product1(p : P, getProductType, getPgsConc, partyId) =
         |> x.setVar var
 
     
+    member x.ReadModbusLog(ctx) = 
+        let p = port() 
+        let f = p.CanLog
+        p.CanLog <- true
+        let r = x.ReadModbus(ctx)
+        p.CanLog <- f
+        r
+
     member x.ReadModbus(ctx) = 
-        
-        
         let r = Mdbs.read3decimal (port()) 1uy (ReadContext.code ctx) (ReadContext.what ctx)
         match r, ctx with
         | Ok value, ReadVar var -> 

@@ -121,15 +121,15 @@ module private PivateComputeProduct =
 
     let getGaussXY p getPgsConc prodType  = function
         | CorPressSens -> failwith "PressureSensCoefs is not for gauss!"
-        | CorTermoPress ->
-            // [ Termo1, ch1.Tpp, Air; Termo1, ch1.Var1, Air ]
-            let xs var =
-                getVarsValues p (List.map( fun t -> TermoPressPt t, var) valuesListOf<TermoPt>)                
-            result {
-                let! temps = xs TppCh0
-                let! vars = xs VdatP
-                return List.zip temps vars }     
-            |> fmtCorrErr ( fun (TermoPressPt t) -> t.What)                      
+        //| CorTermoPress ->
+        //    // [ Termo1, ch1.Tpp, Air; Termo1, ch1.Var1, Air ]
+        //    let xs var =
+        //        getVarsValues p (List.map( fun t -> TermoPressPt t, var) valuesListOf<TermoPt>)                
+        //    result {
+        //        let! temps = xs TppCh0
+        //        let! vars = xs VdatP
+        //        return List.zip temps vars }     
+        //    |> fmtCorrErr ( fun (TermoPressPt t) -> t.What)                      
 
         | CorLin n -> 
             let xs1 = 

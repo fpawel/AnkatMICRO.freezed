@@ -22,21 +22,18 @@ module TabsheetVars =
     type Page = 
         | Lin of SensorIndex
         | T of SensorIndex * ScaleEdgePt
-        | PT 
         | PS
         | Test of SensorIndex
 
         static member what = function
             | Lin n ->      Correction.what <| CorLin n                
             | T (n,gas) ->  Correction.what <| CorTermoScale (n,gas)                
-            | PT ->         Correction.what <| CorTermoPress                
             | PS ->         Correction.what <| CorPressSens                
             | Test n ->     "Проверка " + n.What
 
         static member descr = function
             | Lin n ->      Correction.descr <| CorLin n                
             | T (n,gas) ->  Correction.descr <| CorTermoScale (n,gas)                
-            | PT ->         Correction.descr <| CorTermoPress                
             | PS ->         Correction.descr <| CorPressSens                
             | Test n -> sprintf "Проерка погрешности %s" n.What 
 
@@ -48,7 +45,6 @@ module TabsheetVars =
                 let! n = SensorIndex.valuesList
                 let! gas = ScaleEdgePt.valuesList
                 return T(n,gas) }
-            yield PT
             yield PS
             yield! List.map Test SensorIndex.valuesList ]
                 
@@ -92,12 +88,6 @@ module TabsheetVars =
                 for var in [n.Var1; n.Termo] do
                     let pt = TermoScalePt(n,gas,t),var
                     addcol (Prop.dataPoint pt) (var.What + termoLeter t)           
-        | PT ->
-            for t in TermoPt.valuesList do
-                for var in Correction.physVars CorTermoPress do
-                    let pt = TermoPressPt t,var
-                    addcol (Prop.dataPoint pt) (var.What + termoLeter t)
-
         | PS ->             
             for p in PressPt.valuesList do
                 for var in Correction.physVars CorPressSens do
