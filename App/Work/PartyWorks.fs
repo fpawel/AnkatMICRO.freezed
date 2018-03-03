@@ -445,7 +445,9 @@ module private Helpers1 =
             for t in [TermoLow; TermoHigh; TermoNorm] do
                 yield t.What <||> [
                     yield setupTermo t
-                    yield! blowAndRead (points t) id ]            
+                    yield! blowAndRead (points t) id 
+                    yield blowAir()
+                ]            
             yield computeAndWriteGroup <| CorTermoScale (Sens1,ScaleBeg)
             yield computeAndWriteGroup <| CorTermoScale (Sens1,ScaleEnd)
             if isSens2() then
